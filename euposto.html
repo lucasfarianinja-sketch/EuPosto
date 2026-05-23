@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EuPosto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0e0e14;
+      --surface: #16161f;
+      --surface2: #1e1e2a;
+      --border: #2a2a3a;
+      --accent: #7c6fff;
+      --accent2: #ff6b9d;
+      --text: #e8e8f0;
+      --muted: #6b6b85;
+      --success: #4ade80;
+      --error: #f87171;
+      --warning: #fbbf24;
+      --radius: 12px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px 16px 60px;
+    }
+
+    /* ── Header ── */
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    header h1 {
+      font-family: 'Space Mono', monospace;
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -1px;
+    }
+    header p {
+      color: var(--muted);
+      font-size: .9rem;
+      margin-top: 6px;
+    }
+
+    /* ── Layout ── */
+    .layout {
+      max-width: 860px;
+      margin: 0 auto;
+      display: grid;
+      gap: 20px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .card-title {
+      font-size: .75rem;
+      font-family: 'Space Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    /* ── Drop zone ── */
+    #drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 48px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      position: relative;
+    }
+    #drop-zone:hover, #drop-zone.drag-over {
+      border-color: var(--accent);
+      background: rgba(124,111,255,.06);
+    }
+    #drop-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
+    }
+    #drop-zone .drop-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+      display: block;
+    }
+    #drop-zone p { color: var(--muted); font-size: .9rem; }
+    #drop-zone strong { color: var(--text); }
+
+    /* ── Video preview ── */
+    #video-preview-wrap {
+      display: none;
+      margin-top: 16px;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+    #video-preview-wrap video {
+      width: 100%; display: block; border-radius: 10px;
+      max-height: 320px; object-fit: contain; background: #000;
+    }
+    #video-preview-wrap .remove-btn {
+      position: absolute; top: 10px; right: 10px;
+      background: rgba(0,0,0,.7); border: none; color: #fff;
+      width: 28px; height: 28px; border-radius: 50%;
+      font-size: 1rem; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    #video-preview-wrap .remove-btn:hover { background: var(--error); }
+    #video-info { margin-top: 10px; font-size: .8rem; color: var(--muted); font-family: 'Space Mono', monospace; }
+
+    /* ── Platforms ── */
+    .platform-row {
+      display: flex; gap: 10px; flex-wrap: wrap;
+    }
+    .platform-btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px; border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: var(--surface2);
+      color: var(--muted);
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      font-size: .875rem; font-weight: 500;
+      transition: all .2s; user-select: none;
+    }
+    .platform-btn .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--border); transition: background .2s;
+    }
+    .platform-btn.active {
+      border-color: var(--accent);
+      background: rgba(124,111,255,.12);
+      color: var(--text);
+    }
+    .platform-btn.active .dot { background: var(--accent); }
+    .platform-btn[data-platform="yt"].active { border-color: #ff4444; }
+    .platform-btn[data-platform="yt"].active .dot { background: #ff4444; }
+    .platform-btn[data-platform="ig"].active { border-color: var(--accent2); }
+    .platform-btn[data-platform="ig"].active .dot { background: var(--accent2); }
+    .platform-btn[data-platform="fb"].active { border-color: #1877f2; }
+    .platform-btn[data-platform="fb"].active .dot { background: #1877f2; }
+    .platform-btn[data-platform="tt"].active { border-color: #69c9d0; }
+    .platform-btn[data-platform="tt"].active .dot { background: #69c9d0; }
+
+    .select-all-btn {
+      margin-left: auto;
+      background: none; border: none;
+      color: var(--accent); font-size: .8rem;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      font-weight: 600; white-space: nowrap;
+      padding: 4px 0;
+    }
+    .select-all-btn:hover { text-decoration: underline; }
+
+    /* ── Fields ── */
+    .field { margin-bottom: 18px; }
+    .field label {
+      display: block; font-size: .8rem; font-weight: 600;
+      color: var(--muted); margin-bottom: 6px;
+      text-transform: uppercase; letter-spacing: .8px;
+    }
+    .field input, .field textarea {
+      width: 100%; background: var(--surface2);
+      border: 1.5px solid var(--border); border-radius: 8px;
+      padding: 10px 14px; color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: .95rem;
+      outline: none; transition: border-color .2s; resize: none;
+    }
+    .field input:focus, .field textarea:focus {
+      border-color: var(--accent);
+    }
+    .field .counter {
+      text-align: right; font-size: .75rem;
+      color: var(--muted); margin-top: 4px;
+      font-family: 'Space Mono', monospace;
+    }
+    .field .counter.over { color: var(--error); }
+
+    /* ── Hashtag chips ── */
+    #hashtag-wrap {
+      background: var(--surface2);
+      border: 1.5px solid var(--border); border-radius: 8px;
+      padding: 8px 10px; display: flex; flex-wrap: wrap; gap: 6px;
+      cursor: text; transition: border-color .2s; min-height: 44px;
+    }
+    #hashtag-wrap:focus-within { border-color: var(--accent); }
+    .chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(124,111,255,.18); color: var(--accent);
+      border-radius: 20px; padding: 2px 10px 2px 10px;
+      font-size: .82rem; font-weight: 600;
+    }
+    .chip span { cursor: pointer; opacity: .7; font-size: .9rem; }
+    .chip span:hover { opacity: 1; }
+    #hashtag-input {
+      flex: 1; min-width: 120px; background: none;
+      border: none; outline: none; color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: .9rem;
+      padding: 2px 4px;
+    }
+
+    /* ── Tokens ── */
+    .token-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 600px) { .token-grid { grid-template-columns: 1fr; } }
+    .token-field label {
+      font-size: .72rem; text-transform: uppercase;
+      letter-spacing: .8px; color: var(--muted);
+      display: flex; align-items: center; gap: 6px;
+      margin-bottom: 6px; font-weight: 600;
+    }
+    .token-field .badge {
+      font-family: 'Space Mono', monospace;
+      font-size: .65rem; padding: 1px 6px;
+      border-radius: 4px; opacity: .8;
+    }
+    .badge-yt { background: rgba(255,68,68,.15); color: #ff4444; }
+    .badge-ig { background: rgba(255,107,157,.15); color: var(--accent2); }
+    .badge-fb { background: rgba(24,119,242,.15); color: #1877f2; }
+    .badge-tt { background: rgba(105,201,208,.15); color: #69c9d0; }
+    .token-field input {
+      width: 100%; background: var(--surface2);
+      border: 1.5px solid var(--border); border-radius: 8px;
+      padding: 8px 12px; color: var(--text);
+      font-family: 'Space Mono', monospace; font-size: .78rem;
+      outline: none; transition: border-color .2s;
+    }
+    .token-field input:focus { border-color: var(--accent); }
+    .token-save-btn {
+      margin-top: 12px; padding: 8px 20px;
+      background: var(--surface2); border: 1.5px solid var(--border);
+      border-radius: 8px; color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: .85rem;
+      font-weight: 600; cursor: pointer; transition: all .2s;
+    }
+    .token-save-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .token-saved { font-size: .75rem; color: var(--success); margin-left: 10px; opacity: 0; transition: opacity .3s; }
+    .token-saved.show { opacity: 1; }
+
+    /* ── Extra IDs (Instagram / Facebook) ── */
+    .extra-ids { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    @media (max-width: 600px) { .extra-ids { grid-template-columns: 1fr; } }
+
+    /* ── Publish button ── */
+    #publish-btn {
+      width: 100%; padding: 16px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none; border-radius: var(--radius);
+      color: #fff; font-family: 'DM Sans', sans-serif;
+      font-size: 1rem; font-weight: 700; cursor: pointer;
+      letter-spacing: .3px; transition: opacity .2s, transform .1s;
+    }
+    #publish-btn:hover { opacity: .9; }
+    #publish-btn:active { transform: scale(.99); }
+    #publish-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+    /* ── Status panel ── */
+    #status-panel { display: none; }
+    .status-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .status-item:last-child { border-bottom: none; }
+    .status-icon {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0;
+    }
+    .status-icon.pending { background: var(--surface2); color: var(--muted); }
+    .status-icon.uploading {
+      background: rgba(124,111,255,.15); color: var(--accent);
+      animation: pulse 1.2s infinite;
+    }
+    .status-icon.done { background: rgba(74,222,128,.15); color: var(--success); }
+    .status-icon.error { background: rgba(248,113,113,.15); color: var(--error); }
+    @keyframes pulse {
+      0%,100% { opacity: 1; } 50% { opacity: .4; }
+    }
+    .status-info { flex: 1; min-width: 0; }
+    .status-name { font-weight: 600; font-size: .9rem; }
+    .status-msg { font-size: .8rem; color: var(--muted); margin-top: 2px; word-break: break-all; }
+    .status-progress {
+      height: 3px; background: var(--border);
+      border-radius: 2px; margin-top: 6px; overflow: hidden;
+      display: none;
+    }
+    .status-progress-bar {
+      height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 2px; transition: width .3s; width: 0%;
+    }
+    .status-progress.show { display: block; }
+
+    /* ── Misc ── */
+    .divider { height: 1px; background: var(--border); margin: 4px 0 16px; }
+
+    .collapse-toggle {
+      background: none; border: none; color: var(--muted);
+      font-size: .8rem; cursor: pointer; font-family: 'DM Sans', sans-serif;
+      display: flex; align-items: center; gap: 6px;
+      margin-bottom: 12px; transition: color .2s;
+    }
+    .collapse-toggle:hover { color: var(--text); }
+    .collapse-toggle .arrow { transition: transform .2s; font-style: normal; }
+    .collapse-toggle.open .arrow { transform: rotate(90deg); }
+    .collapsible { display: none; }
+    .collapsible.open { display: block; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>EuPosto</h1>
+  <p>Publica o teu vídeo em todas as plataformas de uma vez</p>
+</header>
+
+<div class="layout">
+
+  <!-- VIDEO UPLOAD -->
+  <div class="card">
+    <div class="card-title">Vídeo</div>
+    <div id="drop-zone">
+      <input type="file" id="file-input" accept="video/*" />
+      <span class="drop-icon">🎬</span>
+      <p><strong>Arrasta o vídeo para aqui</strong> ou clica para selecionar</p>
+      <p style="margin-top:6px;font-size:.8rem;">MP4, MOV, AVI — até 4 GB</p>
+    </div>
+    <div id="video-preview-wrap">
+      <video id="video-preview" controls></video>
+      <button class="remove-btn" id="remove-video" title="Remover vídeo">✕</button>
+    </div>
+    <div id="video-info"></div>
+  </div>
+
+  <!-- PLATFORMS -->
+  <div class="card">
+    <div class="card-title">Plataformas</div>
+    <div class="platform-row">
+      <button class="platform-btn" data-platform="yt">
+        <span class="dot"></span> YouTube
+      </button>
+      <button class="platform-btn" data-platform="ig">
+        <span class="dot"></span> Instagram
+      </button>
+      <button class="platform-btn" data-platform="fb">
+        <span class="dot"></span> Facebook
+      </button>
+      <button class="platform-btn" data-platform="tt">
+        <span class="dot"></span> TikTok
+      </button>
+      <button class="select-all-btn" id="select-all-btn">Selecionar todas</button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="card">
+    <div class="card-title">Conteúdo</div>
+
+    <div class="field">
+      <label>Título</label>
+      <input type="text" id="title" placeholder="Título do vídeo..." maxlength="100" />
+      <div class="counter"><span id="title-count">0</span>/100</div>
+    </div>
+
+    <div class="field">
+      <label>Descrição</label>
+      <textarea id="description" rows="5" placeholder="Descrição do vídeo..." maxlength="5000"></textarea>
+      <div class="counter"><span id="desc-count">0</span>/5000</div>
+    </div>
+
+    <div class="field">
+      <label>Hashtags</label>
+      <div id="hashtag-wrap">
+        <input id="hashtag-input" type="text" placeholder="Escreve e prime Enter..." />
+      </div>
+    </div>
+  </div>
+
+  <!-- TOKENS -->
+  <div class="card">
+    <button class="collapse-toggle" id="token-toggle">
+      <em class="arrow">▶</em> Tokens das APIs
+    </button>
+    <div class="collapsible" id="token-section">
+      <div class="token-grid">
+        <div class="token-field">
+          <label><span class="badge badge-yt">YT</span> YouTube OAuth Token</label>
+          <input type="password" id="tok-yt" placeholder="ya29.a0..." />
+        </div>
+        <div class="token-field">
+          <label><span class="badge badge-ig">IG</span> Instagram Access Token</label>
+          <input type="password" id="tok-ig" placeholder="EAABs..." />
+        </div>
+        <div class="token-field">
+          <label><span class="badge badge-fb">FB</span> Facebook Page Token</label>
+          <input type="password" id="tok-fb" placeholder="EAABs..." />
+        </div>
+        <div class="token-field">
+          <label><span class="badge badge-tt">TT</span> TikTok Access Token</label>
+          <input type="password" id="tok-tt" placeholder="act...." />
+        </div>
+      </div>
+      <div class="extra-ids">
+        <div class="token-field">
+          <label><span class="badge badge-ig">IG</span> Instagram User ID</label>
+          <input type="text" id="ig-user-id" placeholder="17841400..." />
+        </div>
+        <div class="token-field">
+          <label><span class="badge badge-fb">FB</span> Facebook Page ID</label>
+          <input type="text" id="fb-page-id" placeholder="1234567890..." />
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;margin-top:14px;">
+        <button class="token-save-btn" id="save-tokens-btn">Guardar tokens</button>
+        <span class="token-saved" id="token-saved-msg">✓ Guardado</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PUBLISH -->
+  <button id="publish-btn" disabled>Seleciona um vídeo e pelo menos uma plataforma</button>
+
+  <!-- STATUS -->
+  <div class="card" id="status-panel">
+    <div class="card-title">Estado da publicação</div>
+    <div id="status-list"></div>
+  </div>
+
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+//  State
+// ─────────────────────────────────────────────
+let videoFile = null;
+const hashtags = [];
+const LS = 'euposto_tok_';
+
+// ─────────────────────────────────────────────
+//  Helpers
+// ─────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const tok = key => localStorage.getItem(LS + key) || '';
+const fmtBytes = b => b > 1e9 ? (b/1e9).toFixed(1)+' GB' : (b/1e6).toFixed(1)+' MB';
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// ─────────────────────────────────────────────
+//  Load tokens from localStorage
+// ─────────────────────────────────────────────
+function loadTokens() {
+  $('tok-yt').value  = tok('yt');
+  $('tok-ig').value  = tok('ig');
+  $('tok-fb').value  = tok('fb');
+  $('tok-tt').value  = tok('tt');
+  $('ig-user-id').value = localStorage.getItem('euposto_ig_user_id') || '';
+  $('fb-page-id').value = localStorage.getItem('euposto_fb_page_id') || '';
+}
+
+$('save-tokens-btn').addEventListener('click', () => {
+  ['yt','ig','fb','tt'].forEach(k => {
+    const v = $('tok-'+k).value.trim();
+    if (v) localStorage.setItem(LS+k, v);
+    else localStorage.removeItem(LS+k);
+  });
+  const igId = $('ig-user-id').value.trim();
+  const fbId = $('fb-page-id').value.trim();
+  if (igId) localStorage.setItem('euposto_ig_user_id', igId);
+  else localStorage.removeItem('euposto_ig_user_id');
+  if (fbId) localStorage.setItem('euposto_fb_page_id', fbId);
+  else localStorage.removeItem('euposto_fb_page_id');
+
+  const msg = $('token-saved-msg');
+  msg.classList.add('show');
+  setTimeout(() => msg.classList.remove('show'), 2000);
+});
+
+// ─────────────────────────────────────────────
+//  Collapse token section
+// ─────────────────────────────────────────────
+$('token-toggle').addEventListener('click', () => {
+  $('token-toggle').classList.toggle('open');
+  $('token-section').classList.toggle('open');
+});
+
+// ─────────────────────────────────────────────
+//  Drop zone
+// ─────────────────────────────────────────────
+const dropZone = $('drop-zone');
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('video/')) setVideo(f);
+});
+
+$('file-input').addEventListener('change', e => {
+  if (e.target.files[0]) setVideo(e.target.files[0]);
+});
+
+$('remove-video').addEventListener('click', () => {
+  videoFile = null;
+  $('video-preview').src = '';
+  $('video-preview-wrap').style.display = 'none';
+  $('video-info').textContent = '';
+  dropZone.style.display = '';
+  $('file-input').value = '';
+  updatePublishBtn();
+});
+
+function setVideo(f) {
+  videoFile = f;
+  const url = URL.createObjectURL(f);
+  $('video-preview').src = url;
+  $('video-preview-wrap').style.display = 'block';
+  dropZone.style.display = 'none';
+  $('video-info').textContent = `${f.name}  ·  ${fmtBytes(f.size)}  ·  ${f.type}`;
+  updatePublishBtn();
+}
+
+// ─────────────────────────────────────────────
+//  Platform toggle
+// ─────────────────────────────────────────────
+document.querySelectorAll('.platform-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.classList.toggle('active');
+    updatePublishBtn();
+  });
+});
+
+$('select-all-btn').addEventListener('click', () => {
+  const btns = document.querySelectorAll('.platform-btn');
+  const allActive = [...btns].every(b => b.classList.contains('active'));
+  btns.forEach(b => b.classList[allActive ? 'remove' : 'add']('active'));
+  updatePublishBtn();
+});
+
+function getActivePlatforms() {
+  return [...document.querySelectorAll('.platform-btn.active')].map(b => b.dataset.platform);
+}
+
+// ─────────────────────────────────────────────
+//  Counters
+// ─────────────────────────────────────────────
+$('title').addEventListener('input', () => {
+  const n = $('title').value.length;
+  $('title-count').textContent = n;
+  $('title-count').parentElement.classList.toggle('over', n > 100);
+});
+$('description').addEventListener('input', () => {
+  const n = $('description').value.length;
+  $('desc-count').textContent = n;
+  $('desc-count').parentElement.classList.toggle('over', n > 5000);
+});
+
+// ─────────────────────────────────────────────
+//  Hashtags
+// ─────────────────────────────────────────────
+const hashInput = $('hashtag-input');
+$('hashtag-wrap').addEventListener('click', () => hashInput.focus());
+
+hashInput.addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && hashInput.value.trim()) {
+    e.preventDefault();
+    addHashtag(hashInput.value.trim());
+    hashInput.value = '';
+  }
+  if (e.key === 'Backspace' && !hashInput.value && hashtags.length) {
+    removeHashtag(hashtags.length - 1);
+  }
+});
+
+function addHashtag(tag) {
+  const clean = tag.replace(/^#+/, '');
+  if (!clean || hashtags.includes('#'+clean)) return;
+  hashtags.push('#'+clean);
+  renderHashtags();
+}
+
+function removeHashtag(i) {
+  hashtags.splice(i, 1);
+  renderHashtags();
+}
+
+function renderHashtags() {
+  const wrap = $('hashtag-wrap');
+  wrap.querySelectorAll('.chip').forEach(c => c.remove());
+  hashtags.forEach((tag, i) => {
+    const chip = document.createElement('span');
+    chip.className = 'chip';
+    chip.innerHTML = `${tag} <span onclick="removeHashtag(${i})">✕</span>`;
+    wrap.insertBefore(chip, hashInput);
+  });
+}
+
+// ─────────────────────────────────────────────
+//  Publish button state
+// ─────────────────────────────────────────────
+function updatePublishBtn() {
+  const btn = $('publish-btn');
+  const ready = videoFile && getActivePlatforms().length > 0;
+  btn.disabled = !ready;
+  btn.textContent = ready ? '🚀 Publicar agora' : 'Seleciona um vídeo e pelo menos uma plataforma';
+}
+
+// ─────────────────────────────────────────────
+//  Status panel helpers
+// ─────────────────────────────────────────────
+const platformNames = { yt: 'YouTube', ig: 'Instagram', fb: 'Facebook', tt: 'TikTok' };
+const platformIcons = { yt: '▶', ig: '◈', fb: '⬡', tt: '♪' };
+
+function initStatus(platforms) {
+  const panel = $('status-panel');
+  const list = $('status-list');
+  list.innerHTML = '';
+  panel.style.display = 'block';
+
+  platforms.forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'status-item';
+    el.id = 'status-' + p;
+    el.innerHTML = `
+      <div class="status-icon pending" id="icon-${p}">${platformIcons[p]}</div>
+      <div class="status-info">
+        <div class="status-name">${platformNames[p]}</div>
+        <div class="status-msg" id="msg-${p}">A aguardar...</div>
+        <div class="status-progress" id="prog-${p}">
+          <div class="status-progress-bar" id="progbar-${p}"></div>
+        </div>
+      </div>`;
+    list.appendChild(el);
+  });
+
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function setStatus(p, state, msg) {
+  const icon = $('icon-'+p);
+  const msgEl = $('msg-'+p);
+  if (icon) { icon.className = 'status-icon ' + state; }
+  if (msgEl) msgEl.textContent = msg;
+}
+
+function setProgress(p, pct) {
+  const prog = $('prog-'+p);
+  const bar = $('progbar-'+p);
+  if (!prog) return;
+  prog.classList.add('show');
+  bar.style.width = pct + '%';
+  if (pct >= 100) setTimeout(() => prog.classList.remove('show'), 800);
+}
+
+// ─────────────────────────────────────────────
+//  ── YOUTUBE UPLOAD ──────────────────────────
+//  Resumable upload via YouTube Data API v3
+// ─────────────────────────────────────────────
+async function uploadYouTube() {
+  const token = tok('yt');
+  if (!token) throw new Error('Token do YouTube não configurado');
+
+  const title = $('title').value.trim() || 'Sem título';
+  const description = $('description').value.trim();
+  const tags = hashtags.map(h => h.replace('#',''));
+
+  const metadata = {
+    snippet: { title, description, tags, categoryId: '22' },
+    status: { privacyStatus: 'public' }
+  };
+
+  setStatus('yt', 'uploading', 'A iniciar upload resumível...');
+
+  // Step 1: initiate resumable session
+  const initRes = await fetch(
+    'https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-Upload-Content-Type': videoFile.type,
+        'X-Upload-Content-Length': videoFile.size
+      },
+      body: JSON.stringify(metadata)
+    }
+  );
+
+  if (!initRes.ok) {
+    const err = await initRes.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `HTTP ${initRes.status}`);
+  }
+
+  const uploadUrl = initRes.headers.get('Location');
+  if (!uploadUrl) throw new Error('Não foi possível obter URL de upload');
+
+  setStatus('yt', 'uploading', 'A enviar vídeo...');
+
+  // Step 2: upload file with progress tracking via XHR
+  await new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('PUT', uploadUrl);
+    xhr.setRequestHeader('Content-Type', videoFile.type);
+
+    xhr.upload.onprogress = e => {
+      if (e.lengthComputable) {
+        const pct = Math.round(e.loaded / e.total * 100);
+        setProgress('yt', pct);
+        setStatus('yt', 'uploading', `A enviar... ${pct}%`);
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        const data = JSON.parse(xhr.responseText);
+        resolve(data);
+      } else {
+        let msg = `HTTP ${xhr.status}`;
+        try { msg = JSON.parse(xhr.responseText)?.error?.message || msg; } catch(e) {}
+        reject(new Error(msg));
+      }
+    };
+
+    xhr.onerror = () => reject(new Error('Erro de rede durante o upload'));
+    xhr.send(videoFile);
+  });
+}
+
+// ─────────────────────────────────────────────
+//  ── INSTAGRAM UPLOAD ────────────────────────
+//  Reels via Graph API — precisa de URL pública
+//  Usa upload intermédio para o Cloudinary
+// ─────────────────────────────────────────────
+async function uploadInstagram() {
+  const token = tok('ig');
+  const userId = localStorage.getItem('euposto_ig_user_id');
+  if (!token) throw new Error('Token do Instagram não configurado');
+  if (!userId) throw new Error('Instagram User ID não configurado');
+
+  const caption = buildCaption();
+
+  setStatus('ig', 'uploading', 'A fazer upload intermédio (Cloudinary)...');
+  const videoUrl = await uploadToCloudinary();
+  setProgress('ig', 40);
+
+  setStatus('ig', 'uploading', 'A criar container de media...');
+  const containerRes = await fetch(
+    `https://graph.facebook.com/v19.0/${userId}/media?` +
+    new URLSearchParams({
+      media_type: 'REELS',
+      video_url: videoUrl,
+      caption,
+      share_to_feed: 'true',
+      access_token: token
+    }),
+    { method: 'POST' }
+  );
+
+  if (!containerRes.ok) {
+    const err = await containerRes.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `HTTP ${containerRes.status}`);
+  }
+
+  const { id: creationId } = await containerRes.json();
+  setProgress('ig', 70);
+
+  // Poll until FINISHED
+  setStatus('ig', 'uploading', 'A aguardar processamento...');
+  await pollInstagramStatus(userId, creationId, token);
+  setProgress('ig', 90);
+
+  // Publish
+  setStatus('ig', 'uploading', 'A publicar...');
+  const publishRes = await fetch(
+    `https://graph.facebook.com/v19.0/${userId}/media_publish?` +
+    new URLSearchParams({ creation_id: creationId, access_token: token }),
+    { method: 'POST' }
+  );
+
+  if (!publishRes.ok) {
+    const err = await publishRes.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `HTTP ${publishRes.status}`);
+  }
+
+  setProgress('ig', 100);
+}
+
+async function pollInstagramStatus(userId, creationId, token) {
+  for (let i = 0; i < 30; i++) {
+    await sleep(5000);
+    const r = await fetch(
+      `https://graph.facebook.com/v19.0/${creationId}?` +
+      new URLSearchParams({ fields: 'status_code,status', access_token: token })
+    );
+    const data = await r.json();
+    if (data.status_code === 'FINISHED') return;
+    if (data.status_code === 'ERROR') throw new Error('Instagram rejeitou o vídeo: ' + (data.status || ''));
+  }
+  throw new Error('Timeout: Instagram demorou demasiado a processar');
+}
+
+// ─────────────────────────────────────────────
+//  ── FACEBOOK UPLOAD ─────────────────────────
+//  POST /{page-id}/videos com file upload
+// ─────────────────────────────────────────────
+async function uploadFacebook() {
+  const token = tok('fb');
+  const pageId = localStorage.getItem('euposto_fb_page_id');
+  if (!token) throw new Error('Token do Facebook não configurado');
+  if (!pageId) throw new Error('Facebook Page ID não configurado');
+
+  const title = $('title').value.trim() || 'Sem título';
+  const description = buildCaption();
+
+  setStatus('fb', 'uploading', 'A enviar para o Facebook...');
+
+  const form = new FormData();
+  form.append('title', title);
+  form.append('description', description);
+  form.append('source', videoFile, videoFile.name);
+  form.append('access_token', token);
+
+  await new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `https://graph.facebook.com/v19.0/${pageId}/videos`);
+
+    xhr.upload.onprogress = e => {
+      if (e.lengthComputable) {
+        const pct = Math.round(e.loaded / e.total * 100);
+        setProgress('fb', pct);
+        setStatus('fb', 'uploading', `A enviar... ${pct}%`);
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(JSON.parse(xhr.responseText));
+      } else {
+        let msg = `HTTP ${xhr.status}`;
+        try { msg = JSON.parse(xhr.responseText)?.error?.message || msg; } catch(e) {}
+        reject(new Error(msg));
+      }
+    };
+
+    xhr.onerror = () => reject(new Error('Erro de rede durante o upload'));
+    xhr.send(form);
+  });
+}
+
+// ─────────────────────────────────────────────
+//  ── TIKTOK UPLOAD ───────────────────────────
+//  Content Posting API v2 — file upload direto
+// ─────────────────────────────────────────────
+async function uploadTikTok() {
+  const token = tok('tt');
+  if (!token) throw new Error('Token do TikTok não configurado');
+
+  const title = $('title').value.trim() || 'Sem título';
+
+  setStatus('tt', 'uploading', 'A iniciar upload...');
+
+  // Step 1: init
+  const initRes = await fetch('https://open.tiktokapis.com/v2/post/publish/video/init/', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'application/json; charset=UTF-8'
+    },
+    body: JSON.stringify({
+      post_info: {
+        title,
+        privacy_level: 'PUBLIC_TO_EVERYONE',
+        disable_duet: false,
+        disable_comment: false,
+        disable_stitch: false
+      },
+      source_info: {
+        source: 'FILE_UPLOAD',
+        video_size: videoFile.size,
+        chunk_size: videoFile.size,
+        total_chunk_count: 1
+      }
+    })
+  });
+
+  if (!initRes.ok) {
+    const err = await initRes.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `HTTP ${initRes.status}`);
+  }
+
+  const initData = await initRes.json();
+  const publishId = initData?.data?.publish_id;
+  const uploadUrl = initData?.data?.upload_url;
+  if (!uploadUrl) throw new Error('Não foi possível obter URL de upload do TikTok');
+
+  setStatus('tt', 'uploading', 'A enviar vídeo...');
+
+  // Step 2: upload chunk
+  await new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('PUT', uploadUrl);
+    xhr.setRequestHeader('Content-Type', 'video/mp4');
+    xhr.setRequestHeader('Content-Range', `bytes 0-${videoFile.size - 1}/${videoFile.size}`);
+
+    xhr.upload.onprogress = e => {
+      if (e.lengthComputable) {
+        const pct = Math.round(e.loaded / e.total * 100);
+        setProgress('tt', pct);
+        setStatus('tt', 'uploading', `A enviar... ${pct}%`);
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) resolve();
+      else {
+        let msg = `HTTP ${xhr.status}`;
+        try { msg = JSON.parse(xhr.responseText)?.error?.message || msg; } catch(e) {}
+        reject(new Error(msg));
+      }
+    };
+
+    xhr.onerror = () => reject(new Error('Erro de rede durante o upload'));
+    xhr.send(videoFile);
+  });
+
+  setProgress('tt', 100);
+}
+
+// ─────────────────────────────────────────────
+//  ── CLOUDINARY INTERMEDIATE UPLOAD ──────────
+//  Para Instagram e outros que precisam URL pública
+//  Usa unsigned upload preset (configurar no Cloudinary)
+// ─────────────────────────────────────────────
+async function uploadToCloudinary() {
+  const cloudName = localStorage.getItem('euposto_cloudinary_cloud') || '';
+  const uploadPreset = localStorage.getItem('euposto_cloudinary_preset') || '';
+
+  if (!cloudName || !uploadPreset) {
+    throw new Error(
+      'Cloudinary não configurado. Adiciona euposto_cloudinary_cloud e euposto_cloudinary_preset no localStorage. ' +
+      'Exemplo: localStorage.setItem("euposto_cloudinary_cloud","o-teu-cloud"); localStorage.setItem("euposto_cloudinary_preset","euposto_unsigned")'
+    );
+  }
+
+  return new Promise((resolve, reject) => {
+    const form = new FormData();
+    form.append('file', videoFile);
+    form.append('upload_preset', uploadPreset);
+    form.append('resource_type', 'video');
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`);
+
+    xhr.upload.onprogress = e => {
+      if (e.lengthComputable) {
+        const pct = Math.round(e.loaded / e.total * 30); // 0–30%
+        setProgress('ig', pct);
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        const data = JSON.parse(xhr.responseText);
+        resolve(data.secure_url);
+      } else {
+        let msg = `Cloudinary HTTP ${xhr.status}`;
+        try { msg = JSON.parse(xhr.responseText)?.error?.message || msg; } catch(e) {}
+        reject(new Error(msg));
+      }
+    };
+
+    xhr.onerror = () => reject(new Error('Erro de rede no upload para Cloudinary'));
+    xhr.send(form);
+  });
+}
+
+// ─────────────────────────────────────────────
+//  Caption builder (description + hashtags)
+// ─────────────────────────────────────────────
+function buildCaption() {
+  const desc = $('description').value.trim();
+  const tags = hashtags.join(' ');
+  return [desc, tags].filter(Boolean).join('\n\n');
+}
+
+// ─────────────────────────────────────────────
+//  ── PUBLISH ORCHESTRATOR ────────────────────
+// ─────────────────────────────────────────────
+$('publish-btn').addEventListener('click', async () => {
+  const platforms = getActivePlatforms();
+  if (!videoFile || !platforms.length) return;
+
+  $('publish-btn').disabled = true;
+  initStatus(platforms);
+
+  const uploaders = {
+    yt: uploadYouTube,
+    ig: uploadInstagram,
+    fb: uploadFacebook,
+    tt: uploadTikTok
+  };
+
+  // Run all uploads in parallel
+  await Promise.allSettled(
+    platforms.map(async p => {
+      try {
+        setStatus(p, 'uploading', 'A iniciar...');
+        await uploaders[p]();
+        setProgress(p, 100);
+        setStatus(p, 'done', '✓ Publicado com sucesso');
+      } catch (err) {
+        setStatus(p, 'error', '✗ ' + err.message);
+      }
+    })
+  );
+
+  $('publish-btn').disabled = false;
+});
+
+// ─────────────────────────────────────────────
+//  Init
+// ─────────────────────────────────────────────
+loadTokens();
+</script>
+</body>
+</html>
