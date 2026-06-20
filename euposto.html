@@ -25,68 +25,133 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     /* ── Landing / Intro Screen ── */
+    @keyframes lp-fade-up { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes lp-orb-pulse { 0%,100% { transform:scale(1); opacity:.7; } 50% { transform:scale(1.08); opacity:1; } }
+    @keyframes lp-badge-in { from { opacity:0; transform:translateY(8px) scale(.95); } to { opacity:1; transform:translateY(0) scale(1); } }
+
     #landing-screen {
       position: fixed; inset: 0; z-index: 1100;
-      background: #09090f;
+      background: #07071a;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       padding: 40px 24px;
       overflow: auto;
+      font-family: 'Plus Jakarta Sans', sans-serif;
     }
-    #landing-screen::before {
-      content: ''; position: fixed; inset: 0; pointer-events: none;
-      background:
-        radial-gradient(ellipse 60% 50% at 70% 30%, rgba(124,58,237,.18) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 40% at 20% 75%, rgba(236,72,153,.1) 0%, transparent 55%);
+
+    /* Nav bar */
+    .lp-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 40px;
     }
+    .lp-nav-logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.25rem; font-weight: 800; color: #fff; letter-spacing: -.5px;
+    }
+    .lp-nav-logo span { color: #a78bfa; }
+    .lp-nav-links { display: flex; gap: 28px; }
+    .lp-nav-link {
+      font-size: .85rem; font-weight: 500; color: rgba(255,255,255,.5);
+      text-decoration: none; background: none; border: none; cursor: pointer;
+      font-family: inherit; transition: color .2s;
+    }
+    .lp-nav-link:hover { color: #fff; }
+    .lp-nav-cta {
+      padding: 9px 22px; border-radius: 8px;
+      background: #7c3aed; color: #fff; border: none;
+      font-family: inherit; font-size: .85rem; font-weight: 700;
+      cursor: pointer; transition: box-shadow .2s, transform .15s;
+      box-shadow: 0 0 20px rgba(124,58,237,.4);
+    }
+    .lp-nav-cta:hover { transform: translateY(-1px); box-shadow: 0 0 30px rgba(124,58,237,.6); }
+
+    /* Central orb */
+    .lp-orb {
+      position: fixed; left: 50%; top: 50%; transform: translate(-50%, -55%);
+      width: min(700px, 100vw); height: min(700px, 100vw);
+      border-radius: 50%;
+      background: radial-gradient(ellipse at center, rgba(109,40,217,.55) 0%, rgba(76,29,149,.25) 40%, transparent 70%);
+      filter: blur(40px);
+      animation: lp-orb-pulse 5s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .lp-orb-ring {
+      position: fixed; left: 50%; top: 50%; transform: translate(-50%, -55%);
+      width: min(420px, 90vw); height: min(420px, 90vw);
+      border-radius: 50%;
+      border: 1px solid rgba(139,92,246,.15);
+      box-shadow: 0 0 60px rgba(109,40,217,.2), inset 0 0 60px rgba(109,40,217,.1);
+      pointer-events: none;
+    }
+
+    /* Content */
     .lp-inner {
       position: relative; z-index: 1;
       display: flex; flex-direction: column; align-items: center;
-      gap: 32px; max-width: 620px; width: 100%; text-align: center;
+      gap: 28px; max-width: 680px; width: 100%; text-align: center;
     }
-    .lp-logo {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 2rem; font-weight: 800; color: #fff; letter-spacing: -1.5px;
+    .lp-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(139,92,246,.12); border: 1px solid rgba(139,92,246,.3);
+      border-radius: 100px; padding: 6px 16px;
+      font-size: .75rem; font-weight: 600; color: #c4b5fd; letter-spacing: .04em;
+      animation: lp-fade-up .6s ease both;
     }
-    .lp-logo span { color: #a78bfa; }
+    .lp-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #a78bfa; box-shadow: 0 0 8px #a78bfa; }
     .lp-headline {
       font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: clamp(2.2rem, 6vw, 3.6rem); font-weight: 800;
-      color: #fff; letter-spacing: -2px; line-height: 1.1;
+      font-size: clamp(2.6rem, 7vw, 4.4rem); font-weight: 800;
+      color: #fff; letter-spacing: -2.5px; line-height: 1.05;
+      animation: lp-fade-up .6s .1s ease both;
     }
     .lp-headline em { font-style: normal; color: #a78bfa; }
     .lp-sub {
-      font-size: 1rem; color: rgba(255,255,255,.45); line-height: 1.7;
-      max-width: 460px;
+      font-size: 1rem; color: rgba(255,255,255,.4); line-height: 1.75;
+      max-width: 440px;
+      animation: lp-fade-up .6s .2s ease both;
     }
+    .lp-actions {
+      display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+      animation: lp-fade-up .6s .3s ease both;
+    }
+    .lp-cta-primary {
+      padding: 14px 34px; border-radius: 10px; border: none;
+      background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+      color: #fff; font-family: inherit; font-size: .95rem; font-weight: 700;
+      cursor: pointer; transition: transform .15s, box-shadow .2s;
+      box-shadow: 0 8px 32px rgba(124,58,237,.45), 0 0 0 1px rgba(139,92,246,.3);
+    }
+    .lp-cta-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(124,58,237,.6), 0 0 0 1px rgba(139,92,246,.5); }
+    .lp-cta-secondary {
+      padding: 14px 30px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.65); font-family: inherit; font-size: .95rem; font-weight: 600;
+      cursor: pointer; transition: border-color .2s, background .2s, color .2s;
+    }
+    .lp-cta-secondary:hover { border-color: rgba(139,92,246,.4); background: rgba(124,58,237,.08); color: #fff; }
     .lp-platforms {
       display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+      animation: lp-fade-up .6s .4s ease both;
     }
     .lp-plat {
       display: flex; align-items: center; gap: 7px;
-      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
-      border-radius: 24px; padding: 7px 14px;
-      font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.6);
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07);
+      border-radius: 100px; padding: 7px 16px;
+      font-size: .78rem; font-weight: 600; color: rgba(255,255,255,.45);
+      transition: border-color .2s, background .2s, color .2s;
     }
-    .lp-plat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .lp-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
-    .lp-cta-primary {
-      padding: 14px 32px; border-radius: 12px; border: none;
-      background: #7c3aed; color: #fff;
-      font-family: 'Plus Jakarta Sans', sans-serif; font-size: .95rem; font-weight: 700;
-      cursor: pointer; transition: opacity .2s, transform .15s;
-      box-shadow: 0 8px 24px rgba(124,58,237,.35);
+    .lp-plat:hover { border-color: rgba(139,92,246,.3); background: rgba(124,58,237,.07); color: rgba(255,255,255,.7); }
+    .lp-plat-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .lp-note {
+      font-size: .73rem; color: rgba(255,255,255,.18); letter-spacing: .02em;
+      animation: lp-fade-up .6s .5s ease both;
     }
-    .lp-cta-primary:hover { opacity: .88; transform: translateY(-2px); }
-    .lp-cta-secondary {
-      padding: 14px 28px; border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.04);
-      color: rgba(255,255,255,.7);
-      font-family: 'Plus Jakarta Sans', sans-serif; font-size: .95rem; font-weight: 600;
-      cursor: pointer; transition: border-color .2s, background .2s;
+
+    @media (max-width: 600px) {
+      .lp-nav-links { display: none; }
+      .lp-nav { padding: 16px 20px; }
     }
-    .lp-cta-secondary:hover { border-color: rgba(124,58,237,.45); background: rgba(124,58,237,.08); }
-    .lp-note { font-size: .75rem; color: rgba(255,255,255,.22); }
 
     /* ── Login Screen ── */
     /* ══════════════════════════════════════════
@@ -2386,19 +2451,35 @@
 
 <!-- LANDING / INTRO SCREEN -->
 <div id="landing-screen" style="display:none">
+  <!-- Nav -->
+  <nav class="lp-nav">
+    <div class="lp-nav-logo">Eu<span>Posto</span></div>
+    <div class="lp-nav-links">
+      <button class="lp-nav-link" onclick="goToLogin()">Funcionalidades</button>
+      <button class="lp-nav-link" onclick="goToLogin()">Preços</button>
+      <button class="lp-nav-link" onclick="goToLogin()">Sobre</button>
+    </div>
+    <button class="lp-nav-cta" onclick="goToLogin()">Entrar</button>
+  </nav>
+
+  <!-- Orb background -->
+  <div class="lp-orb"></div>
+  <div class="lp-orb-ring"></div>
+
+  <!-- Content -->
   <div class="lp-inner">
-    <div class="lp-logo">Eu<span>Posto</span></div>
-    <div class="lp-headline">Um vídeo.<br><em>Todas as plataformas.</em></div>
-    <p class="lp-sub">Carrega o teu vídeo uma vez e publica no YouTube, Instagram, TikTok e Facebook ao mesmo tempo. Grátis, sem instalação.</p>
+    <div class="lp-badge"><div class="lp-badge-dot"></div>Publica em 4 plataformas de uma vez</div>
+    <h1 class="lp-headline">Um vídeo.<br><em>Todas as plataformas.</em></h1>
+    <p class="lp-sub">Carrega uma vez e publica no YouTube, Instagram, TikTok e Facebook ao mesmo tempo. Grátis, sem instalação.</p>
+    <div class="lp-actions">
+      <button class="lp-cta-primary" onclick="goToRegister()">Criar conta grátis</button>
+      <button class="lp-cta-secondary" onclick="goToLogin()">Já tenho conta</button>
+    </div>
     <div class="lp-platforms">
       <div class="lp-plat"><div class="lp-plat-dot" style="background:#ff4444"></div>YouTube</div>
       <div class="lp-plat"><div class="lp-plat-dot" style="background:#e1306c"></div>Instagram</div>
       <div class="lp-plat"><div class="lp-plat-dot" style="background:#69c9d0"></div>TikTok</div>
       <div class="lp-plat"><div class="lp-plat-dot" style="background:#1877f2"></div>Facebook</div>
-    </div>
-    <div class="lp-actions">
-      <button class="lp-cta-primary" onclick="goToRegister()">Criar conta grátis</button>
-      <button class="lp-cta-secondary" onclick="goToLogin()">Já tenho conta</button>
     </div>
     <p class="lp-note">Sem cartão. Sem compromisso.</p>
   </div>
