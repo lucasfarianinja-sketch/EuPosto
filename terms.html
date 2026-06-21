@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Termos e Condições — EuPosto</title>
+  <meta name="description" content="Termos e Condições de utilização do EuPosto." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #07070e;
+      --surface: #0f0f1c;
+      --surface2: #13132a;
+      --accent: #7c6fff;
+      --accent2: #b06ef3;
+      --text: #e8e8f0;
+      --text2: #a0a0b8;
+      --muted: #5a5a78;
+      --border: rgba(255,255,255,.08);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.7; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(7,7,14,.85); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; height: 62px;
+    }
+    .nav-logo {
+      font-family: 'Space Mono', monospace; font-size: 1.15rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; text-decoration: none;
+    }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a { color: var(--text2); text-decoration: none; font-size: .9rem; font-weight: 500; transition: color .2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; text-decoration: none; padding: 9px 22px;
+      border-radius: 10px; font-size: .88rem; font-weight: 700;
+      transition: opacity .2s, transform .15s;
+    }
+    .nav-cta:hover { opacity: .88; transform: translateY(-1px); }
+
+    /* PAGE HEADER */
+    .page-header {
+      max-width: 760px; margin: 0 auto; padding: 72px 24px 56px;
+      text-align: center; position: relative;
+    }
+    .page-header::before {
+      content: '';
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 500px; height: 300px;
+      background: radial-gradient(ellipse at center, rgba(124,111,255,.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .page-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(124,111,255,.12); border: 1px solid rgba(124,111,255,.3);
+      border-radius: 20px; padding: 5px 14px; font-size: .75rem; font-weight: 700;
+      color: var(--accent); margin-bottom: 20px; letter-spacing: .3px; text-transform: uppercase;
+    }
+    .page-title {
+      font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; line-height: 1.15;
+      margin-bottom: 16px; letter-spacing: -.5px;
+    }
+    .page-title span {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .page-meta { font-size: .9rem; color: var(--muted); }
+
+    /* TABLE OF CONTENTS */
+    .toc-card {
+      max-width: 760px; margin: 0 auto 48px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px 32px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px;
+    }
+    .toc-title {
+      grid-column: 1 / -1; font-size: .72rem; font-weight: 700; letter-spacing: 1px;
+      color: var(--accent); text-transform: uppercase; margin-bottom: 12px;
+    }
+    .toc-card a {
+      color: var(--text2); text-decoration: none; font-size: .875rem; font-weight: 500;
+      padding: 4px 0; border-bottom: 1px solid transparent;
+      transition: color .2s, border-color .2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .toc-card a::before { content: '→'; color: var(--accent); font-size: .75rem; flex-shrink: 0; }
+    .toc-card a:hover { color: var(--text); border-color: rgba(124,111,255,.3); }
+
+    /* CONTENT */
+    .doc-wrap { max-width: 760px; margin: 0 auto; padding: 0 24px 100px; }
+    .doc-section { margin-bottom: 52px; scroll-margin-top: 80px; }
+    .doc-section h2 {
+      font-size: 1.3rem; font-weight: 800; margin-bottom: 18px; letter-spacing: -.2px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .doc-section h2 .sec-num {
+      font-family: 'Space Mono', monospace; font-size: .7rem; font-weight: 700;
+      background: rgba(124,111,255,.15); border: 1px solid rgba(124,111,255,.3);
+      color: var(--accent); padding: 3px 9px; border-radius: 6px; flex-shrink: 0;
+    }
+    .doc-section p { color: var(--text2); margin-bottom: 14px; font-size: .95rem; }
+    .doc-section p:last-child { margin-bottom: 0; }
+    .doc-section ul, .doc-section ol {
+      color: var(--text2); font-size: .95rem;
+      padding-left: 0; list-style: none; margin-bottom: 14px;
+    }
+    .doc-section li {
+      padding: 6px 0 6px 22px; position: relative; border-bottom: 1px solid var(--border);
+    }
+    .doc-section li:last-child { border-bottom: none; }
+    .doc-section ul li::before {
+      content: '·'; position: absolute; left: 6px; color: var(--accent); font-size: 1.4rem; line-height: 1; top: 6px;
+    }
+    .doc-section ol { counter-reset: ol-cnt; }
+    .doc-section ol li { counter-increment: ol-cnt; }
+    .doc-section ol li::before {
+      content: counter(ol-cnt) '.'; position: absolute; left: 0;
+      color: var(--accent); font-size: .78rem; font-weight: 700; font-family: 'Space Mono', monospace; top: 8px;
+    }
+    strong { color: var(--text); font-weight: 700; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* INFO BOX */
+    .info-box {
+      background: rgba(124,111,255,.08); border: 1px solid rgba(124,111,255,.25);
+      border-left: 3px solid var(--accent);
+      border-radius: 10px; padding: 16px 20px; margin: 20px 0;
+      font-size: .9rem; color: var(--text2);
+    }
+    .info-box strong { color: var(--accent); }
+
+    /* WARNING BOX */
+    .warn-box {
+      background: rgba(255,180,0,.07); border: 1px solid rgba(255,180,0,.25);
+      border-left: 3px solid #f5a623;
+      border-radius: 10px; padding: 16px 20px; margin: 20px 0;
+      font-size: .9rem; color: var(--text2);
+    }
+    .warn-box strong { color: #f5a623; }
+
+    /* DIVIDER */
+    .divider { height: 1px; background: var(--border); margin: 0 0 52px; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      text-align: center; padding: 36px 24px;
+      color: var(--muted); font-size: .82rem;
+    }
+    footer a { color: var(--text2); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 640px) {
+      nav { padding: 0 16px; }
+      .nav-links { gap: 14px; }
+      .toc-card { grid-template-columns: 1fr; padding: 20px; }
+      .doc-section h2 { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">EuPosto</a>
+  <div class="nav-links">
+    <a href="index.html">Início</a>
+    <a href="index.html#features">Funcionalidades</a>
+    <a href="privacy.html">Privacidade</a>
+    <a href="euposto.html" class="nav-cta">Abrir app →</a>
+  </div>
+</nav>
+
+<header class="page-header">
+  <div class="page-badge">Documento Legal</div>
+  <h1 class="page-title">Termos e <span>Condições</span></h1>
+  <p class="page-meta">Última atualização: 27 de maio de 2026</p>
+</header>
+
+<div style="max-width:760px;margin:0 auto;padding:0 24px;">
+  <div class="info-box">
+    <strong>Leia antes de continuar:</strong> Ao utilizar o EuPosto, aceita os presentes Termos e Condições.
+    Se não concordar com alguma disposição, deverá cessar imediatamente a utilização da aplicação.
+  </div>
+</div>
+
+<nav class="toc-card" style="max-width:760px;margin:24px auto 48px;">
+  <div class="toc-title">Índice</div>
+  <a href="#sec-definicoes">1. Definições</a>
+  <a href="#sec-servico">2. Descrição do serviço</a>
+  <a href="#sec-acesso">3. Acesso e conta</a>
+  <a href="#sec-uso">4. Utilização permitida</a>
+  <a href="#sec-conteudo">5. Conteúdo do utilizador</a>
+  <a href="#sec-proibido">6. Utilizações proibidas</a>
+  <a href="#sec-plataformas">7. Plataformas de terceiros</a>
+  <a href="#sec-disponibilidade">8. Disponibilidade</a>
+  <a href="#sec-responsabilidade">9. Limitação de responsabilidade</a>
+  <a href="#sec-propriedade">10. Propriedade intelectual</a>
+  <a href="#sec-rescisao">11. Rescisão</a>
+  <a href="#sec-lei">12. Lei aplicável e foro</a>
+  <a href="#sec-alteracoes">13. Alterações aos termos</a>
+  <a href="#sec-contacto">14. Contacto</a>
+</nav>
+
+<div class="doc-wrap">
+
+  <section class="doc-section" id="sec-definicoes">
+    <h2><span class="sec-num">01</span> Definições</h2>
+    <p>Para efeitos dos presentes Termos e Condições, entende-se por:</p>
+    <ul>
+      <li><strong>"EuPosto"</strong> ou <strong>"Serviço"</strong>: a aplicação web disponível em <a href="https://eupostoapp.pages.dev">eupostoapp.pages.dev</a>, incluindo todas as páginas e funcionalidades associadas;</li>
+      <li><strong>"Utilizador"</strong> ou <strong>"você"</strong>: qualquer pessoa singular que aceda ou utilize o EuPosto;</li>
+      <li><strong>"Conteúdo"</strong>: qualquer ficheiro de vídeo, texto, título, descrição, miniatura ou outra informação que o Utilizador introduza, faça upload ou publique através do Serviço;</li>
+      <li><strong>"Plataformas de Terceiros"</strong>: os serviços externos integrados pelo EuPosto, nomeadamente YouTube, Instagram, TikTok e Facebook/Meta;</li>
+      <li><strong>"Responsável"</strong>: Lucas Faria Nascimento, responsável pelo desenvolvimento e operação do EuPosto.</li>
+    </ul>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-servico">
+    <h2><span class="sec-num">02</span> Descrição do serviço</h2>
+    <p>
+      O EuPosto é uma aplicação web que permite ao Utilizador publicar vídeos em múltiplas redes sociais
+      — YouTube, Instagram, TikTok e Facebook — de forma simultânea, através de um único interface.
+    </p>
+    <p>
+      A aplicação funciona exclusivamente no browser do Utilizador, sem servidor de backend próprio.
+      Os dados (tokens de API, histórico, configurações) são armazenados localmente no browser do Utilizador.
+      O EuPosto atua como intermediário técnico entre o Utilizador e as APIs das Plataformas de Terceiros.
+    </p>
+    <p>
+      O Serviço é disponibilizado a título gratuito durante a fase de testes. O Responsável reserva-se
+      o direito de introduzir funcionalidades pagas no futuro, com aviso prévio adequado.
+    </p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-acesso">
+    <h2><span class="sec-num">03</span> Acesso e conta</h2>
+    <p>
+      O acesso ao EuPosto requer a criação de uma conta local (armazenada exclusivamente no browser)
+      ou a autenticação via Google. A conta é pessoal e intransmissível.
+    </p>
+    <p>O Utilizador é responsável por:</p>
+    <ul>
+      <li>Manter a confidencialidade das suas credenciais de acesso;</li>
+      <li>Todas as ações realizadas com a sua conta;</li>
+      <li>Notificar imediatamente o Responsável em caso de uso não autorizado.</li>
+    </ul>
+    <p>
+      O Utilizador deve ter pelo menos <strong>13 anos</strong> para utilizar o Serviço.
+      Para utilizadores entre 13 e 18 anos, é necessário o consentimento de um encarregado de educação.
+    </p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-uso">
+    <h2><span class="sec-num">04</span> Utilização permitida</h2>
+    <p>O EuPosto destina-se exclusivamente a:</p>
+    <ul>
+      <li>Publicação de conteúdo de vídeo do qual o Utilizador seja titular dos direitos necessários;</li>
+      <li>Gestão das contas próprias do Utilizador nas Plataformas de Terceiros integradas;</li>
+      <li>Utilização pessoal ou profissional legítima, em conformidade com a legislação aplicável.</li>
+    </ul>
+    <p>
+      A utilização do Serviço implica o cumprimento não só destes Termos, mas também dos termos e
+      condições de cada Plataforma de Terceiros para a qual o Utilizador publique conteúdo.
+    </p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-conteudo">
+    <h2><span class="sec-num">05</span> Conteúdo do utilizador</h2>
+    <p>
+      O Utilizador mantém plena titularidade de todo o Conteúdo que publique através do EuPosto.
+      O EuPosto não reivindica qualquer direito sobre o Conteúdo do Utilizador.
+    </p>
+    <p>
+      Ao utilizar o Serviço, o Utilizador declara e garante que:
+    </p>
+    <ul>
+      <li>É titular dos direitos de autor e demais direitos necessários sobre o Conteúdo publicado, ou dispõe das devidas autorizações;</li>
+      <li>O Conteúdo não viola direitos de terceiros (direitos de autor, marca registada, imagem, privacidade, etc.);</li>
+      <li>O Conteúdo não infringe a legislação aplicável nem as políticas das Plataformas de Terceiros;</li>
+      <li>O Conteúdo não é ilegal, enganoso, difamatório, obsceno, ou de outro modo prejudicial.</li>
+    </ul>
+    <p>
+      O Utilizador é o único responsável pelo Conteúdo que publica. O EuPosto não monitoriza,
+      modera, nem se responsabiliza pelo Conteúdo publicado através do Serviço.
+    </p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-proibido">
+    <h2><span class="sec-num">06</span> Utilizações proibidas</h2>
+    <div class="warn-box">
+      <strong>Atenção:</strong> A violação destas proibições pode resultar na suspensão imediata do acesso ao Serviço
+      e, em casos graves, em ação legal.
+    </div>
+    <p>É estritamente proibido utilizar o EuPosto para:</p>
+    <ul>
+      <li>Publicar conteúdo ilegal ao abrigo da legislação portuguesa, europeia ou do país de residência do Utilizador;</li>
+      <li>Publicar conteúdo que infrinja direitos de autor, marcas registadas ou outros direitos de propriedade intelectual de terceiros;</li>
+      <li>Publicar conteúdo de abuso sexual de menores (CSAM) ou qualquer conteúdo sexualmente explícito envolvendo menores;</li>
+      <li>Publicar discurso de ódio, conteúdo que incite à violência, terrorismo ou discriminação;</li>
+      <li>Publicar conteúdo enganoso, desinformação ou spam;</li>
+      <li>Tentar contornar restrições técnicas, fazer engenharia reversa ou descompilar a aplicação;</li>
+      <li>Utilizar o Serviço de forma automatizada (bots, scripts) sem autorização expressa;</li>
+      <li>Utilizar o Serviço para gerir contas de terceiros sem o seu consentimento explícito;</li>
+      <li>Sobrecarregar ou prejudicar o funcionamento do Serviço ou das infraestruturas de terceiros.</li>
+    </ul>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-plataformas">
+    <h2><span class="sec-num">07</span> Plataformas de terceiros</h2>
+    <p>
+      O EuPosto integra APIs de terceiros. O Utilizador reconhece que:
+    </p>
+    <ul>
+      <li>A utilização de cada plataforma está sujeita aos respetivos Termos de Serviço (YouTube/<a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener">Google</a>, <a href="https://www.facebook.com/terms" target="_blank" rel="noopener">Meta</a>, <a href="https://www.tiktok.com/legal/terms-of-service" target="_blank" rel="noopener">TikTok</a>);</li>
+      <li>O EuPosto não é afiliado, patrocinado, nem endossado por nenhuma das Plataformas de Terceiros;</li>
+      <li>A disponibilidade das APIs de terceiros pode ser alterada ou descontinuada sem aviso prévio, o que pode afetar funcionalidades do EuPosto;</li>
+      <li>O EuPosto não se responsabiliza por falhas, limitações ou alterações nas APIs de terceiros;</li>
+      <li>Os tokens de API introduzidos pelo Utilizador são da sua exclusiva responsabilidade e devem ser mantidos em segurança.</li>
+    </ul>
+    <div class="info-box">
+      <strong>YouTube:</strong> A utilização da YouTube Data API v3 está sujeita aos
+      <a href="https://developers.google.com/youtube/terms/api-services-terms-of-service" target="_blank" rel="noopener">Termos de Serviço das APIs da Google</a> e à
+      <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Política de Privacidade da Google</a>.
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-disponibilidade">
+    <h2><span class="sec-num">08</span> Disponibilidade do serviço</h2>
+    <p>
+      O EuPosto é disponibilizado <strong>"tal como está"</strong> (<em>as-is</em>) e <strong>"conforme disponível"</strong>
+      (<em>as-available</em>). O Responsável não garante disponibilidade ininterrupta, sem erros ou sem perdas de dados.
+    </p>
+    <p>
+      O Responsável reserva-se o direito de, a qualquer momento e sem aviso prévio:
+    </p>
+    <ul>
+      <li>Interromper temporariamente o Serviço para manutenção;</li>
+      <li>Modificar, adicionar ou remover funcionalidades;</li>
+      <li>Descontinuar o Serviço na totalidade.</li>
+    </ul>
+    <p>
+      Uma vez que os dados são armazenados localmente no browser do Utilizador, uma eventual descontinuação
+      do Serviço não resulta em perda dos dados já armazenados localmente.
+    </p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-responsabilidade">
+    <h2><span class="sec-num">09</span> Limitação de responsabilidade</h2>
+    <p>
+      Na máxima extensão permitida pela lei aplicável, o Responsável não será responsável por:
+    </p>
+    <ul>
+      <li>Danos diretos, indiretos, incidentais, especiais ou consequentes resultantes da utilização ou impossibilidade de utilização do Serviço;</li>
+      <li>Perdas de dados, vídeos, tokens de API ou outras informações;</li>
+      <li>Falhas, erros ou comportamentos inesperados das APIs de terceiros;</li>
+      <li>Violações dos termos de terceiras plataformas pelo Utilizador;</li>
+      <li>Conteúdo publicado pelo Utilizador através do Serviço;</li>
+      <li>Acesso não autorizado à conta do Utilizador por terceiros.</li>
+    </ul>
+    <p>
+      A responsabilidade total do Responsável perante o Utilizador, independentemente da causa de ação,
+      está limitada ao montante de <strong>€0</strong> (zero euros), dado que o Serviço é gratuito.
+    </p>
+    <div class="warn-box">
+      <strong>Importante:</strong> Faça regularmente cópias de segurança dos seus tokens de API e configurações
+      importantes, uma vez que estes estão armazenados apenas no seu browser.
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-propriedade">
+    <h2><span class="sec-num">10</span> Propriedade intelectual</h2>
+    <p>
+      O código-fonte, design, marca, logótipo e restantes elementos do EuPosto são propriedade
+      de Lucas Faria Nascimento ou de terceiros licenciantes, e estão protegidos pela legislação
+      de propriedade intelectual aplicável.
+    </p>
+    <p>
+      O Utilizador não pode copiar, modificar, distribuir, vender ou fazer engenharia reversa
+      de qualquer componente do Serviço sem autorização escrita prévia do Responsável.
+    </p>
+    <p>
+      Logótipos e marcas de terceiros (YouTube, Google, Instagram, Facebook/Meta, TikTok)
+      são propriedade dos respetivos titulares e são usados apenas para fins de identificação.
+    </p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-rescisao">
+    <h2><span class="sec-num">11</span> Rescisão</h2>
+    <p>
+      O Utilizador pode cessar a utilização do Serviço a qualquer momento, bastando para isso
+      fechar a aplicação e, se desejar, eliminar os dados do browser (localStorage).
+    </p>
+    <p>
+      O Responsável pode suspender ou terminar o acesso do Utilizador ao Serviço, sem aviso
+      prévio, nos seguintes casos:
+    </p>
+    <ul>
+      <li>Violação dos presentes Termos e Condições;</li>
+      <li>Uso do Serviço de forma ilegal ou prejudicial;</li>
+      <li>Descontinuação do Serviço.</li>
+    </ul>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-lei">
+    <h2><span class="sec-num">12</span> Lei aplicável e foro</h2>
+    <p>
+      Os presentes Termos e Condições são regidos e interpretados de acordo com a
+      <strong>lei portuguesa</strong> e com o direito da União Europeia aplicável.
+    </p>
+    <p>
+      Para a resolução de quaisquer litígios emergentes da interpretação ou execução destes Termos,
+      as partes elegem o <strong>foro da comarca de Lisboa</strong>, com expressa renúncia a qualquer outro.
+    </p>
+    <p>
+      O Utilizador que seja consumidor residente na UE tem o direito de recorrer à plataforma
+      europeia de resolução de litígios em linha:
+      <a href="https://ec.europa.eu/consumers/odr/" target="_blank" rel="noopener">ec.europa.eu/consumers/odr</a>.
+    </p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-alteracoes">
+    <h2><span class="sec-num">13</span> Alterações aos termos</h2>
+    <p>
+      O Responsável reserva-se o direito de modificar os presentes Termos e Condições a qualquer momento.
+      A data da última atualização é sempre indicada no topo desta página.
+    </p>
+    <p>
+      Alterações substanciais serão comunicadas através de um aviso visível na aplicação.
+      A continuação da utilização do Serviço após a publicação de alterações constitui aceitação
+      dos novos Termos.
+    </p>
+    <p>
+      Caso o Utilizador não concorde com as alterações, deve cessar a utilização do Serviço e
+      eliminar os seus dados locais.
+    </p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-contacto">
+    <h2><span class="sec-num">14</span> Contacto</h2>
+    <p>Para questões relacionadas com estes Termos e Condições, contacte:</p>
+    <div class="info-box">
+      <strong>Lucas Faria Nascimento</strong><br />
+      E-mail: <a href="mailto:lucasgajo.contacto@gmail.com">lucasgajo.contacto@gmail.com</a><br />
+      Website: <a href="https://eupostoapp.pages.dev">eupostoapp.pages.dev</a>
+    </div>
+    <p>Tentaremos responder a todas as solicitações no prazo de 30 dias.</p>
+  </section>
+
+</div>
+
+<footer>
+  <p>
+    <a href="index.html">EuPosto</a> &nbsp;·&nbsp;
+    <a href="privacy.html">Privacidade</a> &nbsp;·&nbsp;
+    <a href="terms.html">Termos</a> &nbsp;·&nbsp;
+    <a href="mailto:lucasgajo.contacto@gmail.com">Contacto</a>
+  </p>
+  <p style="margin-top:10px;">© 2026 EuPosto · Lucas Faria Nascimento</p>
+</footer>
+
+</body>
+</html>

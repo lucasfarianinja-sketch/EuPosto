@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="hex-g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <filter id="glow-hex" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="28" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-arrow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="12" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1024" height="1024" fill="#0a0a0f"/>
+
+  <!-- Hexagon outline with glow -->
+  <polygon
+    points="512,104 864,308 864,716 512,920 160,716 160,308"
+    fill="none"
+    stroke="url(#hex-g)"
+    stroke-width="44"
+    stroke-linejoin="round"
+    filter="url(#glow-hex)"/>
+
+  <!-- Arrow: head + stem -->
+  <g filter="url(#glow-arrow)">
+    <!-- Stem -->
+    <rect x="460" y="496" width="104" height="232" rx="8" fill="#9333ea"/>
+    <!-- Head -->
+    <polygon points="512,296 660,496 564,496 564,496 460,496 364,496" fill="#b855f7"/>
+  </g>
+</svg>

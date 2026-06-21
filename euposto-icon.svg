@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a1133"/>
+      <stop offset="100%" stop-color="#07070f"/>
+    </linearGradient>
+
+    <linearGradient id="g1" x1="256" y1="420" x2="256" y2="80" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#7c6fff"/>
+      <stop offset="100%" stop-color="#d946ef"/>
+    </linearGradient>
+
+    <linearGradient id="g2" x1="256" y1="420" x2="256" y2="80" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#a78bfa" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#e879f9" stop-opacity="0.7"/>
+    </linearGradient>
+
+    <linearGradient id="g3" x1="256" y1="420" x2="256" y2="80" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#c4b5fd" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#f5d0fe" stop-opacity="0.35"/>
+    </linearGradient>
+
+    <radialGradient id="dotglow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#c4b5fd"/>
+      <stop offset="100%" stop-color="#7c6fff"/>
+    </radialGradient>
+
+    <radialGradient id="amb" cx="50%" cy="65%" r="45%">
+      <stop offset="0%"   stop-color="#7c6fff" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#7c6fff" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="10" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <filter id="glow2" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="18" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <clipPath id="clip">
+      <rect width="512" height="512" rx="112"/>
+    </clipPath>
+
+  </defs>
+
+  <g clip-path="url(#clip)">
+
+    <!-- Background -->
+    <rect width="512" height="512" fill="url(#bg)"/>
+    <rect width="512" height="512" fill="url(#amb)"/>
+
+    <!-- Outer arc (faintest) -->
+    <path d="M 72 310 Q 256 42 440 310"
+          stroke="url(#g3)" stroke-width="26" fill="none"
+          stroke-linecap="round"/>
+
+    <!-- Middle arc -->
+    <path d="M 120 330 Q 256 100 392 330"
+          stroke="url(#g2)" stroke-width="30" fill="none"
+          stroke-linecap="round" filter="url(#glow)"/>
+
+    <!-- Inner arc (brightest) -->
+    <path d="M 172 350 Q 256 175 340 350"
+          stroke="url(#g1)" stroke-width="34" fill="none"
+          stroke-linecap="round" filter="url(#glow)"/>
+
+    <!-- Center dot with double glow -->
+    <circle cx="256" cy="400" r="32" fill="url(#dotglow)" filter="url(#glow2)"/>
+    <circle cx="256" cy="400" r="22" fill="#f0e6ff"/>
+
+  </g>
+</svg>

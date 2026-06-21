@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Política de Privacidade — EuPosto</title>
+  <meta name="description" content="Política de Privacidade do EuPosto. Saiba como tratamos os seus dados." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #07070e;
+      --surface: #0f0f1c;
+      --surface2: #13132a;
+      --accent: #7c6fff;
+      --accent2: #b06ef3;
+      --text: #e8e8f0;
+      --text2: #a0a0b8;
+      --muted: #5a5a78;
+      --border: rgba(255,255,255,.08);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.7; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(7,7,14,.85); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; height: 62px;
+    }
+    .nav-logo {
+      font-family: 'Space Mono', monospace; font-size: 1.15rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; text-decoration: none;
+    }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a { color: var(--text2); text-decoration: none; font-size: .9rem; font-weight: 500; transition: color .2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; text-decoration: none; padding: 9px 22px;
+      border-radius: 10px; font-size: .88rem; font-weight: 700;
+      transition: opacity .2s, transform .15s;
+    }
+    .nav-cta:hover { opacity: .88; transform: translateY(-1px); }
+
+    /* HERO / PAGE HEADER */
+    .page-header {
+      max-width: 760px; margin: 0 auto; padding: 72px 24px 56px;
+      text-align: center; position: relative;
+    }
+    .page-header::before {
+      content: '';
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 500px; height: 300px;
+      background: radial-gradient(ellipse at center, rgba(124,111,255,.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .page-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(124,111,255,.12); border: 1px solid rgba(124,111,255,.3);
+      border-radius: 20px; padding: 5px 14px; font-size: .75rem; font-weight: 700;
+      color: var(--accent); margin-bottom: 20px; letter-spacing: .3px; text-transform: uppercase;
+    }
+    .page-title {
+      font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; line-height: 1.15;
+      margin-bottom: 16px; letter-spacing: -.5px;
+    }
+    .page-title span {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .page-meta { font-size: .9rem; color: var(--muted); }
+
+    /* TABLE OF CONTENTS */
+    .toc-card {
+      max-width: 760px; margin: 0 auto 48px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px 32px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px;
+    }
+    .toc-title {
+      grid-column: 1 / -1; font-size: .72rem; font-weight: 700; letter-spacing: 1px;
+      color: var(--accent); text-transform: uppercase; margin-bottom: 12px;
+    }
+    .toc-card a {
+      color: var(--text2); text-decoration: none; font-size: .875rem; font-weight: 500;
+      padding: 4px 0; border-bottom: 1px solid transparent;
+      transition: color .2s, border-color .2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .toc-card a::before { content: '→'; color: var(--accent); font-size: .75rem; flex-shrink: 0; }
+    .toc-card a:hover { color: var(--text); border-color: rgba(124,111,255,.3); }
+
+    /* CONTENT */
+    .doc-wrap {
+      max-width: 760px; margin: 0 auto; padding: 0 24px 100px;
+    }
+    .doc-section {
+      margin-bottom: 52px;
+      scroll-margin-top: 80px;
+    }
+    .doc-section h2 {
+      font-size: 1.3rem; font-weight: 800; margin-bottom: 18px; letter-spacing: -.2px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .doc-section h2 .sec-num {
+      font-family: 'Space Mono', monospace; font-size: .7rem; font-weight: 700;
+      background: rgba(124,111,255,.15); border: 1px solid rgba(124,111,255,.3);
+      color: var(--accent); padding: 3px 9px; border-radius: 6px; flex-shrink: 0;
+    }
+    .doc-section p {
+      color: var(--text2); margin-bottom: 14px; font-size: .95rem;
+    }
+    .doc-section p:last-child { margin-bottom: 0; }
+    .doc-section ul, .doc-section ol {
+      color: var(--text2); font-size: .95rem;
+      padding-left: 0; list-style: none; margin-bottom: 14px;
+    }
+    .doc-section li {
+      padding: 6px 0 6px 22px; position: relative; border-bottom: 1px solid var(--border);
+    }
+    .doc-section li:last-child { border-bottom: none; }
+    .doc-section ul li::before {
+      content: '·'; position: absolute; left: 6px; color: var(--accent); font-size: 1.4rem; line-height: 1;
+      top: 6px;
+    }
+    .doc-section ol { counter-reset: ol-cnt; }
+    .doc-section ol li { counter-increment: ol-cnt; }
+    .doc-section ol li::before {
+      content: counter(ol-cnt) '.'; position: absolute; left: 0;
+      color: var(--accent); font-size: .78rem; font-weight: 700; font-family: 'Space Mono', monospace;
+      top: 8px;
+    }
+    strong { color: var(--text); font-weight: 700; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* INFO BOX */
+    .info-box {
+      background: rgba(124,111,255,.08); border: 1px solid rgba(124,111,255,.25);
+      border-left: 3px solid var(--accent);
+      border-radius: 10px; padding: 16px 20px; margin: 20px 0;
+      font-size: .9rem; color: var(--text2);
+    }
+    .info-box strong { color: var(--accent); }
+
+    /* HIGHLIGHT TABLE */
+    .data-table {
+      width: 100%; border-collapse: collapse; margin: 20px 0;
+      font-size: .88rem;
+    }
+    .data-table th {
+      background: var(--surface2); color: var(--text); font-weight: 700;
+      padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border);
+      font-size: .78rem; text-transform: uppercase; letter-spacing: .6px;
+    }
+    .data-table th:first-child { border-radius: 8px 0 0 0; }
+    .data-table th:last-child { border-radius: 0 8px 0 0; }
+    .data-table td {
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
+      color: var(--text2); vertical-align: top;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: rgba(255,255,255,.02); }
+    .tag {
+      display: inline-block; padding: 2px 8px; border-radius: 5px;
+      font-size: .75rem; font-weight: 700;
+    }
+    .tag-local { background: rgba(124,111,255,.15); color: var(--accent); border: 1px solid rgba(124,111,255,.3); }
+    .tag-temp { background: rgba(176,110,243,.12); color: var(--accent2); border: 1px solid rgba(176,110,243,.3); }
+    .tag-ext { background: rgba(255,255,255,.06); color: var(--text2); border: 1px solid var(--border); }
+
+    /* DIVIDER */
+    .divider { height: 1px; background: var(--border); margin: 0 0 52px; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      text-align: center; padding: 36px 24px;
+      color: var(--muted); font-size: .82rem;
+    }
+    footer a { color: var(--text2); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 640px) {
+      nav { padding: 0 16px; }
+      .nav-links { gap: 14px; }
+      .toc-card { grid-template-columns: 1fr; padding: 20px; }
+      .doc-section h2 { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">EuPosto</a>
+  <div class="nav-links">
+    <a href="index.html">Início</a>
+    <a href="index.html#features">Funcionalidades</a>
+    <a href="terms.html">Termos</a>
+    <a href="euposto.html" class="nav-cta">Abrir app →</a>
+  </div>
+</nav>
+
+<header class="page-header">
+  <div class="page-badge">Documento Legal</div>
+  <h1 class="page-title">Política de <span>Privacidade</span></h1>
+  <p class="page-meta">Última atualização: 27 de maio de 2026</p>
+</header>
+
+<div style="max-width:760px;margin:0 auto;padding:0 24px;">
+  <div class="info-box">
+    <strong>Resumo:</strong> O EuPosto não recolhe, armazena nem transmite dados pessoais para servidores próprios.
+    Toda a informação fica no seu dispositivo (localStorage do browser). Os tokens de API que introduz são usados
+    exclusivamente para comunicar diretamente com as plataformas que escolher (YouTube, Instagram, TikTok, Facebook).
+  </div>
+</div>
+
+<nav class="toc-card" style="max-width:760px;margin:24px auto 48px;">
+  <div class="toc-title">Índice</div>
+  <a href="#sec-intro">1. Quem somos</a>
+  <a href="#sec-dados">2. Dados que tratamos</a>
+  <a href="#sec-localstorage">3. Armazenamento local</a>
+  <a href="#sec-r2">4. Armazenamento temporário (R2)</a>
+  <a href="#sec-terceiros">5. Serviços de terceiros</a>
+  <a href="#sec-google">6. Autenticação Google</a>
+  <a href="#sec-cookies">7. Cookies e rastreamento</a>
+  <a href="#sec-direitos">8. Os seus direitos (RGPD)</a>
+  <a href="#sec-seguranca">9. Segurança</a>
+  <a href="#sec-menores">10. Menores de idade</a>
+  <a href="#sec-alteracoes">11. Alterações a esta política</a>
+  <a href="#sec-contacto">12. Contacto</a>
+</nav>
+
+<div class="doc-wrap">
+
+  <section class="doc-section" id="sec-intro">
+    <h2><span class="sec-num">01</span> Quem somos</h2>
+    <p>
+      O <strong>EuPosto</strong> é uma ferramenta pessoal de publicação de vídeos em múltiplas redes sociais
+      (YouTube, Instagram, TikTok e Facebook/Meta) a partir de um único interface web.
+    </p>
+    <p>
+      <strong>Responsável pelo tratamento de dados:</strong><br />
+      Lucas Faria Nascimento<br />
+      E-mail: <a href="mailto:lucasgajo.contacto@gmail.com">lucasgajo.contacto@gmail.com</a>
+    </p>
+    <p>
+      Esta Política de Privacidade descreve como o EuPosto trata as suas informações quando utiliza
+      a aplicação disponível em <a href="https://eupostoapp.pages.dev">eupostoapp.pages.dev</a>.
+    </p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-dados">
+    <h2><span class="sec-num">02</span> Dados que tratamos</h2>
+    <p>
+      O EuPosto foi concebido com uma filosofia de <strong>privacidade por design</strong>: não operamos servidores
+      próprios de base de dados, não recolhemos analytics, não enviamos e-mails de marketing e não partilhamos
+      quaisquer dados com terceiros para fins comerciais.
+    </p>
+    <p>A tabela abaixo resume os dados envolvidos no funcionamento da aplicação:</p>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Dado</th>
+          <th>Onde fica</th>
+          <th>Finalidade</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Nome e e-mail (conta EuPosto)</td>
+          <td><span class="tag tag-local">localStorage</span></td>
+          <td>Identificação local na aplicação</td>
+        </tr>
+        <tr>
+          <td>Senha (hash SHA-256)</td>
+          <td><span class="tag tag-local">localStorage</span></td>
+          <td>Autenticação local; nunca armazenada em texto claro</td>
+        </tr>
+        <tr>
+          <td>Tokens de API (YouTube, Instagram, TikTok, Facebook)</td>
+          <td><span class="tag tag-local">localStorage</span></td>
+          <td>Autenticação junto das plataformas de terceiros</td>
+        </tr>
+        <tr>
+          <td>Histórico de publicações</td>
+          <td><span class="tag tag-local">localStorage</span></td>
+          <td>Visualização local do histórico de uploads</td>
+        </tr>
+        <tr>
+          <td>Vídeos em processo de upload para o Instagram</td>
+          <td><span class="tag tag-temp">R2 temporário</span></td>
+          <td>Intermediário técnico; eliminado após a publicação (ver §4)</td>
+        </tr>
+        <tr>
+          <td>Dados de autenticação Google (nome, e-mail, foto)</td>
+          <td><span class="tag tag-local">localStorage</span></td>
+          <td>Sessão de login via Google Sign-In</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-localstorage">
+    <h2><span class="sec-num">03</span> Armazenamento local (localStorage)</h2>
+    <p>
+      A quase totalidade dos dados da aplicação é guardada exclusivamente no <strong>localStorage do seu browser</strong>,
+      no seu dispositivo. Isto significa que:
+    </p>
+    <ul>
+      <li>Os dados nunca saem do seu dispositivo para servidores do EuPosto;</li>
+      <li>Nenhum colaborador ou terceiro tem acesso a essa informação;</li>
+      <li>Se limpar os dados do browser, toda a informação é eliminada;</li>
+      <li>Os dados não são sincronizados entre dispositivos diferentes.</li>
+    </ul>
+    <p>
+      As chaves utilizadas no localStorage começam com o prefixo <code>euposto_</code>.
+      Pode inspecioná-las a qualquer momento através das ferramentas de desenvolvimento do seu browser
+      (F12 → Application → Local Storage).
+    </p>
+    <p>
+      <strong>Senhas:</strong> As senhas criadas para acesso à aplicação são transformadas num hash irreversível
+      (SHA-256, via API nativa <code>crypto.subtle</code>) antes de serem guardadas. O EuPosto nunca armazena
+      a sua senha em texto claro.
+    </p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-r2">
+    <h2><span class="sec-num">04</span> Armazenamento temporário — Cloudflare R2</h2>
+    <p>
+      O Instagram Graph API exige que os vídeos sejam disponibilizados através de um URL publicamente acessível
+      antes da publicação. Para satisfazer este requisito técnico, o EuPosto utiliza um <strong>bucket de armazenamento
+      temporário Cloudflare R2</strong> (<code>euposto-videos</code>) como intermediário.
+    </p>
+    <p>O fluxo é o seguinte:</p>
+    <ol>
+      <li>O ficheiro de vídeo é enviado para o bucket R2 através de um worker Cloudflare (proxy CORS);</li>
+      <li>O EuPosto fornece o URL temporário do R2 à API do Instagram;</li>
+      <li>O Instagram descarrega o vídeo diretamente a partir do R2 e processa a publicação;</li>
+      <li>O ficheiro no R2 pode ser eliminado manualmente pelo utilizador; a política de retenção padrão
+          prevê eliminação automática após 24 horas.</li>
+    </ol>
+    <div class="info-box">
+      <strong>Nota:</strong> Os ficheiros no R2 são tecnicamente acessíveis por URL público durante o período
+      de retenção. Não partilhe URLs de vídeo do R2 com terceiros se o conteúdo for privado.
+    </div>
+    <p>
+      Este armazenamento é gerido pela <strong>Cloudflare, Inc.</strong>, sujeita à sua própria política de privacidade:
+      <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">cloudflare.com/privacypolicy</a>.
+    </p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-terceiros">
+    <h2><span class="sec-num">05</span> Serviços de terceiros</h2>
+    <p>
+      Para cumprir a sua função, o EuPosto comunica diretamente (no seu browser, com os seus tokens)
+      com as APIs das seguintes plataformas:
+    </p>
+    <table class="data-table">
+      <thead>
+        <tr><th>Serviço</th><th>Finalidade</th><th>Política de privacidade</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>YouTube Data API v3</strong> (Google)</td>
+          <td>Publicação de vídeos no YouTube</td>
+          <td><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></td>
+        </tr>
+        <tr>
+          <td><strong>Instagram Graph API</strong> (Meta)</td>
+          <td>Publicação de Reels no Instagram</td>
+          <td><a href="https://privacycenter.instagram.com/policy" target="_blank" rel="noopener">privacycenter.instagram.com</a></td>
+        </tr>
+        <tr>
+          <td><strong>Facebook Graph API</strong> (Meta)</td>
+          <td>Publicação de vídeos no Facebook</td>
+          <td><a href="https://www.facebook.com/privacy/policy" target="_blank" rel="noopener">facebook.com/privacy/policy</a></td>
+        </tr>
+        <tr>
+          <td><strong>TikTok Content Posting API</strong></td>
+          <td>Publicação de vídeos no TikTok</td>
+          <td><a href="https://www.tiktok.com/legal/page/row/privacy-policy/en" target="_blank" rel="noopener">tiktok.com/legal/privacy-policy</a></td>
+        </tr>
+        <tr>
+          <td><strong>Cloudflare Workers / R2</strong></td>
+          <td>Proxy CORS + armazenamento temporário</td>
+          <td><a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">cloudflare.com/privacypolicy</a></td>
+        </tr>
+        <tr>
+          <td><strong>Google Fonts</strong></td>
+          <td>Tipografia da interface</td>
+          <td><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      O EuPosto atua apenas como <strong>intermediário técnico</strong>: as suas credenciais são enviadas
+      diretamente para as APIs das plataformas, nunca passando por servidores de base de dados do EuPosto.
+    </p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-google">
+    <h2><span class="sec-num">06</span> Autenticação Google</h2>
+    <p>
+      O EuPosto oferece a opção de entrar com uma conta Google através do serviço
+      <strong>Google Sign-In</strong> (<code>accounts.google.com/gsi/client</code>).
+      Quando usa esta opção, o Google partilha com a aplicação o seu nome, endereço de e-mail
+      e fotografia de perfil pública.
+    </p>
+    <p>
+      Estes dados são guardados <strong>exclusivamente no localStorage do seu browser</strong> e são usados
+      apenas para apresentar o seu nome e foto no ecrã de login da aplicação. Não são enviados para
+      qualquer servidor do EuPosto.
+    </p>
+    <p>
+      Para detalhes sobre como o Google trata os seus dados, consulte a
+      <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Política de Privacidade da Google</a>.
+    </p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-cookies">
+    <h2><span class="sec-num">07</span> Cookies e rastreamento</h2>
+    <p>
+      O EuPosto <strong>não utiliza cookies próprios</strong>, não instala pixels de rastreamento,
+      não usa ferramentas de analytics (Google Analytics, Mixpanel, etc.) e não exibe publicidade.
+    </p>
+    <p>
+      Serviços de terceiros integrados (como Google Fonts ou Google Sign-In) podem definir cookies
+      próprios conforme as respetivas políticas. Pode gerir ou bloquear esses cookies através das
+      definições do seu browser.
+    </p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-direitos">
+    <h2><span class="sec-num">08</span> Os seus direitos ao abrigo do RGPD</h2>
+    <p>
+      Se for residente na União Europeia ou no Espaço Económico Europeu, o
+      Regulamento Geral sobre a Proteção de Dados (RGPD — Regulamento UE 2016/679)
+      concede-lhe os seguintes direitos:
+    </p>
+    <ul>
+      <li><strong>Direito de acesso:</strong> pode consultar os seus dados a qualquer momento através das ferramentas de desenvolvimento do browser (localStorage).</li>
+      <li><strong>Direito de retificação:</strong> pode alterar os seus dados diretamente nas definições da aplicação.</li>
+      <li><strong>Direito ao apagamento:</strong> pode eliminar todos os seus dados clicando em "Sair e limpar dados" na aplicação, ou limpando o localStorage do browser.</li>
+      <li><strong>Direito à portabilidade:</strong> os dados estão acessíveis localmente em formato JSON no localStorage.</li>
+      <li><strong>Direito de oposição:</strong> como não há tratamento automático de decisões nem marketing direto, este direito é aplicável maioritariamente no contexto dos serviços de terceiros.</li>
+      <li><strong>Direito de limitação:</strong> pode simplesmente deixar de usar a aplicação; todos os dados permanecem no seu dispositivo.</li>
+    </ul>
+    <p>
+      Para exercer qualquer um destes direitos ou para questões relacionadas com a privacidade,
+      contacte: <a href="mailto:lucasgajo.contacto@gmail.com">lucasgajo.contacto@gmail.com</a>.
+    </p>
+    <p>
+      Tem também o direito de apresentar uma reclamação à autoridade de controlo competente.
+      Em Portugal: <strong>CNPD — Comissão Nacional de Proteção de Dados</strong>
+      (<a href="https://www.cnpd.pt" target="_blank" rel="noopener">cnpd.pt</a>).
+    </p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-seguranca">
+    <h2><span class="sec-num">09</span> Segurança</h2>
+    <p>
+      Tomamos as seguintes medidas de segurança no design da aplicação:
+    </p>
+    <ul>
+      <li>As senhas são sempre armazenadas como hash SHA-256 irreversível;</li>
+      <li>Os tokens de API ficam apenas no localStorage do seu browser, sob o seu controlo;</li>
+      <li>Toda a comunicação com APIs de terceiros é feita via HTTPS;</li>
+      <li>O código-fonte da aplicação é HTML/CSS/JS estático, sem backend próprio.</li>
+    </ul>
+    <p>
+      Contudo, a segurança do localStorage depende da segurança do seu dispositivo e browser.
+      Recomendamos que não utilize a aplicação em dispositivos partilhados sem limpar a sessão
+      no final, e que mantenha o seu browser atualizado.
+    </p>
+    <p>
+      Em caso de suspeita de acesso não autorizado, elimine imediatamente os dados da aplicação
+      através da opção "Sair e limpar dados" ou limpando manualmente o localStorage.
+    </p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-menores">
+    <h2><span class="sec-num">10</span> Menores de idade</h2>
+    <p>
+      O EuPosto destina-se a utilizadores com <strong>13 anos ou mais</strong>. Não recolhemos
+      intencionalmente dados de menores de 13 anos. Se for menor de idade, certifique-se de que
+      tem autorização de um encarregado de educação antes de utilizar a aplicação.
+    </p>
+    <p>
+      Se acreditar que uma criança com menos de 13 anos criou uma conta, contacte-nos através do
+      endereço <a href="mailto:lucasgajo.contacto@gmail.com">lucasgajo.contacto@gmail.com</a>
+      e eliminaremos os dados associados.
+    </p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-alteracoes">
+    <h2><span class="sec-num">11</span> Alterações a esta política</h2>
+    <p>
+      Podemos atualizar esta Política de Privacidade periodicamente para refletir alterações
+      na aplicação ou na legislação aplicável. A data da última atualização está sempre indicada
+      no topo desta página.
+    </p>
+    <p>
+      Alterações significativas serão comunicadas através de um aviso visível na aplicação.
+      O uso continuado do EuPosto após a publicação de alterações constitui aceitação da
+      política revista.
+    </p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="doc-section" id="sec-contacto">
+    <h2><span class="sec-num">12</span> Contacto</h2>
+    <p>
+      Para qualquer questão relativa a esta Política de Privacidade ou ao tratamento dos seus dados, contacte:
+    </p>
+    <div class="info-box">
+      <strong>Lucas Faria Nascimento</strong><br />
+      E-mail: <a href="mailto:lucasgajo.contacto@gmail.com">lucasgajo.contacto@gmail.com</a><br />
+      Website: <a href="https://eupostoapp.pages.dev">eupostoapp.pages.dev</a>
+    </div>
+    <p>Tentaremos responder a todas as solicitações no prazo de 30 dias.</p>
+  </section>
+
+</div>
+
+<footer>
+  <p>
+    <a href="index.html">EuPosto</a> &nbsp;·&nbsp;
+    <a href="privacy.html">Privacidade</a> &nbsp;·&nbsp;
+    <a href="terms.html">Termos</a> &nbsp;·&nbsp;
+    <a href="mailto:lucasgajo.contacto@gmail.com">Contacto</a>
+  </p>
+  <p style="margin-top:10px;">© 2026 EuPosto · Lucas Faria Nascimento</p>
+</footer>
+
+</body>
+</html>

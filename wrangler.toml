@@ -1,0 +1,10 @@
+name = "still-cloud-be15"
+main = "worker.js"
+compatibility_date = "2026-05-24"
+
+[[kv_namespaces]]
+binding = "JOB_QUEUE"
+id = "ca2808553e5e4f46aa787a959147ee0c"
+
+[triggers]
+crons = ["* * * * *"]
