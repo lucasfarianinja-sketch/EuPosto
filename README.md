@@ -59,3 +59,5 @@ Precisas de estar autenticado na conta Cloudflare `lucasfarianinja`.
 - Toda a autenticação passa por OAuth das plataformas. Não guardamos passwords.
 - Tokens ficam **só no localStorage do browser** do utilizador — sem base de dados.
 - O worker.js contém segredos das apps (client secrets). **Não partilhar publicamente.**
+
+_Deploy automático via GitHub ativo desde 2026-07-11._
