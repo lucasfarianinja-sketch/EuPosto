@@ -13,7 +13,7 @@ var R2_BUCKET = "euposto-videos";
 var R2_PUBLIC_URL = "https://pub-e2a2b46909004142bb4b2ed9b4a7db94.r2.dev";
 var IG_APP_ID = "1736364031132996";
 var IG_CLIENT_SECRET = "f46a15a30cacf3030ee9a324ff80ef68";
-var TT_CLIENT_SECRET = "gmwB8hJU7ZLY1lYEemcjyy8ZCrKH7pLW";
+var TT_CLIENT_SECRET = "nG83QfTZxOCv1jWCMuuT4lMhthKVNdq9";
 var JOBS_KEY = "euposto_jobs";
 
 var worker_default = {
@@ -38,6 +38,9 @@ var worker_default = {
         case "queue_jobs": res = await queueJobs(request, env); break;
         case "get_jobs":   res = await getJobs(url, env); break;
         case "cancel_job": res = await cancelJob(url, env); break;
+        case "ai_chat":    res = await aiChat(request, env); break;
+        case "ai_caption": res = await aiCaption(request, env); break;
+        case "tt_creator_info": res = await ttCreatorInfo(request); break;
         default:           res = json({ error: "Unknown action" }, 400);
       }
       const out = new Response(res.body, res);
@@ -392,10 +395,27 @@ async function ttUser(url) {
 }
 __name(ttUser, "ttUser");
 
+async function ttCreatorInfo(req) {
+  const auth = req.headers.get("Authorization");
+  const r = await fetch("https://open.tiktokapis.com/v2/post/publish/creator_info/query/", {
+    method: "POST",
+    headers: { "Authorization": auth, "Content-Type": "application/json; charset=UTF-8" }
+  });
+  return json(await r.json(), r.status);
+}
+__name(ttCreatorInfo, "ttCreatorInfo");
+
 async function ttInit(req) {
   const auth = req.headers.get("Authorization");
+  const url = new URL(req.url);
+  const useInbox = url.searchParams.get("inbox") === "1";
+  // Inbox endpoint = upload as DRAFT (works for unaudited apps + public accounts).
+  // Direct publish endpoint requires audited app OR private account.
+  const endpoint = useInbox
+    ? "https://open.tiktokapis.com/v2/post/publish/inbox/video/init/"
+    : "https://open.tiktokapis.com/v2/post/publish/video/init/";
   const body = await req.text();
-  const r = await fetch("https://open.tiktokapis.com/v2/post/publish/video/init/", {
+  const r = await fetch(endpoint, {
     method: "POST",
     headers: { "Authorization": auth, "Content-Type": "application/json; charset=UTF-8" },
     body
@@ -470,5 +490,51 @@ function json(data, status = 200) {
   });
 }
 __name(json, "json");
+
+async function aiChat(request, env) {
+  const body = await request.json();
+  const messages = body.messages || [];
+  const systemPrompt = `És o assistente IA do EuPosto, uma app que publica vídeos em YouTube, Instagram, TikTok e Facebook ao mesmo tempo. Ajudas criadores com: como usar a app, dicas de conteúdo viral, estratégias de hashtags, melhores horários para postar, edição de clipes, ideias para vídeos, otimização de SEO em redes sociais, análise de tendências. Responde sempre em português, de forma curta, prática e direta. Se a pergunta for sobre uma funcionalidade do EuPosto, explica brevemente onde encontrá-la (Início, Publicar, Contas, Histórico, Definições).`;
+  if (!env.AI) {
+    return json({ reply: "IA não configurada no Worker. Adiciona binding 'AI' nas configurações do Cloudflare Worker." });
+  }
+  try {
+    const out = await env.AI.run("@cf/meta/llama-3.3-70b-instruct-fp8-fast", {
+      messages: [{ role: "system", content: systemPrompt }, ...messages],
+      max_tokens: 400
+    });
+    return json({ reply: out.response || out.result?.response || "Sem resposta." });
+  } catch (e) {
+    return json({ error: e.message, reply: "Erro a contactar IA: " + e.message }, 500);
+  }
+}
+__name(aiChat, "aiChat");
+
+async function aiCaption(request, env) {
+  const body = await request.json();
+  const description = body.description || "";
+  const platforms = body.platforms || [];
+  const language = body.language || "pt";
+  const systemPrompt = `És um copywriter de redes sociais. Geras legendas CURTAS (máximo 2 frases + 3-5 hashtags relevantes), em ${language === "pt" ? "português" : language === "pt-BR" ? "português do Brasil" : "inglês"}, otimizadas para engagement. Sem clichés, sem floreios, sem emojis em excesso (máximo 1-2). Foca no que o vídeo mostra/diz. Responde APENAS com a legenda, sem prefixos tipo "Aqui está:" ou comentários extra.`;
+  const userPrompt = `Vídeo sobre: "${description}"
+Plataformas: ${platforms.join(", ") || "geral"}
+Gera uma legenda curta e cativante.`;
+  if (!env.AI) {
+    return json({ caption: "IA não configurada. Adiciona binding 'AI' no Worker." });
+  }
+  try {
+    const out = await env.AI.run("@cf/meta/llama-3.3-70b-instruct-fp8-fast", {
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
+      ],
+      max_tokens: 200
+    });
+    return json({ caption: (out.response || out.result?.response || "").trim() });
+  } catch (e) {
+    return json({ error: e.message, caption: "Erro: " + e.message }, 500);
+  }
+}
+__name(aiCaption, "aiCaption");
 
 export { worker_default as default };

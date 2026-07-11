@@ -1,0 +1,29 @@
+# Backups zip
+*.zip
+
+# Backups locais (mantidos só no teu PC)
+backups/
+
+# Wrangler / Cloudflare cache
+.wrangler/
+
+# Claude Code artefactos internos
+.claude/
+
+# Ficheiros antigos / cópias de trabalho
+euposto_backup.html
+euposto_current.html
+euposto_live.html
+euposto_latest/
+index_current.html
+server.js
+_panel_*.html
+tiktok*.txt
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Logs
+*.log

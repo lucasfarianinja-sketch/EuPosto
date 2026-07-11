@@ -80,6 +80,7 @@
     }
     .nav-logo {
       font-family: 'Space Mono', monospace; font-size: 1.1rem; font-weight: 700;
+      display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text; text-decoration: none; letter-spacing: -.5px;
@@ -717,7 +718,7 @@
 <body>
 
 <nav id="main-nav">
-  <a class="nav-logo" href="/">EuPosto</a>
+  <a class="nav-logo" href="/"><svg viewBox="0 0 80 80" style="width:24px;height:24px;flex-shrink:0;filter:drop-shadow(0 2px 8px rgba(37,99,235,.35))" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="nav-ep-a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1e40af"/><stop offset="1" stop-color="#3b82f6"/></linearGradient><linearGradient id="nav-ep-b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7dd3fc"/><stop offset="1" stop-color="#3b82f6"/></linearGradient></defs><rect x="10" y="10" width="60" height="60" rx="14" fill="url(#nav-ep-a)"/><rect x="22" y="22" width="36" height="36" rx="8" fill="none" stroke="url(#nav-ep-b)" stroke-width="3"/><polygon points="34,30 50,40 34,50" fill="#fff"/></svg><span>EuPosto</span></a>
   <div class="nav-center">
     <a href="#funcionalidades" id="nav-features">Funcionalidades</a>
     <a href="#como-funciona" id="nav-how">Como funciona</a>
@@ -1152,7 +1153,7 @@
   <span class="footer-logo">EuPosto</span>
   <div class="footer-links">
     <a href="euposto.html">App</a>
-    <a href="euposto.html" id="footer-about">App</a>
+    <a href="#funcionalidades" id="footer-about">Sobre</a>
     <a href="privacy.html" id="footer-privacy">Política de Privacidade</a>
     <a href="terms.html" id="footer-terms">Termos de Serviço</a>
     <a href="mailto:lucasgajo.contacto@gmail.com" id="footer-contact">Contacto</a>

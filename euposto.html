@@ -7,6 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>EuPosto</title>
+  <link rel="icon" type="image/svg+xml" href="/euposto-icon.svg" />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -161,6 +162,7 @@
     .enter-btn.show { display: block; }
     .enter-btn:hover { opacity: .9; }
     .login-terms { font-size: .75rem; color: var(--muted); text-align: center; line-height: 1.5; }
+    .login-terms a { color: var(--accent-light); text-decoration: underline; }
     .auth-field { display: flex; flex-direction: column; gap: 5px; }
     .auth-label { font-size: .7rem; font-weight: 700; color: var(--muted); letter-spacing: .9px; text-transform: uppercase; }
     .auth-input-wrap { display: flex; align-items: center; gap: 10px; background: var(--surface2); border: 1.5px solid var(--glass-border); border-radius: 10px; padding: 11px 14px; transition: border-color .2s, box-shadow .2s; }
@@ -198,6 +200,10 @@
       display: flex; align-items: center; gap: 8px;
       padding: 6px 8px 18px;
     }
+    .sidebar-brand-logo {
+      width: 28px; height: 28px; flex-shrink: 0;
+      filter: drop-shadow(0 2px 8px rgba(37,99,235,.35));
+    }
     .sidebar-brand-name {
       font-family: 'Space Mono', monospace; font-size: 1.1rem; font-weight: 700;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
@@ -206,7 +212,7 @@
     }
     /* Fire icon */
     .fire-icon {
-      font-size: 1.15rem; display: inline-block;
+      font-size: 1.15rem; display: inline-flex; align-items: center;
       transition: filter .6s ease, transform .3s ease;
       filter: grayscale(1) brightness(.5);
       cursor: help;
@@ -217,6 +223,29 @@
     @keyframes firePulse {
       0%,100% { transform: scale(1); filter: sepia(1) saturate(5) hue-rotate(200deg) brightness(1.2); }
       50%      { transform: scale(1.15); filter: sepia(1) saturate(6) hue-rotate(220deg) brightness(1.4); }
+    }
+
+    /* Blue fire (custom SVG) — glow ESTÁTICO + 1 animação leve (transform/opacity) */
+    .fire-icon.blue-fire {
+      filter: drop-shadow(0 0 7px rgba(59,130,246,.7)) drop-shadow(0 0 14px rgba(125,211,252,.35));
+    }
+    .fire-icon.blue-fire svg {
+      width: 16px; height: 22px; display: block;
+      transform-origin: 50% 90%;
+      will-change: transform;
+      animation: blueFireWave 2.4s ease-in-out infinite;
+    }
+    .fire-icon.blue-fire svg .bf-inner {
+      transform-origin: 50% 85%;
+      animation: blueFireInner 1s ease-in-out infinite alternate;
+    }
+    @keyframes blueFireWave {
+      0%,100% { transform: scale(1, 1); }
+      50%     { transform: scale(0.97, 1.05); }
+    }
+    @keyframes blueFireInner {
+      from { opacity: 0.8; }
+      to   { opacity: 1; }
     }
 
     /* New post button */
@@ -284,15 +313,33 @@
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
       background: var(--bg);
-      background-image:
-        radial-gradient(ellipse 90% 60% at 50% -10%, rgba(37,99,235,.10) 0%, transparent 65%),
-        radial-gradient(ellipse 60% 40% at 90% 110%, rgba(176,110,243,.06) 0%, transparent 60%);
-      background-attachment: fixed;
       color: var(--text);
       min-height: 100vh;
       padding: 28px 16px 80px;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+    }
+    /* Gradiente de fundo fixo via pseudo-elemento GPU (não repinta no scroll) */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background-image:
+        radial-gradient(ellipse 90% 60% at 50% -10%, rgba(37,99,235,.10) 0%, transparent 65%),
+        radial-gradient(ellipse 60% 40% at 90% 110%, rgba(176,110,243,.06) 0%, transparent 60%);
+    }
+    html { scroll-behavior: smooth; }
+    /* Scrollbar temática */
+    * { scrollbar-width: thin; scrollbar-color: rgba(37,99,235,.4) transparent; }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(37,99,235,.35); border-radius: 8px;
+      border: 2px solid transparent; background-clip: padding-box;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(37,99,235,.6); background-clip: padding-box; }
+    /* Máquinas fracas / preferência de menos movimento → sem animações (mais FPS) */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
     }
 
     /* ── Header ── */
@@ -697,17 +744,44 @@
     }
     .status-item:last-child { border-bottom: none; }
     .status-icon {
-      width: 36px; height: 36px; border-radius: 50%;
+      width: 40px; height: 40px; border-radius: 11px;
       display: flex; align-items: center; justify-content: center;
       font-size: 1rem; flex-shrink: 0;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.06);
+      position: relative; overflow: hidden;
     }
-    .status-icon.pending { background: var(--surface2); color: var(--muted); }
-    .status-icon.uploading {
-      background: rgba(37,99,235,.15); color: var(--accent);
-      animation: pulse 1.2s infinite;
+    .status-icon svg { width: 22px; height: 22px; display: block; }
+    .status-icon.pending svg { opacity: .55; filter: grayscale(.5); }
+    .status-icon.uploading { animation: pulse 1.6s ease-in-out infinite; }
+    .status-icon.done::after {
+      content: ''; position: absolute; inset: -1px;
+      border: 2px solid #22c55e; border-radius: 11px;
+      box-shadow: 0 0 18px rgba(34,197,94,.45), inset 0 0 12px rgba(34,197,94,.15);
     }
-    .status-icon.done { background: rgba(74,222,128,.15); color: var(--success); }
-    .status-icon.error { background: rgba(248,113,113,.15); color: var(--error); }
+    .status-icon.done::before {
+      content: ''; position: absolute; right: -4px; bottom: -4px; width: 18px; height: 18px;
+      border-radius: 50%; background: #22c55e; border: 2px solid #060B14;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'><path d='M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/></svg>");
+      background-size: 11px; background-position: center; background-repeat: no-repeat;
+      z-index: 1;
+    }
+    .status-icon.error::after {
+      content: ''; position: absolute; inset: -1px;
+      border: 2px solid var(--error); border-radius: 11px;
+      box-shadow: 0 0 18px rgba(248,113,113,.4);
+    }
+    .status-msg.done-msg {
+      color: #22c55e; font-weight: 600;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .status-msg.done-msg::before {
+      content: ''; display: inline-block; width: 14px; height: 14px; border-radius: 50%;
+      background: #22c55e;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'><path d='M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/></svg>");
+      background-size: 10px; background-position: center; background-repeat: no-repeat;
+      flex-shrink: 0;
+    }
     @keyframes pulse {
       0%,100% { opacity: 1; } 50% { opacity: .4; }
     }
@@ -816,6 +890,7 @@
     .toggle-switch input:checked + .toggle-slider { background: var(--accent); }
     .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
     .toggle-label { font-size: .9rem; font-weight: 500; color: var(--text); }
+    .toggle-hint { color: var(--muted); font-weight: 400; font-size: .82rem; margin-left: 4px; }
 
     .schedule-panel { display:none; flex-direction:column; gap:12px; margin-top:14px; }
     .schedule-panel.show { display:flex; }
@@ -1450,12 +1525,10 @@
       letter-spacing: .2px;
     }
 
-    /* Sidebar */
+    /* Sidebar — fundo sólido (sem backdrop-filter) para scroll fluido */
     .sidebar {
-      background: rgba(9,9,18,.72);
+      background: #0a0a14;
       border-color: rgba(255,255,255,.07);
-      backdrop-filter: blur(36px);
-      -webkit-backdrop-filter: blur(36px);
       box-shadow: 0 8px 32px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.05);
     }
     .sidebar-label {
@@ -1784,12 +1857,10 @@
       transform: translateY(-1px);
     }
 
-    /* Header user pill */
+    /* Header user pill — fundo sólido para scroll fluido */
     #header-user {
-      background: rgba(12,12,22,.88);
+      background: #0c0c16;
       border-color: rgba(37,99,235,.18);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
     }
 
     /* Confirm modal */
@@ -1845,7 +1916,6 @@
       background: rgba(255,255,255,.03);
       border: 1px solid rgba(255,255,255,.05);
       border-radius: 20px; overflow: hidden;
-      backdrop-filter: blur(12px);
     }
     .home-stat { flex: 1; text-align: center; padding: 18px 12px; }
     .home-stat-num { font-family: 'Space Mono', monospace; font-size: 1.4rem; font-weight: 700; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
@@ -2230,6 +2300,7 @@
       background: rgba(37,99,235,.13); border: 1.5px solid rgba(37,99,235,.3);
       transition: background .35s, border-color .35s;
     }
+    .pub-ov-icon svg { width: 24px; height: 24px; display: block; }
     .pub-ov-icon.uploading { animation: pulseIcon 1.1s ease-in-out infinite; }
     .pub-ov-icon.done      { background: rgba(52,211,153,.14); border-color: rgba(52,211,153,.5); }
     .pub-ov-icon.error     { background: rgba(248,113,113,.14); border-color: rgba(248,113,113,.5); }
@@ -2251,6 +2322,448 @@
       cursor: pointer; transition: background .2s, color .2s, border-color .2s;
     }
     #pub-overlay-close:hover { background: rgba(255,255,255,.12); color: var(--text); border-color: rgba(255,255,255,.22); }
+
+    /* ── AI Caption button (inline next to label) ── */
+    .ai-caption-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: linear-gradient(135deg, rgba(37,99,235,.18), rgba(56,189,248,.12));
+      border: 1px solid rgba(37,99,235,.4);
+      color: var(--accent-light); font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .72rem; font-weight: 600;
+      padding: 4px 10px; border-radius: 12px;
+      cursor: pointer; transition: all .2s;
+      text-transform: none; letter-spacing: 0;
+    }
+    .ai-caption-btn:hover {
+      background: linear-gradient(135deg, rgba(37,99,235,.28), rgba(56,189,248,.18));
+      border-color: var(--accent); box-shadow: 0 0 12px rgba(37,99,235,.3);
+    }
+
+    /* ── Peak time button (special variant) ── */
+    .sched-quick-btn.peak-btn {
+      background: linear-gradient(135deg, rgba(37,99,235,.15), rgba(56,189,248,.08));
+      border-color: rgba(37,99,235,.45); color: var(--accent-light); font-weight: 600;
+    }
+    .sched-quick-btn.peak-btn:hover {
+      background: linear-gradient(135deg, rgba(37,99,235,.25), rgba(56,189,248,.15));
+      border-color: var(--accent); box-shadow: 0 0 16px rgba(37,99,235,.3);
+    }
+
+    /* ── Pre-flight check card ── */
+    .preflight-card { padding: 16px 20px !important; }
+    .preflight-list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+    .preflight-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 10px; border-radius: 6px;
+      font-size: .82rem; color: var(--text2);
+      background: rgba(255,255,255,.02);
+      border: 1px solid rgba(255,255,255,.04);
+    }
+    .preflight-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 18px; height: 18px; border-radius: 50%;
+      font-size: .7rem; font-weight: 700; flex-shrink: 0;
+    }
+    .preflight-ok .preflight-icon { background: rgba(34,197,94,.18); color: #22c55e; }
+    .preflight-warn .preflight-icon { background: rgba(251,191,36,.18); color: #fbbf24; }
+    .preflight-err .preflight-icon { background: rgba(248,113,113,.18); color: var(--error); }
+    .preflight-info .preflight-icon { background: rgba(96,165,250,.18); color: var(--accent-light); }
+    .preflight-err { border-color: rgba(248,113,113,.25); background: rgba(248,113,113,.04); }
+    .preflight-warn { border-color: rgba(251,191,36,.18); background: rgba(251,191,36,.03); }
+
+    /* ── AI Caption Modal ── */
+    .ai-modal {
+      display: none; position: fixed; inset: 0; z-index: 2000;
+      background: rgba(0,0,0,.7); backdrop-filter: blur(8px);
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .ai-modal.show { display: flex; animation: aiFadeIn .2s ease; }
+    @keyframes aiFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .ai-modal-card {
+      background: linear-gradient(160deg, #0f0e1a 0%, #0a0a14 100%);
+      border: 1px solid rgba(37,99,235,.25); border-radius: 18px;
+      padding: 26px; width: 100%; max-width: 480px;
+      position: relative; box-shadow: 0 24px 64px rgba(0,0,0,.6), 0 0 60px rgba(37,99,235,.12);
+      animation: aiSlideUp .25s ease;
+    }
+    @keyframes aiSlideUp { from { transform: translateY(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+    .ai-modal-close {
+      position: absolute; top: 12px; right: 14px;
+      background: none; border: none; color: var(--muted);
+      font-size: 1.5rem; cursor: pointer; line-height: 1;
+      width: 28px; height: 28px; border-radius: 6px;
+      transition: background .2s, color .2s;
+    }
+    .ai-modal-close:hover { background: rgba(255,255,255,.08); color: var(--text); }
+    .ai-modal-header { display: flex; gap: 14px; margin-bottom: 18px; align-items: flex-start; }
+    .ai-modal-icon {
+      width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center; color: #fff;
+      box-shadow: 0 4px 16px rgba(37,99,235,.4);
+    }
+    .ai-modal-title { font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .ai-modal-sub { font-size: .8rem; color: var(--muted); line-height: 1.5; }
+    .ai-modal-label {
+      display: block; font-size: .72rem; font-weight: 700; color: var(--text2);
+      text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px;
+    }
+    .ai-modal #ai-caption-desc {
+      width: 100%; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+      border-radius: 10px; padding: 12px 14px; color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: .9rem;
+      resize: vertical; outline: none; transition: border-color .2s, box-shadow .2s;
+    }
+    .ai-modal #ai-caption-desc:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.18); }
+    .ai-caption-gen-btn {
+      width: 100%; margin-top: 14px; padding: 13px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; border: none; border-radius: 10px;
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: .95rem; font-weight: 700;
+      cursor: pointer; transition: transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 18px rgba(37,99,235,.3);
+    }
+    .ai-caption-gen-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(37,99,235,.5); }
+    .ai-caption-gen-btn:disabled { opacity: .6; cursor: wait; }
+    .ai-caption-result { margin-top: 14px; }
+    .ai-caption-result:empty { display: none; }
+    .ai-caption-output {
+      background: rgba(37,99,235,.06); border: 1px solid rgba(37,99,235,.25);
+      border-radius: 10px; padding: 14px;
+      color: var(--text); font-size: .9rem; line-height: 1.5;
+    }
+    .ai-caption-actions { display: flex; gap: 8px; margin-top: 10px; }
+    .ai-caption-actions button {
+      flex: 1; padding: 10px; border-radius: 8px; cursor: pointer;
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: .85rem; font-weight: 600;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; border: none; transition: transform .15s;
+    }
+    .ai-caption-actions button:hover { transform: translateY(-1px); }
+    .ai-caption-actions .ai-caption-regen {
+      background: rgba(255,255,255,.04); color: var(--text2); border: 1px solid rgba(255,255,255,.08);
+    }
+    .ai-caption-actions .ai-caption-regen:hover { background: rgba(255,255,255,.08); color: var(--text); }
+
+    /* ── AI Chat FAB ── */
+    .ai-chat-fab {
+      position: fixed; bottom: 22px; right: 22px; z-index: 1500;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none; color: #fff; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 28px rgba(37,99,235,.45), 0 0 0 1px rgba(255,255,255,.06);
+      transition: transform .2s, box-shadow .25s;
+    }
+    .ai-chat-fab:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 14px 40px rgba(37,99,235,.6); }
+    .ai-chat-fab-close { display: none; }
+    .ai-chat-fab.open .ai-chat-fab-icon { display: none; }
+    .ai-chat-fab.open .ai-chat-fab-close { display: block; }
+    .ai-chat-fab::before {
+      content: ''; position: absolute; inset: -4px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      opacity: .3; z-index: -1; animation: aiPulse 2.4s ease-in-out infinite;
+    }
+    @keyframes aiPulse {
+      0%,100% { transform: scale(1); opacity: .3; }
+      50% { transform: scale(1.15); opacity: 0; }
+    }
+
+    /* ── AI Chat Panel ── */
+    .ai-chat-panel {
+      position: fixed; bottom: 90px; right: 22px; z-index: 1500;
+      width: 380px; max-width: calc(100vw - 44px); height: 540px; max-height: calc(100vh - 130px);
+      background: linear-gradient(160deg, #0f0e1a 0%, #0a0a14 100%);
+      border: 1px solid rgba(37,99,235,.25); border-radius: 18px;
+      box-shadow: 0 24px 64px rgba(0,0,0,.6), 0 0 60px rgba(37,99,235,.12);
+      display: none; flex-direction: column; overflow: hidden;
+      transform-origin: bottom right;
+    }
+    .ai-chat-panel.open { display: flex; animation: aiChatOpen .25s cubic-bezier(.4, 1.5, .5, 1); }
+    @keyframes aiChatOpen {
+      from { transform: scale(.85) translateY(20px); opacity: 0; }
+      to   { transform: none; opacity: 1; }
+    }
+    .ai-chat-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,.06);
+      background: rgba(37,99,235,.06);
+    }
+    .ai-chat-header-avatar {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center; color: #fff;
+    }
+    .ai-chat-header-title { font-size: .9rem; font-weight: 700; color: var(--text); line-height: 1.2; }
+    .ai-chat-header-sub { font-size: .7rem; color: #22c55e; margin-top: 2px; display: flex; align-items: center; gap: 5px; }
+    .ai-chat-header-sub::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%; background: #22c55e;
+      box-shadow: 0 0 6px #22c55e;
+    }
+    .ai-chat-messages {
+      flex: 1; overflow-y: auto; padding: 14px 14px 6px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .ai-chat-msg { display: flex; }
+    .ai-chat-msg-user { justify-content: flex-end; }
+    .ai-chat-msg-assistant { justify-content: flex-start; }
+    .ai-chat-bubble {
+      max-width: 82%; padding: 9px 13px; border-radius: 14px;
+      font-size: .85rem; line-height: 1.5; word-wrap: break-word;
+    }
+    .ai-chat-msg-user .ai-chat-bubble {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; border-bottom-right-radius: 4px;
+    }
+    .ai-chat-msg-assistant .ai-chat-bubble {
+      background: rgba(255,255,255,.05);
+      color: var(--text); border-bottom-left-radius: 4px;
+      border: 1px solid rgba(255,255,255,.06);
+    }
+    .ai-chat-typing .ai-chat-bubble { padding: 12px 16px; display: inline-flex; gap: 4px; }
+    .ai-typing-dot {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--accent-light);
+      animation: aiDot 1.2s ease-in-out infinite;
+    }
+    .ai-typing-dot:nth-child(2) { animation-delay: .2s; }
+    .ai-typing-dot:nth-child(3) { animation-delay: .4s; }
+    @keyframes aiDot {
+      0%,80%,100% { opacity: .3; transform: scale(.8); }
+      40% { opacity: 1; transform: scale(1); }
+    }
+    .ai-chat-suggestions {
+      display: flex; gap: 6px; padding: 0 14px 8px; flex-wrap: wrap;
+    }
+    .ai-chat-suggestions button {
+      background: rgba(37,99,235,.08); border: 1px solid rgba(37,99,235,.25);
+      color: var(--accent-light); font-size: .72rem; font-weight: 600;
+      padding: 5px 10px; border-radius: 12px; cursor: pointer;
+      font-family: 'Plus Jakarta Sans', sans-serif; transition: all .2s;
+    }
+    .ai-chat-suggestions button:hover {
+      background: rgba(37,99,235,.18); border-color: var(--accent);
+    }
+    .ai-chat-input-row {
+      display: flex; gap: 8px; padding: 10px 14px 14px;
+      border-top: 1px solid rgba(255,255,255,.05);
+    }
+    .ai-chat-input-row input {
+      flex: 1; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+      border-radius: 10px; padding: 10px 14px; color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: .85rem;
+      outline: none; transition: border-color .2s, box-shadow .2s;
+    }
+    .ai-chat-input-row input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.15); }
+    .ai-chat-input-row button {
+      width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform .15s, box-shadow .2s;
+    }
+    .ai-chat-input-row button:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(37,99,235,.4); }
+
+    @media (max-width: 600px) {
+      .ai-chat-panel { width: calc(100vw - 24px); right: 12px; bottom: 80px; }
+      .ai-chat-fab { right: 14px; bottom: 14px; }
+    }
+
+    /* ── Site-styled confirm modal ── */
+    #site-confirm-modal {
+      display: none; position: fixed; inset: 0; z-index: 2500;
+      background: rgba(0,0,0,.75); backdrop-filter: blur(8px);
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    #site-confirm-modal.show { display: flex; animation: scFadeIn .2s ease; }
+    @keyframes scFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .site-confirm-dialog {
+      background: linear-gradient(160deg, #0f0e1a 0%, #0a0a14 100%);
+      border: 1px solid rgba(37,99,235,.3); border-radius: 18px;
+      padding: 28px 26px 22px; width: 100%; max-width: 420px;
+      text-align: center;
+      box-shadow: 0 24px 64px rgba(0,0,0,.6), 0 0 60px rgba(37,99,235,.15);
+      animation: scSlideUp .25s cubic-bezier(.4, 1.4, .5, 1);
+    }
+    @keyframes scSlideUp { from { transform: translateY(20px) scale(.96); opacity: 0; } to { transform: none; opacity: 1; } }
+    .site-confirm-icon {
+      font-size: 2.4rem; margin-bottom: 12px; line-height: 1;
+      filter: drop-shadow(0 4px 12px rgba(37,99,235,.4));
+    }
+    .site-confirm-title {
+      font-size: 1.15rem; font-weight: 800; color: var(--text);
+      margin-bottom: 8px; letter-spacing: -.02em;
+    }
+    .site-confirm-msg {
+      font-size: .9rem; color: var(--text2); line-height: 1.5;
+      margin-bottom: 22px;
+    }
+    .site-confirm-actions { display: flex; gap: 10px; }
+    .site-confirm-cancel {
+      flex: 1; padding: 12px; border-radius: 10px;
+      border: 1.5px solid var(--border); background: rgba(255,255,255,.03);
+      color: var(--text2); font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .9rem; font-weight: 600; cursor: pointer;
+      transition: background .2s, color .2s, border-color .2s;
+    }
+    .site-confirm-cancel:hover { background: rgba(255,255,255,.08); color: var(--text); border-color: rgba(255,255,255,.18); }
+    .site-confirm-ok {
+      flex: 2; padding: 12px; border-radius: 10px; border: none;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .9rem; font-weight: 700; cursor: pointer;
+      box-shadow: 0 6px 22px rgba(37,99,235,.35);
+      transition: transform .15s, box-shadow .2s;
+    }
+    .site-confirm-ok:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(37,99,235,.5); }
+
+    /* ── Logos de marca (app-icon badges) — containers transparentes ── */
+    .hpc-logo { background: transparent !important; border: none !important; padding: 0; }
+    .hpc-logo svg { width: 50px; height: 50px; display: block; border-radius: 14px; }
+    .acc-platform-logo { background: none !important; border: none !important; width: 34px; height: 34px; }
+    .acc-platform-logo svg { width: 34px; height: 34px; display: block; border-radius: 9px; }
+    .status-icon { background: transparent !important; border: none !important; overflow: visible; }
+    .status-icon svg { width: 38px; height: 38px; display: block; border-radius: 10px; }
+    .pub-ov-icon { background: transparent !important; border: none !important; }
+    .pub-ov-icon svg { width: 40px; height: 40px; display: block; border-radius: 11px; }
+    .plat-btn-logo { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; vertical-align: -4px; margin-right: 2px; }
+    .plat-btn-logo svg { width: 18px; height: 18px; display: block; border-radius: 5px; }
+
+    /* ── TikTok publishing options — polished ── */
+    #tt-options {
+      background: linear-gradient(160deg, rgba(37,99,235,.05) 0%, rgba(56,189,248,.02) 60%, transparent 100%);
+      border: 1px solid rgba(37,99,235,.18);
+      border-radius: 16px; padding: 20px; margin-top: 20px;
+      position: relative; overflow: hidden;
+    }
+    #tt-options::before {
+      content: ''; position: absolute; top: -60px; right: -60px;
+      width: 180px; height: 180px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(56,189,248,.10) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .tt-opt-divider { display: none; }
+    .tt-opt-header {
+      display: flex; align-items: center; gap: 10px;
+      font-size: .95rem; font-weight: 700; color: var(--text);
+      margin-bottom: 18px;
+      padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .tt-opt-header::after {
+      content: 'API Compliance'; margin-left: auto;
+      font-size: .65rem; font-weight: 700; letter-spacing: .8px;
+      background: rgba(34,197,94,.14); border: 1px solid rgba(34,197,94,.3);
+      color: #22c55e; padding: 3px 9px; border-radius: 10px;
+      text-transform: uppercase;
+    }
+    .tt-opt-header .plat-btn-logo { width: 22px !important; height: 22px !important; }
+
+    /* Creator card */
+    .tt-creator {
+      display: flex; align-items: center; gap: 12px;
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px; padding: 11px 14px; margin-bottom: 16px;
+      position: relative;
+    }
+    .tt-creator img {
+      width: 42px; height: 42px; border-radius: 50%; object-fit: cover;
+      background: var(--surface2); flex-shrink: 0;
+      box-shadow: 0 0 0 2px rgba(37,99,235,.25);
+    }
+    .tt-creator-name { font-size: .95rem; font-weight: 700; color: var(--text); }
+    .tt-creator-sub {
+      font-size: .74rem; color: var(--muted); margin-top: 2px;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .tt-creator-sub::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%; background: #22c55e;
+      box-shadow: 0 0 6px #22c55e;
+    }
+
+    /* Fields */
+    .tt-opt-field { margin-bottom: 16px; position: relative; }
+    .tt-opt-field:last-child { margin-bottom: 0; }
+    .tt-opt-label {
+      display: block; font-size: .72rem; font-weight: 700; color: var(--text2);
+      text-transform: uppercase; letter-spacing: .6px; margin-bottom: 9px;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .tt-opt-label::before {
+      content: ''; width: 3px; height: 12px; border-radius: 2px;
+      background: linear-gradient(180deg, var(--accent), var(--accent2));
+    }
+
+    /* Select */
+    .tt-opt-select {
+      width: 100%; background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 11px; padding: 12px 40px 12px 14px;
+      color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; font-size: .92rem; font-weight: 500;
+      outline: none; cursor: pointer; appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2360A5FA'><path d='M7 10l5 5 5-5z'/></svg>");
+      background-repeat: no-repeat; background-position: right 12px center; background-size: 18px;
+      transition: border-color .2s, box-shadow .2s, background-color .2s;
+    }
+    .tt-opt-select:hover { border-color: rgba(37,99,235,.35); }
+    .tt-opt-select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.18); }
+    .tt-opt-select option { background: #0a0a14; color: var(--text); }
+
+    /* Interaction pills */
+    .tt-toggle-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tt-check {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: .85rem; font-weight: 600; color: var(--text2);
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+      padding: 8px 14px; border-radius: 22px;
+      cursor: pointer; user-select: none;
+      transition: background .2s, border-color .2s, color .2s;
+    }
+    .tt-check:hover { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.14); }
+    .tt-check input {
+      width: 15px; height: 15px; accent-color: var(--accent);
+      cursor: pointer; flex-shrink: 0; margin: 0;
+    }
+    .tt-check:has(input:checked) {
+      background: rgba(37,99,235,.13); border-color: rgba(37,99,235,.4); color: var(--text);
+    }
+    .tt-check.disabled { opacity: .35; cursor: not-allowed; }
+    .tt-check.disabled input { cursor: not-allowed; }
+
+    /* Commercial disclosure section */
+    .tt-commercial-main { margin-bottom: 0; align-self: flex-start; }
+    .tt-commercial-sub {
+      display: flex; flex-direction: column; gap: 8px; margin-top: 12px;
+      padding: 14px; background: rgba(0,0,0,.25);
+      border: 1px solid rgba(37,99,235,.22); border-radius: 12px;
+      position: relative;
+    }
+    .tt-commercial-sub::before {
+      content: '⚠ Divulgação obrigatória'; display: block; margin: -2px 0 4px;
+      font-size: .68rem; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
+      color: #fbbf24;
+    }
+    .tt-commercial-sub .tt-check {
+      font-size: .84rem; align-items: flex-start; border-radius: 10px;
+      background: transparent; border: 1px solid transparent; padding: 6px 8px;
+    }
+    .tt-commercial-sub .tt-check:hover { background: rgba(255,255,255,.04); }
+    .tt-commercial-sub .tt-check:has(input:checked) {
+      background: rgba(251,191,36,.08); border-color: rgba(251,191,36,.28);
+      color: var(--text);
+    }
+    .tt-commercial-sub .tt-check input { accent-color: #fbbf24; }
+
+    /* Disclosure box */
+    .tt-opt-disclosure {
+      font-size: .8rem; color: var(--text2); line-height: 1.55; margin-top: 16px;
+      padding: 13px 15px; background: rgba(0,0,0,.28);
+      border: 1px solid rgba(255,255,255,.06); border-left: 3px solid var(--accent);
+      border-radius: 0 10px 10px 0;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .tt-opt-disclosure::before {
+      content: '🎵'; flex-shrink: 0; font-size: 1.05rem; line-height: 1.4;
+    }
+    .tt-opt-disclosure a { color: var(--accent-light); text-decoration: underline; font-weight: 600; }
+    .tt-opt-disclosure a:hover { color: #7DD3FC; }
 
   </style>
 </head>
@@ -2366,7 +2879,7 @@
         <input type="checkbox" id="remember-email-chk" checked style="display:none" />
 
         <div class="login-terms">
-          Ao criar conta concorda com os nossos Termos de Uso e Política de Privacidade.
+          Ao criar conta concorda com os nossos <a href="terms.html" target="_blank" rel="noopener">Termos de Uso</a> e <a href="privacy.html" target="_blank" rel="noopener">Política de Privacidade</a>.
         </div>
         <div class="auth-switch-row">já tem conta? <button class="auth-switch-btn" onclick="setLoginMode('login')">Entrar</button></div>
       </div>
@@ -2435,8 +2948,9 @@
 <nav class="sidebar">
   <!-- Brand + fire -->
   <div class="sidebar-brand">
+    <svg class="sidebar-brand-logo" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ep-logo-a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1e40af"/><stop offset="1" stop-color="#3b82f6"/></linearGradient><linearGradient id="ep-logo-b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7dd3fc"/><stop offset="1" stop-color="#3b82f6"/></linearGradient></defs><rect x="10" y="10" width="60" height="60" rx="14" fill="url(#ep-logo-a)"/><rect x="22" y="22" width="36" height="36" rx="8" fill="none" stroke="url(#ep-logo-b)" stroke-width="3"/><polygon points="34,30 50,40 34,50" fill="#fff"/></svg>
     <span class="sidebar-brand-name">EuPosto</span>
-    <span class="fire-icon" id="fire-icon" title="O teu nível de atividade">🔥</span>
+    <span class="fire-icon blue-fire" id="fire-icon" title="O teu nível de atividade"><svg viewBox="0 0 24 32" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="bf-grad" x1="0" x2="0" y1="1" y2="0"><stop offset="0" stop-color="#1e40af"/><stop offset="0.45" stop-color="#3b82f6"/><stop offset="0.78" stop-color="#7dd3fc"/><stop offset="1" stop-color="#ffffff"/></linearGradient><radialGradient id="bf-core" cx="0.5" cy="0.7" r="0.6"><stop offset="0" stop-color="#ffffff" stop-opacity="0.95"/><stop offset="0.5" stop-color="#bae6fd" stop-opacity="0.5"/><stop offset="1" stop-color="#3b82f6" stop-opacity="0"/></radialGradient></defs><path class="bf-outer" d="M12 1 C16 7 21 11 21 19 C21 26 17 31 12 31 C7 31 3 26 3 19 C3 13 7 9 9 4 C10 6 11 7 12 1 Z" fill="url(#bf-grad)"/><path class="bf-inner" d="M12 9 C14 13 17 16 17 21 C17 25 15 28 12 28 C9 28 7 25 7 21 C7 17 9 15 10 11 C11 12 11 13 12 9 Z" fill="url(#bf-core)"/></svg></span>
   </div>
 
   <span class="sidebar-label">Menu</span>
@@ -2445,13 +2959,13 @@
     <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
     Início
   </button>
-  <button class="sidebar-item" data-tab="publicar" onclick="switchTab('publicar')">
-    <svg viewBox="0 0 24 24"><path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
-    Publicar
-  </button>
   <button class="sidebar-item" data-tab="contas" onclick="switchTab('contas')">
     <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
     Contas
+  </button>
+  <button class="sidebar-item" data-tab="publicar" onclick="switchTab('publicar')">
+    <svg viewBox="0 0 24 24"><path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+    Publicar
   </button>
   <button class="sidebar-item" data-tab="historico" onclick="switchTab('historico')">
     <svg viewBox="0 0 24 24"><path d="M5 20H3V10h2v10zm4 0H7V4h2v16zm4 0h-2V8h2v12zm4 0h-2v-6h2v6zm4 0h-2v-4h2v4z"/></svg>
@@ -2564,30 +3078,22 @@
   <div class="home-section-label">Estado das plataformas</div>
   <div class="home-plat-grid" id="home-plat-grid">
     <div class="home-plat-card" id="hpc-yt">
-      <div class="hpc-logo" style="background:rgba(255,68,68,.12);border-color:rgba(255,68,68,.25);">
-        <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:#ff4444"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.8 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>
-      </div>
+      <div class="hpc-logo" data-brand="yt"></div>
       <div class="hpc-name">YouTube</div>
       <div class="hpc-status" id="hpc-yt-s">—</div>
     </div>
     <div class="home-plat-card" id="hpc-ig">
-      <div class="hpc-logo" style="background:rgba(225,48,108,.12);border-color:rgba(225,48,108,.25);">
-        <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:#e1306c"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
-      </div>
+      <div class="hpc-logo" data-brand="ig"></div>
       <div class="hpc-name">Instagram</div>
       <div class="hpc-status" id="hpc-ig-s">—</div>
     </div>
     <div class="home-plat-card" id="hpc-tt">
-      <div class="hpc-logo" style="background:rgba(105,201,208,.12);border-color:rgba(105,201,208,.25);">
-        <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:#69c9d0"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.95a8.24 8.24 0 004.83 1.56V7.07a4.85 4.85 0 01-1.06-.38z"/></svg>
-      </div>
+      <div class="hpc-logo" data-brand="tt"></div>
       <div class="hpc-name">TikTok</div>
       <div class="hpc-status" id="hpc-tt-s">—</div>
     </div>
     <div class="home-plat-card" id="hpc-fb">
-      <div class="hpc-logo" style="background:rgba(24,119,242,.12);border-color:rgba(24,119,242,.25);">
-        <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:#1877f2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-      </div>
+      <div class="hpc-logo" data-brand="fb"></div>
       <div class="hpc-name">Facebook</div>
       <div class="hpc-status" id="hpc-fb-s">—</div>
     </div>
@@ -2735,16 +3241,16 @@
     <div class="card-title">Plataformas</div>
     <div class="platform-row">
       <button class="platform-btn" data-platform="yt">
-        <span class="dot"></span> YouTube
+        <span class="plat-btn-logo" data-brand="yt"></span> YouTube
       </button>
       <button class="platform-btn" data-platform="ig">
-        <span class="dot"></span> Instagram
+        <span class="plat-btn-logo" data-brand="ig"></span> Instagram
       </button>
       <button class="platform-btn" data-platform="fb">
-        <span class="dot"></span> Facebook
+        <span class="plat-btn-logo" data-brand="fb"></span> Facebook
       </button>
       <button class="platform-btn" data-platform="tt">
-        <span class="dot"></span> TikTok
+        <span class="plat-btn-logo" data-brand="tt"></span> TikTok
       </button>
       <button class="select-all-btn" id="select-all-btn">Selecionar todas</button>
     </div>
@@ -2768,6 +3274,58 @@
       </div>
       <div class="ig-collab-note">Os utilizadores receberão um convite para colaborar antes do post aparecer no perfil deles.</div>
     </div>
+
+    <!-- TikTok publishing options (TikTok Content Posting API compliance) -->
+    <div id="tt-options" style="display:none;">
+      <div class="tt-opt-divider"></div>
+      <div class="tt-opt-header">
+        <span class="plat-btn-logo" data-brand="tt" style="width:20px;height:20px;"></span>
+        <span>Opções de publicação no TikTok</span>
+      </div>
+
+      <!-- Creator info (who you're posting as) -->
+      <div class="tt-creator" id="tt-creator" style="display:none;">
+        <img id="tt-creator-avatar" src="" alt="" />
+        <div>
+          <div class="tt-creator-name" id="tt-creator-name"></div>
+          <div class="tt-creator-sub">A publicar nesta conta TikTok</div>
+        </div>
+      </div>
+
+      <!-- Privacy level -->
+      <div class="tt-opt-field">
+        <label class="tt-opt-label">Quem pode ver este vídeo</label>
+        <select id="tt-privacy" class="tt-opt-select">
+          <option value="PUBLIC_TO_EVERYONE">Público — todos</option>
+          <option value="MUTUAL_FOLLOW_FRIENDS">Amigos — seguidores mútuos</option>
+          <option value="SELF_ONLY">Só eu — privado</option>
+        </select>
+      </div>
+
+      <!-- Interaction toggles -->
+      <div class="tt-opt-field">
+        <label class="tt-opt-label">Permitir interações</label>
+        <div class="tt-toggle-row">
+          <label class="tt-check"><input type="checkbox" id="tt-allow-comment" checked /> <span>Comentários</span></label>
+          <label class="tt-check"><input type="checkbox" id="tt-allow-duet" checked /> <span>Dueto</span></label>
+          <label class="tt-check"><input type="checkbox" id="tt-allow-stitch" checked /> <span>Stitch</span></label>
+        </div>
+      </div>
+
+      <!-- Commercial / branded content disclosure -->
+      <div class="tt-opt-field">
+        <label class="tt-check tt-commercial-main"><input type="checkbox" id="tt-commercial" /> <span>Divulgar conteúdo comercial</span></label>
+        <div class="tt-commercial-sub" id="tt-commercial-sub" style="display:none;">
+          <label class="tt-check"><input type="checkbox" id="tt-your-brand" /> <span>A tua marca — promoves a ti próprio ou o teu negócio</span></label>
+          <label class="tt-check"><input type="checkbox" id="tt-branded-content" /> <span>Conteúdo de marca — promoves outra marca (parceria paga)</span></label>
+        </div>
+      </div>
+
+      <!-- Music usage / compliance declaration -->
+      <div class="tt-opt-disclosure" id="tt-disclosure">
+        Ao publicar, concordas com a <a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/en" target="_blank" rel="noopener">Confirmação de Uso de Música do TikTok</a>.
+      </div>
+    </div>
   </div>
 
   <!-- CONTENT -->
@@ -2783,9 +3341,28 @@
         <div class="counter"><span id="title-count">0</span>/100</div>
       </div>
       <div class="field">
-        <label>Descrição</label>
+        <label style="display:flex;align-items:center;justify-content:space-between;">
+          <span>Descrição</span>
+          <button type="button" class="ai-caption-btn" onclick="openAiCaptionModal()" title="Gera legenda com IA baseada no vídeo">
+            <svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:currentColor"><path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z"/></svg>
+            Gerar com IA
+          </button>
+        </label>
         <textarea id="description" rows="5" placeholder="Descrição do vídeo..." maxlength="5000"></textarea>
         <div class="counter"><span id="desc-count">0</span>/5000</div>
+      </div>
+
+      <!-- Pinned first comment -->
+      <div class="field pinned-comment-field" style="margin-top:14px;">
+        <div class="toggle-wrap">
+          <label class="toggle-switch">
+            <input type="checkbox" id="pinned-comment-toggle" />
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="toggle-label">Comentário fixado</span>
+        </div>
+        <textarea id="pinned-comment-input" rows="2" placeholder="Ex: Link na bio 👉 ... · Créditos: @nathan" maxlength="500" style="display:none;margin-top:10px;"></textarea>
+        <div class="counter" id="pinned-comment-counter" style="display:none;"><span id="pinned-comment-count">0</span>/500</div>
       </div>
     </div>
 
@@ -2821,6 +3398,10 @@
 
       <!-- Atalhos rápidos -->
       <div class="sched-quick-row">
+        <button class="sched-quick-btn peak-btn" onclick="setSchedulePeak()" title="Sugere o melhor horário com base nas plataformas selecionadas">
+          <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:currentColor;vertical-align:-1px;margin-right:3px"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+          Horário de pico
+        </button>
         <button class="sched-quick-btn" onclick="setScheduleQuick(1)">+1 hora</button>
         <button class="sched-quick-btn" onclick="setScheduleQuick(2)">+2 horas</button>
         <button class="sched-quick-btn" onclick="setScheduleQuick(6)">+6 horas</button>
@@ -2853,6 +3434,15 @@
       <span id="queue-count-badge" style="font-size:.75rem;color:var(--text2);background:var(--surface3);padding:2px 10px;border-radius:20px;font-weight:600;"></span>
     </div>
     <div id="queue-list"></div>
+  </div>
+
+  <!-- PRE-FLIGHT CHECK -->
+  <div class="card preflight-card" id="preflight-card" style="display:none;">
+    <div class="card-title" style="display:flex;align-items:center;gap:8px;">
+      <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:var(--accent-light)"><path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm-1.06 13.54L7.4 12l1.41-1.41 2.12 2.12 4.24-4.24 1.41 1.41-5.64 5.66z"/></svg>
+      Verificação pré-publicação
+    </div>
+    <div class="preflight-list" id="preflight-list"></div>
   </div>
 
   <!-- PUBLISH -->
@@ -3290,9 +3880,9 @@ function loadSession() {
   if (saved) {
     try {
       currentUser = JSON.parse(saved);
-      // Check if session is still valid (72 hours = 259200000 ms)
+      // Check if session is still valid (15 days)
       const sessionAge = Date.now() - (currentUser.loginTime || 0);
-      const SESSION_DURATION = 72 * 60 * 60 * 1000; // 72 hours in milliseconds
+      const SESSION_DURATION = 15 * 24 * 60 * 60 * 1000; // 15 days in milliseconds
       if (sessionAge > SESSION_DURATION) {
         localStorage.removeItem('euposto_user');
         window.location.replace('index.html');
@@ -3356,14 +3946,31 @@ function _saveFormText() {
   localStorage.setItem('_f_tags',  JSON.stringify(hashtags));
 }
 async function _restoreForm() {
-  const t = localStorage.getItem('_f_title');
-  const d = localStorage.getItem('_f_desc');
-  const tg = localStorage.getItem('_f_tags');
-  if (t)  $('title').value = t;
-  if (d)  $('description').value = d;
-  if (tg) { try { const arr = JSON.parse(tg); if (Array.isArray(arr)) { arr.forEach(h => { if (!hashtags.includes(h)) hashtags.push(h); }); renderHashtags(); } } catch(e) {} }
+  // Título / descrição / hashtags começam SEMPRE vazios (não persistem em F5).
+  // Só o vídeo é restaurado no mesmo separador (F5), limpo ao fechar/reabrir.
+  localStorage.removeItem('_f_title');
+  localStorage.removeItem('_f_desc');
+  localStorage.removeItem('_f_tags');
+  const tabAlive = sessionStorage.getItem('_form_tab');
+  if (!tabAlive) {
+    _clearFormVideo();
+    sessionStorage.setItem('_form_tab', '1');
+    return;
+  }
   const file = await _loadFormVideo();
   if (file) setVideo(file);
+}
+// Limpa título, descrição e hashtags (F5 e após cada publicação)
+function clearTextFields() {
+  if ($('title')) $('title').value = '';
+  if ($('description')) $('description').value = '';
+  hashtags.length = 0;
+  if (typeof renderHashtags === 'function') renderHashtags();
+  if ($('title-count')) $('title-count').textContent = '0';
+  if ($('desc-count')) $('desc-count').textContent = '0';
+  localStorage.removeItem('_f_title');
+  localStorage.removeItem('_f_desc');
+  localStorage.removeItem('_f_tags');
 }
 function _clearPersistedForm() {
   localStorage.removeItem('_f_title');
@@ -3389,7 +3996,7 @@ function updateFireIcon() {
   const el = document.getElementById('fire-icon');
   if (!el) return;
   const score = calcHeatScore();
-  el.className = 'fire-icon';
+  el.className = 'fire-icon blue-fire';
   const lang = _greetLang ? _greetLang() : 'pt';
   const labels = {
     pt:    ['Ainda sem publicações — vamos começar! 🌱', 'A aquecer! Continua a publicar 🔥', 'Em chamas! Ótimo desempenho 🔥🔥', 'Lendário! Nível máximo 🔥🔥🔥'],
@@ -4056,17 +4663,32 @@ if (document.readyState === 'loading') {
 //  ── CONNECTED ACCOUNTS (Multi-account) ─────
 // ─────────────────────────────────────────────
 
-const TT_CLIENT_KEY = 'sbaw930nq94lipbf2x';
+const TT_CLIENT_KEY = 'aw25jfk9xzdhhfzv';
 const TT_REDIRECT = 'https://eupostoapp.pages.dev/euposto.html';
 const IG_APP_ID = '1736364031132996';
 const IG_REDIRECT = 'https://eupostoapp.pages.dev/euposto.html';
 
-const PLAT_SVGS = {
-  yt: '<svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.8 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>',
-  ig: '<svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>',
-  fb: '<svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>',
-  tt: '<svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z"/></svg>'
+// ── Logos oficiais das plataformas (app-icon, cor real, vetorial = máxima resolução) ──
+const BRAND_LOGOS = {
+  yt: '<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="12" fill="#FF0000"/><path fill="#fff" d="M20 16.2 33 24l-13 7.8z"/></svg>',
+  ig: '<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ig-badge-grad" cx="0.3" cy="1.02" r="1.15"><stop offset="0" stop-color="#FFDD77"/><stop offset="0.25" stop-color="#F4A03B"/><stop offset="0.5" stop-color="#EF4056"/><stop offset="0.72" stop-color="#D6309D"/><stop offset="1" stop-color="#8A3AB9"/></radialGradient></defs><rect width="48" height="48" rx="12" fill="url(#ig-badge-grad)"/><rect x="13" y="13" width="22" height="22" rx="6.5" fill="none" stroke="#fff" stroke-width="2.6"/><circle cx="24" cy="24" r="5.6" fill="none" stroke="#fff" stroke-width="2.6"/><circle cx="31.5" cy="16.5" r="1.85" fill="#fff"/></svg>',
+  fb: '<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="12" fill="#1877F2"/><path fill="#fff" d="M30.6 24.5l.85-5.4h-5.18v-3.5c0-1.48.72-2.92 3.05-2.92h2.36V7.9s-2.14-.37-4.19-.37c-4.28 0-7.07 2.59-7.07 7.28v4.12h-4.75v5.4h4.75V37h5.85V24.5z"/></svg>',
+  tt: '<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="12" fill="#010101"/><svg x="11" y="11" width="26" height="26" viewBox="0 0 24 24"><path fill="#25F4EE" transform="translate(0.7,0.7)" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.65z"/><path fill="#FE2C55" transform="translate(-0.7,-0.7)" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.65z"/><path fill="#fff" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.65z"/></svg></svg>'
 };
+const PLAT_SVGS = BRAND_LOGOS;
+
+// Preenche todos os slots [data-brand] com a logo oficial correspondente
+function _injectBrandLogos() {
+  document.querySelectorAll('[data-brand]').forEach(el => {
+    const b = el.getAttribute('data-brand');
+    if (BRAND_LOGOS[b] && !el.querySelector('svg')) el.innerHTML = BRAND_LOGOS[b];
+  });
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _injectBrandLogos);
+} else {
+  _injectBrandLogos();
+}
 
 // ── Multi-account storage ──
 function getAccounts(p) {
@@ -4342,30 +4964,86 @@ function connectFacebook() {
   FB.login(response => {
     if (!response.authResponse) return;
     const token = response.authResponse.accessToken;
-    FB.api('/me', { fields: 'name,username,accounts{instagram_business_account{username,id},name,access_token,id,username}' }, data => {
-      const page = data.accounts?.data?.[0];
-      const fbHandle = page?.username ? '@'+page.username : (page?.name || data.name || 'Página Facebook');
-      const pageToken = page ? page.access_token : token;
-      const pageId = page ? page.id : '';
-      addAccountData('fb', { name: fbHandle, token: pageToken, pageId });
-      const igId = page?.instagram_business_account?.id;
-      const igUsername = page?.instagram_business_account?.username;
-      if (igId) addAccountData('ig', { name: igUsername ? '@'+igUsername : fbHandle, token: pageToken, userId: igId });
+    FB.api('/me/accounts', { fields: 'id,name,username,access_token,instagram_business_account{id,username,name}' }, accountsData => {
+      const page = accountsData?.data?.[0];
+      if (!page) {
+        alert('Não encontrei nenhuma Página de Facebook ligada à tua conta. Cria uma Página primeiro em facebook.com/pages/create.');
+        return;
+      }
+      const pageName = page.name || 'Página Facebook';
+      const fbHandle = page.username ? '@' + page.username : pageName;
+      addAccountData('fb', { name: fbHandle, token: page.access_token, pageId: page.id });
+      const ig = page.instagram_business_account;
+      if (ig?.id) {
+        const igName = ig.username ? '@' + ig.username : (ig.name || fbHandle);
+        addAccountData('ig', { name: igName, token: page.access_token, userId: ig.id });
+      }
       renderContas();
     });
-  }, { scope: 'pages_manage_posts,pages_read_engagement,instagram_content_publish,instagram_basic,instagram_business_manage_insights,publish_video,pages_show_list' });
+  }, { scope: 'pages_show_list,pages_manage_posts,pages_read_engagement,instagram_basic,instagram_content_publish' });
 }
 
 function connectInstagram() {
-  const authUrl = `https://api.instagram.com/oauth/authorize?` +
-    `client_id=${IG_APP_ID}&redirect_uri=${encodeURIComponent(IG_REDIRECT)}` +
-    `&scope=instagram_basic,instagram_content_publish&response_type=code&state=ig_connect`;
+  // Uses the new "Instagram API with Instagram Login" (substitui o antigo Basic
+  // Display, descontinuado em dez/2024). Login direto via Instagram, sem Facebook.
+  // Requer que a app Meta tenha o produto "Instagram" configurado.
+  const authUrl = 'https://www.instagram.com/oauth/authorize' +
+    '?force_reauth=true' +
+    '&client_id=' + IG_APP_ID +
+    '&redirect_uri=' + encodeURIComponent(IG_REDIRECT) +
+    '&response_type=code' +
+    '&scope=' + encodeURIComponent('instagram_business_basic,instagram_business_content_publish,instagram_business_manage_comments,instagram_business_manage_messages') +
+    '&state=ig_connect';
   window.location.href = authUrl;
 }
 
+// ─────────────────────────────────────────────
+//  ── SITE-STYLED CONFIRM MODAL ───────────────
+// ─────────────────────────────────────────────
+function siteConfirm(opts) {
+  return new Promise(resolve => {
+    let modal = document.getElementById('site-confirm-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'site-confirm-modal';
+      modal.innerHTML = `
+        <div class="site-confirm-dialog">
+          <div class="site-confirm-icon"></div>
+          <h2 class="site-confirm-title"></h2>
+          <p class="site-confirm-msg"></p>
+          <div class="site-confirm-actions">
+            <button class="site-confirm-cancel"></button>
+            <button class="site-confirm-ok"></button>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+    }
+    modal.querySelector('.site-confirm-icon').textContent = opts.icon || '💬';
+    modal.querySelector('.site-confirm-title').textContent = opts.title || 'Confirmar';
+    modal.querySelector('.site-confirm-msg').textContent = opts.message || '';
+    const okBtn = modal.querySelector('.site-confirm-ok');
+    const cancelBtn = modal.querySelector('.site-confirm-cancel');
+    okBtn.textContent = opts.okText || 'Continuar';
+    cancelBtn.textContent = opts.cancelText || 'Cancelar';
+    const close = result => {
+      modal.classList.remove('show');
+      okBtn.onclick = null; cancelBtn.onclick = null; modal.onclick = null;
+      resolve(result);
+    };
+    okBtn.onclick = () => close(true);
+    cancelBtn.onclick = () => close(false);
+    modal.onclick = e => { if (e.target === modal) close(false); };
+    modal.classList.add('show');
+    setTimeout(() => okBtn.focus(), 100);
+  });
+}
+
 function connectTikTok() {
+  // video.upload = inbox/draft (sempre aprovado por defeito)
+  // video.publish = direct post (precisa de auditoria — pedimos os dois, TikTok
+  // só concede os que estiverem aprovados na app)
   const authUrl = `https://www.tiktok.com/v2/auth/authorize/?` +
-    `client_key=${TT_CLIENT_KEY}&response_type=code&scope=user.info.basic,video.publish` +
+    `client_key=${TT_CLIENT_KEY}&response_type=code&scope=user.info.basic,video.upload,video.publish` +
     `&redirect_uri=${encodeURIComponent(TT_REDIRECT)}&state=tt_connect`;
   window.location.href = authUrl;
 }
@@ -4696,11 +5374,11 @@ function analyzeVideo(videoEl) {
   const h = videoEl.videoHeight;
   const d = videoEl.duration;
   const isVertical = h > w;
-  const isShortCompatible = isVertical && d <= 60;
-  videoMeta = { width: w, height: h, duration: d, isVertical, isShortCompatible };
+  const isSquare = Math.abs(h - w) < 10;
+  videoMeta = { width: w, height: h, duration: d, isVertical, isSquare, isShortCompatible: true };
 
-  // Auto-select format based on actual video properties
-  setVideoType(isShortCompatible ? 'short' : 'long');
+  // Sempre publica no YouTube como Shorts (preferência do utilizador)
+  setVideoType('short');
 
   // Update file info bar with resolution + duration
   const orient = isVertical ? 'vertical' : 'horizontal';
@@ -4721,8 +5399,85 @@ function updateVtypeVisibility() {
   const igActive = document.querySelector('.platform-btn[data-platform="ig"]').classList.contains('active');
   const collabSec = $('ig-collab-section');
   if (collabSec) collabSec.style.display = igActive ? '' : 'none';
+  // TikTok options panel (Content Posting API compliance)
+  const ttActive = document.querySelector('.platform-btn[data-platform="tt"]').classList.contains('active');
+  const ttOpts = $('tt-options');
+  if (ttOpts) {
+    ttOpts.style.display = ttActive ? '' : 'none';
+    if (ttActive) loadTikTokCreatorInfo();
+  }
   renderAccountSelectors();
 }
+
+// ── TikTok creator info (obrigatório pela Content Posting API antes de publicar) ──
+let _ttCreatorLoaded = false;
+async function loadTikTokCreatorInfo() {
+  const accts = (typeof getAccounts === 'function') ? getAccounts('tt') : [];
+  const acct = accts[0];
+  if (!acct || !acct.token) { _ttCreatorLoaded = false; return; }
+  if (_ttCreatorLoaded) return;
+  try {
+    const r = await fetch(AI_WORKER + '?action=tt_creator_info', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + acct.token }
+    });
+    const data = await r.json();
+    const info = data?.data;
+    if (!info) return;
+    _ttCreatorLoaded = true;
+    // Creator display
+    const cbox = $('tt-creator');
+    if (info.creator_nickname) {
+      $('tt-creator-name').textContent = info.creator_nickname;
+      if (info.creator_avatar_url) $('tt-creator-avatar').src = info.creator_avatar_url;
+      cbox.style.display = 'flex';
+    }
+    // Privacy options — só mostrar as permitidas pela conta
+    const allowed = info.privacy_level_options || [];
+    if (allowed.length) {
+      const sel = $('tt-privacy');
+      const labels = {
+        PUBLIC_TO_EVERYONE: 'Público — todos',
+        MUTUAL_FOLLOW_FRIENDS: 'Amigos — seguidores mútuos',
+        FOLLOWER_OF_CREATOR: 'Seguidores',
+        SELF_ONLY: 'Só eu — privado'
+      };
+      sel.innerHTML = allowed.map(p => `<option value="${p}">${labels[p] || p}</option>`).join('');
+    }
+    // Interações desativadas pela conta → desativar checkbox
+    _ttToggle('tt-allow-comment', info.comment_disabled);
+    _ttToggle('tt-allow-duet', info.duet_disabled);
+    _ttToggle('tt-allow-stitch', info.stitch_disabled);
+  } catch(e) { /* silencioso — fallback usa defaults */ }
+}
+function _ttToggle(id, disabled) {
+  const cb = $(id);
+  if (!cb) return;
+  const wrap = cb.closest('.tt-check');
+  if (disabled) { cb.checked = false; cb.disabled = true; wrap?.classList.add('disabled'); }
+  else { cb.disabled = false; wrap?.classList.remove('disabled'); }
+}
+
+// ── Commercial / branded content toggle ──
+document.getElementById('tt-commercial')?.addEventListener('change', e => {
+  const sub = document.getElementById('tt-commercial-sub');
+  if (sub) sub.style.display = e.target.checked ? 'flex' : 'none';
+  if (!e.target.checked) {
+    const yb = document.getElementById('tt-your-brand');
+    const bc = document.getElementById('tt-branded-content');
+    if (yb) yb.checked = false;
+    if (bc) bc.checked = false;
+  }
+});
+// Branded content não pode ser privado (regra TikTok)
+document.getElementById('tt-branded-content')?.addEventListener('change', e => {
+  const sel = document.getElementById('tt-privacy');
+  if (e.target.checked && sel && sel.value === 'SELF_ONLY') {
+    const pub = [...sel.options].find(o => o.value === 'PUBLIC_TO_EVERYONE');
+    if (pub) sel.value = 'PUBLIC_TO_EVERYONE';
+    alert('Conteúdo de marca não pode ser privado. Visibilidade alterada para Público.');
+  }
+});
 
 document.querySelectorAll('.platform-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -5241,7 +5996,7 @@ async function publishQueue() {
             new Promise((_, rej) => setTimeout(() => rej(new Error('Timeout: upload demorou mais de 10 min')), 10 * 60 * 1000))
           ]);
           setProgress(p, 100);
-          setStatus(p, 'done', item.scheduledTime ? 'Agendado com sucesso' : '✓ Publicado com sucesso');
+          setStatus(p, 'done', p==='tt' ? ttDoneMsg(item.scheduledTime) : (item.scheduledTime ? 'Agendado com sucesso' : '✓ Publicado com sucesso'));
           const _vurl = p==='yt' && id ? `https://youtu.be/${id}` : p==='fb' && id ? `https://www.facebook.com/video/${id}/` : null;
           saveHistoryEntry({
             platform: p,
@@ -5273,7 +6028,7 @@ async function publishQueue() {
 //  Status panel helpers
 // ─────────────────────────────────────────────
 const platformNames = { yt: 'YouTube', ig: 'Instagram', fb: 'Facebook', tt: 'TikTok' };
-const platformIcons = { yt: '▶', ig: '◈', fb: '⬡', tt: '♪' };
+const platformIcons = BRAND_LOGOS;
 
 function initStatus(tasks, scheduledTime) {
   // Normalize: string[] → task objects
@@ -5323,7 +6078,12 @@ function setStatus(p, state, msg) {
   const icon = $('icon-'+p);
   const msgEl = $('msg-'+p);
   if (icon) { icon.className = 'status-icon ' + state; }
-  if (msgEl) msgEl.textContent = msg;
+  if (msgEl) {
+    // Limpa prefixos "✓ " / "X " da mensagem (vamos usar o badge CSS em vez)
+    const cleanMsg = msg.replace(/^[✓✗X]\s+/, '').trim();
+    msgEl.textContent = state === 'done' ? cleanMsg.replace(/^Publicado com sucesso$/i, 'Publicado com sucesso') : cleanMsg;
+    msgEl.className = 'status-msg' + (state === 'done' ? ' done-msg' : '');
+  }
   setOverlayStatus(p, state, msg);
 }
 
@@ -5647,25 +6407,72 @@ uploadTikTok = async function(scheduledTime, acct, statusKey='tt') {
   const ttTitleFull = ttTagsText ? ttTitleBase + ' ' + ttTagsText : ttTitleBase;
   const title = ttTitleFull.slice(0, 150);
 
-  setStatus(statusKey, 'uploading', 'A iniciar upload TikTok...');
+  const WORKER = 'https://still-cloud-be15.lucasfarianinja.workers.dev';
+  // Chunking conforme a referência oficial do TikTok:
+  // - chunk_size entre 5MB e 64MB
+  // - total_chunk_count = floor(video_size / chunk_size)
+  // - o ÚLTIMO chunk leva o resto (pode ir até 2× chunk_size)
+  // Regra oficial do TikTok (produção, aplicada à risca):
+  //  • vídeo ≤ 64MB  → 1 chunk único, chunk_size = video_size, total = 1
+  //  • vídeo > 64MB  → chunks de 64MB, total = floor(size/64MB), último leva o resto
+  const MB = 1024 * 1024;
+  const MAX_CHUNK = 64 * MB;
+  const size = videoFile.size;
+  let chunkSize, totalChunks;
+  if (size <= MAX_CHUNK) {
+    chunkSize = size;
+    totalChunks = 1;
+  } else {
+    chunkSize = MAX_CHUNK;
+    totalChunks = Math.floor(size / chunkSize);
+  }
+  const sourceInfo = { source: 'FILE_UPLOAD', video_size: size, chunk_size: chunkSize, total_chunk_count: totalChunks };
+
+  // Lê opções de publicação da UI (Content Posting API compliance)
+  const gv = (id, d) => { const el = $(id); return el ? el.value : d; };
+  const gc = (id, d) => { const el = $(id); return el ? el.checked : d; };
+  const privacy = gv('tt-privacy', 'PUBLIC_TO_EVERYONE');
   const postInfo = {
     title: title || 'Vídeo',
-    privacy_level: 'SELF_ONLY',
-    disable_duet: false, disable_comment: false, disable_stitch: false,
+    privacy_level: privacy,
+    disable_comment: !gc('tt-allow-comment', true),
+    disable_duet:    !gc('tt-allow-duet', true),
+    disable_stitch:  !gc('tt-allow-stitch', true)
   };
+  const isCommercial = gc('tt-commercial', false);
+  if (isCommercial) {
+    postInfo.brand_content_toggle = gc('tt-branded-content', false); // promove outra marca
+    postInfo.brand_organic_toggle = gc('tt-your-brand', false);      // promove a própria marca
+  }
   if (scheduledTime) postInfo.scheduled_publish_time = Math.floor(scheduledTime.getTime() / 1000);
-  const WORKER = 'https://still-cloud-be15.lucasfarianinja.workers.dev';
-  const chunkSize = Math.min(videoFile.size, 64 * 1024 * 1024); // max 64MB per chunk
-  const totalChunks = Math.ceil(videoFile.size / chunkSize);
-  const initRes = await fetch(WORKER + '?action=tt_init', {
+
+  // 1ª tentativa: DIRECT POST (publica direto no perfil). Se a app ainda não
+  // tiver "Direct Post" auditado, cai automaticamente para rascunho (inbox).
+  let useInbox = false;
+  setStatus(statusKey, 'uploading', 'A iniciar publicação no TikTok...');
+  let initRes = await fetch(WORKER + '?action=tt_init', {
     method: 'POST',
     signal: publishAbortCtrl?.signal,
     headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      post_info: postInfo,
-      source_info: { source: 'FILE_UPLOAD', video_size: videoFile.size, chunk_size: chunkSize, total_chunk_count: totalChunks }
-    })
+    body: JSON.stringify({ post_info: postInfo, source_info: sourceInfo })
   });
+  let initPeek = await initRes.clone().json().catch(() => ({}));
+  const errCode = initPeek?.error?.code;
+  if (errCode && errCode !== 'ok') {
+    // Erro que indica falta de auditoria Direct Post → fallback para rascunho
+    const fallbackCodes = ['unaudited_client_can_only_post_to_private_accounts', 'scope_not_authorized', 'access_token_invalid'];
+    const msg = (initPeek?.error?.message || '').toLowerCase();
+    if (fallbackCodes.includes(errCode) || msg.includes('unaudited') || msg.includes('private account')) {
+      useInbox = true;
+      setStatus(statusKey, 'uploading', 'A enviar para rascunhos do TikTok...');
+      initRes = await fetch(WORKER + '?action=tt_init&inbox=1', {
+        method: 'POST',
+        signal: publishAbortCtrl?.signal,
+        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source_info: sourceInfo })
+      });
+    }
+  }
   if (publishCancelled) throw new Error('Cancelado');
   const initData = await initRes.json();
   if (initData?.error?.code && initData.error.code !== 'ok') {
@@ -5673,22 +6480,57 @@ uploadTikTok = async function(scheduledTime, acct, statusKey='tt') {
   }
   const uploadUrl = initData?.data?.upload_url;
   if (!uploadUrl) throw new Error('TikTok: URL de upload não retornada');
-  setStatus(statusKey, 'uploading', 'A enviar vídeo...');
-  await new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    activeXHRs.push(xhr);
-    xhr.open('PUT', uploadUrl);
-    xhr.setRequestHeader('Content-Type', videoFile.type || 'video/mp4');
-    xhr.setRequestHeader('Content-Range', `bytes 0-${videoFile.size - 1}/${videoFile.size}`);
-    xhr.upload.onprogress = e => { if (e.lengthComputable) { const p=Math.round(e.loaded/e.total*100); setProgress(statusKey,p); setStatus(statusKey,'uploading',`A enviar... ${p}%`); } };
-    xhr.onload = () => { activeXHRs.splice(activeXHRs.indexOf(xhr),1); if (xhr.status>=200&&xhr.status<300) resolve(); else reject(new Error(`TikTok upload HTTP ${xhr.status}`)); };
-    xhr.onerror = () => { activeXHRs.splice(activeXHRs.indexOf(xhr),1); reject(new Error('Erro de rede no upload TikTok')); };
-    xhr.onabort = () => { activeXHRs.splice(activeXHRs.indexOf(xhr),1); reject(new Error('Cancelado')); };
-    xhr.send(videoFile);
-  });
+  setStatus(statusKey, 'uploading', `A enviar vídeo (${totalChunks} ${totalChunks===1?'parte':'partes'})...`);
+
+  // Upload sequencial. O último chunk vai até ao fim do ficheiro (leva o resto).
+  let totalUploaded = 0;
+  for (let i = 0; i < totalChunks; i++) {
+    if (publishCancelled) throw new Error('Cancelado');
+    const start = i * chunkSize;
+    const end = (i === totalChunks - 1) ? size : start + chunkSize; // último → EOF
+    const chunkBlob = videoFile.slice(start, end);
+    const chunkLen = end - start;
+    await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      activeXHRs.push(xhr);
+      xhr.open('PUT', uploadUrl);
+      xhr.setRequestHeader('Content-Type', videoFile.type || 'video/mp4');
+      xhr.setRequestHeader('Content-Range', `bytes ${start}-${end - 1}/${size}`);
+      xhr.upload.onprogress = e => {
+        if (e.lengthComputable) {
+          const overall = Math.round((totalUploaded + e.loaded) / size * 100);
+          setProgress(statusKey, overall);
+          setStatus(statusKey, 'uploading', totalChunks === 1 ? `A enviar... ${overall}%` : `A enviar... ${overall}% (parte ${i+1}/${totalChunks})`);
+        }
+      };
+      xhr.onload = () => {
+        activeXHRs.splice(activeXHRs.indexOf(xhr), 1);
+        // 200 = completo · 201/206 = chunk aceite, faltam outros
+        if (xhr.status === 200 || xhr.status === 201 || xhr.status === 206) {
+          totalUploaded += chunkLen;
+          resolve();
+        } else {
+          let m = `HTTP ${xhr.status}`;
+          try { m = xhr.responseText.slice(0, 200); } catch(e) {}
+          reject(new Error(`TikTok chunk ${i+1}: ${m}`));
+        }
+      };
+      xhr.onerror = () => { activeXHRs.splice(activeXHRs.indexOf(xhr), 1); reject(new Error('Erro de rede no upload TikTok')); };
+      xhr.onabort = () => { activeXHRs.splice(activeXHRs.indexOf(xhr), 1); reject(new Error('Cancelado')); };
+      xhr.send(chunkBlob);
+    });
+  }
   setProgress(statusKey, 100);
+  // Guarda o modo usado para o orquestrador mostrar a mensagem certa
+  window._ttLastUploadMode = useInbox ? 'inbox' : 'direct';
   return initData?.data?.publish_id || null;
 };
+
+// Mensagem de sucesso TikTok conforme o modo (rascunho vs publicação direta)
+function ttDoneMsg(scheduledTime) {
+  if (window._ttLastUploadMode === 'inbox') return '✓ Enviado para rascunhos — finaliza na app TikTok';
+  return scheduledTime ? '✓ Agendado no TikTok' : '✓ Publicado no TikTok';
+}
 
 // ─────────────────────────────────────────────
 //  ── HISTORY ─────────────────────────────────
@@ -5787,7 +6629,7 @@ async function checkAndAutoPublish() {
             new Promise((_, rej) => setTimeout(() => rej(new Error('Timeout')), 10 * 60 * 1000))
           ]);
           setProgress(p, 100);
-          setStatus(p, 'done', '✓ Publicado com sucesso');
+          setStatus(p, 'done', p==='tt' ? ttDoneMsg(item.scheduledTime) : '✓ Publicado com sucesso');
           saveHistoryEntry({
             platform: p, title: item.title || 'Sem título', description: item.description || '',
             hashtags: item.hashtags || [], date: new Date().toISOString(),
@@ -6466,7 +7308,7 @@ async function doPublish() {
         ]);
         if (publishCancelled) { setStatus(key, 'error', '✗ Cancelado'); return; }
         setProgress(key, 100);
-        setStatus(key, 'done', scheduledTime ? '⏰ Agendado com sucesso' : '✓ Publicado com sucesso');
+        setStatus(key, 'done', platform==='tt' ? ttDoneMsg(scheduledTime) : (scheduledTime ? '⏰ Agendado com sucesso' : '✓ Publicado com sucesso'));
         const videoUrl = platform==='yt' && videoId ? `https://youtu.be/${videoId}`
                        : platform==='fb' && videoId ? `https://www.facebook.com/video/${videoId}/`
                        : null;
@@ -6494,6 +7336,8 @@ async function doPublish() {
 
   $('cancel-btn').style.display = 'none';
   $('publish-btn').disabled = false;
+  // Limpa título, descrição e hashtags após a publicação
+  if (!publishCancelled) clearTextFields();
 }
 
 // ─────────────────────────────────────────────
@@ -7072,6 +7916,56 @@ async function editFacebook(postId, token, title, description) {
   </div>
 </div>
 
+<!-- ── AI Caption Modal ── -->
+<div id="ai-caption-modal" class="ai-modal">
+  <div class="ai-modal-card">
+    <button class="ai-modal-close" onclick="closeAiCaptionModal()" aria-label="Fechar">×</button>
+    <div class="ai-modal-header">
+      <div class="ai-modal-icon">
+        <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:currentColor"><path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z"/></svg>
+      </div>
+      <div>
+        <div class="ai-modal-title">Gerar legenda com IA</div>
+        <div class="ai-modal-sub">Descreve brevemente o que o vídeo mostra ou diz — a IA gera uma legenda curta e cativante.</div>
+      </div>
+    </div>
+    <label class="ai-modal-label">O que mostra/diz o vídeo</label>
+    <textarea id="ai-caption-desc" rows="3" placeholder="Ex: Tutorial rápido de edição de vídeo com música lo-fi e transições suaves"></textarea>
+    <button id="ai-caption-gen-btn" class="ai-caption-gen-btn" onclick="generateAiCaption()">✨ Gerar legenda</button>
+    <div id="ai-caption-result" class="ai-caption-result"></div>
+  </div>
+</div>
+
+<!-- ── AI Chat Widget ── -->
+<button id="ai-chat-fab" class="ai-chat-fab" onclick="toggleAiChat()" aria-label="Abrir assistente IA">
+  <svg class="ai-chat-fab-icon" viewBox="0 0 24 24" style="width:22px;height:22px;fill:currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.54.36 2.99.97 4.29L1 23l6.71-1.97C9.01 21.64 10.46 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm-1 5h2v2h-2V7zm0 4h2v6h-2v-6z"/></svg>
+  <svg class="ai-chat-fab-close" viewBox="0 0 24 24" style="width:22px;height:22px;fill:currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+</button>
+
+<div id="ai-chat-panel" class="ai-chat-panel">
+  <div class="ai-chat-header">
+    <div class="ai-chat-header-avatar">
+      <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor"><path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5z"/></svg>
+    </div>
+    <div style="flex:1">
+      <div class="ai-chat-header-title">Assistente EuPosto</div>
+      <div class="ai-chat-header-sub">IA · sempre online</div>
+    </div>
+  </div>
+  <div id="ai-chat-messages" class="ai-chat-messages"></div>
+  <div class="ai-chat-suggestions">
+    <button onclick="document.getElementById('ai-chat-input').value='Qual o melhor horário para postar no TikTok?';sendAiChatMessage()">Melhor horário?</button>
+    <button onclick="document.getElementById('ai-chat-input').value='Dá-me 5 ideias de hashtags virais para vídeos curtos';sendAiChatMessage()">Hashtags virais</button>
+    <button onclick="document.getElementById('ai-chat-input').value='Como funciona o EuPosto?';sendAiChatMessage()">Como usar a app</button>
+  </div>
+  <div class="ai-chat-input-row">
+    <input type="text" id="ai-chat-input" placeholder="Pergunta sobre EuPosto, viralizar, hashtags..." autocomplete="off" />
+    <button onclick="sendAiChatMessage()" aria-label="Enviar">
+      <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+
 <!-- PUBLISHING OVERLAY -->
 <div id="pub-overlay" style="display:none;">
   <div id="pub-overlay-card">
@@ -7093,7 +7987,7 @@ async function editFacebook(postId, token, title, description) {
 
 <script>
 // ── Publishing overlay ──────────────────────────────────────────────────────
-const _ovIcons = { yt:'▶', ig:'◈', fb:'⬡', tt:'♪' };
+const _ovIcons = (typeof platformIcons !== 'undefined') ? platformIcons : { yt:'▶', ig:'◈', fb:'⬡', tt:'♪' };
 
 let _overlayIsScheduled = false;
 function showPubOverlay(tasks, scheduledTime) {
@@ -7172,6 +8066,262 @@ function closePubOverlayForce() {
   if (window.publishAbortCtrl) window.publishAbortCtrl.abort();
   window.publishCancelled = true;
 }
+
+// ─────────────────────────────────────────────
+//  ── AI CAPTION MODAL ────────────────────────
+// ─────────────────────────────────────────────
+const AI_WORKER = 'https://still-cloud-be15.lucasfarianinja.workers.dev';
+
+function openAiCaptionModal() {
+  const modal = document.getElementById('ai-caption-modal');
+  if (!modal) return;
+  const fileName = videoFile?.name || '';
+  modal.classList.add('show');
+  setTimeout(() => document.getElementById('ai-caption-desc')?.focus(), 200);
+}
+
+function closeAiCaptionModal() {
+  document.getElementById('ai-caption-modal')?.classList.remove('show');
+  document.getElementById('ai-caption-result').innerHTML = '';
+  document.getElementById('ai-caption-desc').value = '';
+}
+
+async function generateAiCaption() {
+  const desc = document.getElementById('ai-caption-desc').value.trim();
+  if (!desc) { alert('Descreve brevemente o que mostra/diz o vídeo.'); return; }
+  const platforms = getActivePlatforms ? getActivePlatforms() : ['yt','ig','tt','fb'];
+  const lang = localStorage.getItem('euposto_lang') || 'pt';
+  const btn = document.getElementById('ai-caption-gen-btn');
+  const result = document.getElementById('ai-caption-result');
+  btn.disabled = true;
+  btn.textContent = 'A gerar...';
+  result.innerHTML = '<div style="color:var(--muted);font-size:.85rem;padding:14px;text-align:center;">⏳ A IA está a pensar...</div>';
+  try {
+    const r = await fetch(AI_WORKER + '?action=ai_caption', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ description: desc, platforms, language: lang })
+    });
+    const data = await r.json();
+    const caption = (data.caption || data.error || 'Sem resposta').trim();
+    result.innerHTML = `
+      <div class="ai-caption-output">${escapeHtml(caption).replace(/\n/g,'<br>')}</div>
+      <div class="ai-caption-actions">
+        <button onclick="useAiCaption(this)">Usar esta legenda</button>
+        <button onclick="generateAiCaption()" class="ai-caption-regen">Gerar outra</button>
+      </div>`;
+    result.querySelector('.ai-caption-output').dataset.caption = caption;
+  } catch (e) {
+    result.innerHTML = `<div style="color:var(--error);font-size:.85rem;padding:14px;">Erro: ${escapeHtml(e.message)}</div>`;
+  }
+  btn.disabled = false;
+  btn.textContent = '✨ Gerar legenda';
+}
+
+function useAiCaption(btn) {
+  const out = btn.closest('.ai-caption-result').querySelector('.ai-caption-output');
+  const caption = out.dataset.caption || out.textContent;
+  document.getElementById('description').value = caption;
+  document.getElementById('description').dispatchEvent(new Event('input'));
+  closeAiCaptionModal();
+  if (typeof showToastMsg === 'function') showToastMsg('✓ Legenda aplicada');
+}
+
+// ─────────────────────────────────────────────
+//  ── HORÁRIO DE PICO ─────────────────────────
+// ─────────────────────────────────────────────
+const PEAK_HOURS = {
+  yt: [{h:18,m:0},{h:20,m:0}],
+  ig: [{h:11,m:0},{h:19,m:30}],
+  tt: [{h:18,m:0},{h:21,m:0}],
+  fb: [{h:13,m:0},{h:20,m:0}]
+};
+
+function setSchedulePeak() {
+  const platforms = (getActivePlatforms ? getActivePlatforms() : ['yt']);
+  if (!platforms.length) {
+    alert('Seleciona pelo menos uma plataforma primeiro.');
+    return;
+  }
+  // Pick the soonest peak hour that's at least 30min in future, weighted by platforms
+  const now = new Date();
+  const candidates = [];
+  platforms.forEach(p => {
+    (PEAK_HOURS[p] || PEAK_HOURS.yt).forEach(({h, m}) => {
+      const d = new Date(now); d.setHours(h, m, 0, 0);
+      if (d.getTime() - now.getTime() < 30 * 60 * 1000) d.setDate(d.getDate() + 1);
+      candidates.push(d);
+    });
+  });
+  candidates.sort((a, b) => a - b);
+  const chosen = candidates[0];
+  // Enable schedule toggle if not already
+  const tog = document.getElementById('schedule-toggle');
+  if (tog && !tog.checked) { tog.checked = true; tog.dispatchEvent(new Event('change')); }
+  // Set datetime via flatpickr if available
+  const inp = document.getElementById('schedule-datetime');
+  if (inp && inp._flatpickr) {
+    inp._flatpickr.setDate(chosen, true);
+  } else if (inp) {
+    inp.value = chosen.toLocaleString('pt-PT');
+  }
+  if (typeof updatePublishBtn === 'function') updatePublishBtn();
+  if (typeof showToastMsg === 'function') {
+    const platName = { yt:'YouTube', ig:'Instagram', tt:'TikTok', fb:'Facebook' };
+    showToastMsg(`✓ Agendado para horário de pico de ${platName[platforms[0]]}`);
+  }
+}
+
+// ─────────────────────────────────────────────
+//  ── PRE-FLIGHT CHECK ────────────────────────
+// ─────────────────────────────────────────────
+function runPreflightCheck() {
+  const card = document.getElementById('preflight-card');
+  const list = document.getElementById('preflight-list');
+  if (!card || !list) return;
+  const platforms = getActivePlatforms ? getActivePlatforms() : [];
+  if (!videoFile || !platforms.length) {
+    card.style.display = 'none';
+    return;
+  }
+  const checks = [];
+  // 1. Video format
+  const ext = (videoFile.name.split('.').pop() || '').toLowerCase();
+  const okFormats = ['mp4','mov','avi','mkv','webm'];
+  checks.push({
+    ok: okFormats.includes(ext),
+    label: okFormats.includes(ext) ? `Formato .${ext}` : `Formato .${ext} pode não funcionar`,
+    type: okFormats.includes(ext) ? 'ok' : 'warn'
+  });
+  // 2. Size
+  const sizeMB = videoFile.size / (1024 * 1024);
+  if (sizeMB > 4000) checks.push({ ok: false, label: `${sizeMB.toFixed(0)} MB excede 4 GB`, type: 'err' });
+  else if (sizeMB > 1000) checks.push({ ok: true, label: `${sizeMB.toFixed(0)} MB (grande, upload demora)`, type: 'warn' });
+  else checks.push({ ok: true, label: `${sizeMB.toFixed(1)} MB`, type: 'ok' });
+  // 3. Duration limits per platform
+  const dur = videoMeta?.duration;
+  if (dur) {
+    const limits = { yt: 43200, ig: 90, tt: 600, fb: 240*60 };
+    platforms.forEach(p => {
+      const max = limits[p];
+      if (max && dur > max) {
+        checks.push({ ok: false, label: `${({yt:'YouTube',ig:'Instagram',tt:'TikTok',fb:'Facebook'})[p]} corta aos ${Math.floor(max/60)}min`, type: 'warn' });
+      }
+    });
+  }
+  // 4. Copyright check
+  if (typeof copyrightDetected !== 'undefined' && copyrightDetected) {
+    checks.push({ ok: false, label: `Música com direitos detectada: "${copyrightDetected.title}"`, type: 'warn' });
+  } else {
+    checks.push({ ok: true, label: 'Direitos autorais não verificados', type: 'info' });
+  }
+  // 5. Title and description
+  const title = document.getElementById('title').value.trim();
+  const desc = document.getElementById('description').value.trim();
+  if (!title) checks.push({ ok: false, label: 'Sem título — recomendado para SEO', type: 'warn' });
+  else checks.push({ ok: true, label: 'Título preenchido', type: 'ok' });
+  if (!desc) checks.push({ ok: false, label: 'Sem descrição — recomendado', type: 'warn' });
+  else checks.push({ ok: true, label: 'Descrição preenchida', type: 'ok' });
+  // 6. Accounts
+  const selected = typeof getSelectedPublishAccounts === 'function' ? getSelectedPublishAccounts() : {};
+  const missing = platforms.filter(p => !selected[p] || !selected[p].length);
+  if (missing.length) {
+    const names = { yt:'YouTube', ig:'Instagram', tt:'TikTok', fb:'Facebook' };
+    checks.push({ ok: false, label: `Sem conta ligada: ${missing.map(p=>names[p]).join(', ')}`, type: 'err' });
+  } else {
+    checks.push({ ok: true, label: `${platforms.length} plataforma(s) com conta ligada`, type: 'ok' });
+  }
+
+  list.innerHTML = checks.map(c => {
+    const icon = c.type === 'ok' ? '✓' : c.type === 'warn' ? '⚠' : c.type === 'err' ? '✗' : 'ℹ';
+    return `<div class="preflight-item preflight-${c.type}"><span class="preflight-icon">${icon}</span><span>${escapeHtml(c.label)}</span></div>`;
+  }).join('');
+  card.style.display = '';
+}
+
+// Hook preflight to relevant updates
+['title','description'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', () => setTimeout(runPreflightCheck, 100));
+});
+const _origUpdatePub = window.updatePublishBtn;
+if (typeof _origUpdatePub === 'function') {
+  window.updatePublishBtn = function() { _origUpdatePub.apply(this, arguments); runPreflightCheck(); };
+}
+
+// Pinned comment toggle
+document.getElementById('pinned-comment-toggle')?.addEventListener('change', e => {
+  const inp = document.getElementById('pinned-comment-input');
+  const ctr = document.getElementById('pinned-comment-counter');
+  if (e.target.checked) { inp.style.display = ''; ctr.style.display = ''; }
+  else { inp.style.display = 'none'; ctr.style.display = 'none'; }
+});
+document.getElementById('pinned-comment-input')?.addEventListener('input', e => {
+  document.getElementById('pinned-comment-count').textContent = e.target.value.length;
+});
+
+// ─────────────────────────────────────────────
+//  ── AI SUPPORT CHAT WIDGET ──────────────────
+// ─────────────────────────────────────────────
+const _aiChatHistory = [];
+
+function toggleAiChat() {
+  const panel = document.getElementById('ai-chat-panel');
+  const btn = document.getElementById('ai-chat-fab');
+  if (panel.classList.contains('open')) {
+    panel.classList.remove('open');
+    btn.classList.remove('open');
+  } else {
+    panel.classList.add('open');
+    btn.classList.add('open');
+    if (!_aiChatHistory.length) {
+      _addAiChatMessage('assistant', 'Olá! Sou o teu assistente IA do EuPosto. Pergunta-me sobre a app, dicas de viralização, melhores horários para postar, hashtags, ou estratégias de conteúdo. Em que posso ajudar?');
+    }
+    setTimeout(() => document.getElementById('ai-chat-input')?.focus(), 200);
+  }
+}
+
+function _addAiChatMessage(role, text) {
+  const list = document.getElementById('ai-chat-messages');
+  const div = document.createElement('div');
+  div.className = 'ai-chat-msg ai-chat-msg-' + role;
+  div.innerHTML = `<div class="ai-chat-bubble">${escapeHtml(text).replace(/\n/g,'<br>')}</div>`;
+  list.appendChild(div);
+  list.scrollTop = list.scrollHeight;
+  if (role !== 'system-typing') _aiChatHistory.push({ role: role === 'user' ? 'user' : 'assistant', content: text });
+}
+
+async function sendAiChatMessage() {
+  const input = document.getElementById('ai-chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  _addAiChatMessage('user', text);
+  // Typing indicator
+  const list = document.getElementById('ai-chat-messages');
+  const typing = document.createElement('div');
+  typing.className = 'ai-chat-msg ai-chat-msg-assistant ai-chat-typing';
+  typing.innerHTML = '<div class="ai-chat-bubble"><span class="ai-typing-dot"></span><span class="ai-typing-dot"></span><span class="ai-typing-dot"></span></div>';
+  list.appendChild(typing);
+  list.scrollTop = list.scrollHeight;
+  try {
+    const r = await fetch(AI_WORKER + '?action=ai_chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: _aiChatHistory.slice(-10) })
+    });
+    const data = await r.json();
+    typing.remove();
+    _addAiChatMessage('assistant', data.reply || 'Sem resposta.');
+  } catch (e) {
+    typing.remove();
+    _addAiChatMessage('assistant', '⚠ Erro de ligação: ' + e.message);
+  }
+}
+
+document.getElementById('ai-chat-input')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAiChatMessage(); }
+});
 </script>
 </body>
 </html>
