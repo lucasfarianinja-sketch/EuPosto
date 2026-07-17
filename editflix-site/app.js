@@ -5,7 +5,7 @@
 
 const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost:8787'
-  : ''; // same-origin em produção (Worker + Pages)
+  : 'https://editflix-api.lucasfarianinja.workers.dev';
 
 const els = {
   form: document.getElementById('searchForm'),
