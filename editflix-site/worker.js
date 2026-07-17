@@ -65,13 +65,14 @@ async function handleSearch(url, env, ctx) {
   const groups = await Promise.all(tasks);
   let results = groups.flat();
 
-  // Filtro por resolução mínima
+  // Filtro por resolução mínima — só exclui quando a resolução É conhecida e inferior.
+  // Resultados sem resolução conhecida passam (mostram-se ao user, que decide).
   if (minRes > 0) {
-    results = results.filter(r => (r.height || 0) >= minRes);
+    results = results.filter(r => !r.height || r.height >= minRes);
   }
-  // Filtro por fps mínimo
+  // Filtro por fps mínimo — mesma lógica.
   if (minFps > 0) {
-    results = results.filter(r => (r.fps || 0) >= minFps);
+    results = results.filter(r => !r.fps || r.fps >= minFps);
   }
 
   // Ordenar: primeiro os que têm ficheiro para cortar, depois por resolução desc
