@@ -1,0 +1,29 @@
+name = "editflix-api"
+main = "worker.js"
+compatibility_date = "2026-01-15"
+
+# ---- Bindings ----
+# KV para cache de resultados (opcional). Cria em: Cloudflare Dashboard → Workers → KV → Create Namespace
+# Depois cola o id aqui e faz `wrangler deploy`.
+# [[kv_namespaces]]
+# binding = "EDITFLIX_CACHE"
+# id = "COLA_AQUI"
+
+# ---- Secrets ----
+# YouTube Data API v3 key. Adiciona com:
+#   wrangler secret put YOUTUBE_API_KEY
+# Sem esta key, YouTube fica desativado (outras fontes continuam a funcionar).
+#
+# TMDb API key (v3, grátis). Regista em: https://www.themoviedb.org/settings/api
+#   wrangler secret put TMDB_API_KEY
+# Sem esta key, busca de filmes/séries via TMDb fica desativada.
+
+# ---- Rotas (produção) ----
+# Descomenta quando ligares o domínio:
+# routes = [
+#   { pattern = "editflix.pt/api/*", zone_name = "editflix.pt" }
+# ]
+
+# ---- Dev local ----
+[dev]
+port = 8787

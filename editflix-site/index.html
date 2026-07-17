@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>EditFlix — Encontra clipes para os teus edits</title>
+<meta name="description" content="Motor de busca de clipes de anime em alta qualidade para editores. Sakugabooru, AnimeThemes e mais." />
+<link rel="stylesheet" href="./app.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-logo"></div>
+    <div class="brand-text">
+      <div class="brand-name">EditFlix</div>
+      <div class="brand-sub">Clip finder para editores</div>
+    </div>
+  </div>
+  <nav class="topnav">
+    <a href="#how" class="link">Como funciona</a>
+    <a href="#sources" class="link">Fontes</a>
+    <a href="https://euposto.pt" target="_blank" class="link">EuPosto</a>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <h1>Encontra o take certo.<br/><span class="grad">Corta. Descarrega. Edita.</span></h1>
+    <p class="lead">Anime, filmes, séries. Pesquisa em Sakugabooru, AnimeThemes, TMDb, Reddit, Internet Archive e YouTube. Corta o segmento que precisas sem sair do browser.</p>
+
+    <form class="search" id="searchForm" autocomplete="off">
+      <input id="q" type="text" placeholder='Ex.: "Maki Jujutsu", "The Batman fight scene", "Breaking Bad Ozymandias"' required />
+
+      <div class="category-row">
+        <label class="cat-chip">
+          <input type="radio" name="category" value="all" checked />
+          <span>Tudo</span>
+        </label>
+        <label class="cat-chip">
+          <input type="radio" name="category" value="anime" />
+          <span>Anime</span>
+        </label>
+        <label class="cat-chip">
+          <input type="radio" name="category" value="movies" />
+          <span>Filmes</span>
+        </label>
+        <label class="cat-chip">
+          <input type="radio" name="category" value="series" />
+          <span>Séries</span>
+        </label>
+      </div>
+
+      <div class="filters">
+        <details class="sources-toggle">
+          <summary>Fontes</summary>
+          <div class="sources-list">
+            <label class="chip"><input type="checkbox" id="src_sakuga" checked /><span>Sakugabooru</span></label>
+            <label class="chip"><input type="checkbox" id="src_themes" checked /><span>AnimeThemes</span></label>
+            <label class="chip"><input type="checkbox" id="src_youtube" checked /><span>YouTube</span></label>
+            <label class="chip"><input type="checkbox" id="src_tmdb" checked /><span>TMDb</span></label>
+            <label class="chip"><input type="checkbox" id="src_reddit" checked /><span>Reddit</span></label>
+            <label class="chip"><input type="checkbox" id="src_archive" checked /><span>Archive.org</span></label>
+          </div>
+        </details>
+        <select id="minRes" class="select">
+          <option value="0">Qualquer resolução</option>
+          <option value="720">≥ 720p</option>
+          <option value="1080" selected>≥ 1080p</option>
+          <option value="1440">≥ 1440p</option>
+          <option value="2160">≥ 2160p (4K)</option>
+        </select>
+        <select id="minFps" class="select">
+          <option value="0">Qualquer fps</option>
+          <option value="24" selected>≥ 24 fps (nativo)</option>
+          <option value="30">≥ 30 fps</option>
+          <option value="60">≥ 60 fps (interpolado)</option>
+        </select>
+      </div>
+      <button class="cta" type="submit">
+        <span>Buscar</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      </button>
+    </form>
+
+    <div class="hint">
+      <span>Dica: anime é nativo a 24fps. Filmes/séries variam (24 cinema, 30/60 broadcast). 60fps em anime é interpolação.</span>
+    </div>
+  </section>
+
+  <section id="results" class="results" hidden>
+    <div class="results-head">
+      <h2 id="resultsTitle">Resultados</h2>
+      <div class="results-meta" id="resultsMeta"></div>
+    </div>
+    <div id="resultsGrid" class="grid"></div>
+    <div id="loadMoreWrap" class="loadmore" hidden>
+      <button id="loadMore" class="ghost">Carregar mais</button>
+    </div>
+  </section>
+
+  <section id="empty" class="empty" hidden>
+    <div class="empty-inner">
+      <div class="empty-icon">🎞️</div>
+      <h3>Sem resultados</h3>
+      <p>Tenta outros termos, retira filtros de resolução, ou tenta em inglês (as fontes indexam melhor).</p>
+    </div>
+  </section>
+
+  <section id="how" class="section">
+    <h2>Como funciona</h2>
+    <div class="how">
+      <div class="how-card">
+        <div class="how-num">1</div>
+        <h3>Pesquisa</h3>
+        <p>Escreves o personagem, cena ou anime. O EditFlix pesquisa em paralelo nas fontes selecionadas.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">2</div>
+        <h3>Escolhe</h3>
+        <p>Cada resultado mostra resolução real, fps e fonte. Vês preview antes de decidir.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">3</div>
+        <h3>Corta</h3>
+        <p>Timeline no browser. Marcas in/out. Ffmpeg corta localmente — o clipe nunca passa por servidor.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">4</div>
+        <h3>Descarrega</h3>
+        <p>MP4 pronto para o teu editor. Sem watermark. Sem conta.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="sources" class="section">
+    <h2>Fontes</h2>
+    <div class="sources">
+      <div class="source-card">
+        <div class="source-head">
+          <h3>Sakugabooru</h3>
+          <span class="tag ok">Anime · corte direto</span>
+        </div>
+        <p>Cortes de Blu-ray isolados por animador. WebM/MP4 até 1080p+, 24fps nativo. A fonte mais autêntica para anime.</p>
+      </div>
+      <div class="source-card">
+        <div class="source-head">
+          <h3>AnimeThemes.moe</h3>
+          <span class="tag ok">Anime · OPs/EDs</span>
+        </div>
+        <p>Openings e endings do BD sem logos, WebM alta qualidade em 1080p. Ideal para intros e transições de edit.</p>
+      </div>
+      <div class="source-card">
+        <div class="source-head">
+          <h3>TMDb</h3>
+          <span class="tag ok">Filmes/Séries · trailers</span>
+        </div>
+        <p>Base de dados universal de filmes e séries. Devolve metadados, poster, e trailers oficiais (via YouTube).</p>
+      </div>
+      <div class="source-card">
+        <div class="source-head">
+          <h3>Reddit</h3>
+          <span class="tag ok">Cenas · corte direto</span>
+        </div>
+        <p>Comunidades r/moviescenes, r/HighQualityGifs, r/cinemagems, r/tvscenes. v.redd.it entrega MP4 pronto a cortar.</p>
+      </div>
+      <div class="source-card">
+        <div class="source-head">
+          <h3>Internet Archive</h3>
+          <span class="tag ok">Domínio público</span>
+        </div>
+        <p>Filmes antigos, séries clássicas, gravações históricas em domínio público. MP4/MKV direto, sem restrições.</p>
+      </div>
+      <div class="source-card">
+        <div class="source-head">
+          <h3>YouTube</h3>
+          <span class="tag warn">Download em V1</span>
+        </div>
+        <p>Canais Movieclips, Binge Society, AMV Source. Mostra resultados; download automático chega com o server-side em V1.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div>© 2026 EditFlix — parte do ecossistema <a href="https://euposto.pt">EuPosto</a></div>
+    <div class="footer-sub">Ferramenta para pesquisa e edição pessoal. Respeita as licenças e direitos dos criadores originais.</div>
+  </footer>
+
+</main>
+
+<!-- Clip cutter modal -->
+<div id="cutter" class="modal" hidden>
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 id="cutterTitle">Cortar clipe</h3>
+      <button class="icon-btn" data-close aria-label="Fechar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <video id="cutterVideo" controls playsinline></video>
+      <div class="timeline">
+        <div class="time-row">
+          <label>Início <span id="inLabel">0.00s</span></label>
+          <input type="range" id="inRange" min="0" max="100" step="0.01" value="0" />
+        </div>
+        <div class="time-row">
+          <label>Fim <span id="outLabel">0.00s</span></label>
+          <input type="range" id="outRange" min="0" max="100" step="0.01" value="100" />
+        </div>
+        <div class="duration">Duração do corte: <strong id="durLabel">0.00s</strong></div>
+      </div>
+      <div id="cutterStatus" class="status"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="ghost" data-close>Cancelar</button>
+      <button id="downloadFull" class="ghost">Descarregar completo</button>
+      <button id="doCut" class="cta">
+        <span>Cortar e descarregar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="./app.js"></script>
+</body>
+</html>
