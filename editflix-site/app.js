@@ -43,7 +43,27 @@ let state = {
   page: 1,
   lastQuery: '',
   activeItem: null,
+  status: null,
 };
+
+// Status check (fire and forget)
+fetch(`${API_BASE}/api/status`).then(r => r.json()).then(s => {
+  state.status = s;
+  updateKeyWarn();
+}).catch(() => {});
+
+function updateKeyWarn() {
+  const el = document.getElementById('keyWarn');
+  if (!el || !state.status) return;
+  const cat = (document.querySelector('input[name="category"]:checked') || {}).value || 'all';
+  const needsMedia = cat === 'movies' || cat === 'series';
+  const missing = !state.status.keys.tmdb && !state.status.keys.youtube;
+  el.hidden = !(needsMedia && missing);
+}
+
+document.querySelectorAll('input[name="category"]').forEach(r => {
+  r.addEventListener('change', updateKeyWarn);
+});
 
 /* ---------- Search ---------- */
 

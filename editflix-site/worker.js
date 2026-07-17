@@ -30,6 +30,16 @@ export default {
       return json({ ok: true, ts: Date.now() });
     }
 
+    if (url.pathname === '/api/status') {
+      return json({
+        keys: {
+          youtube: !!env.YOUTUBE_API_KEY,
+          tmdb: !!env.TMDB_API_KEY,
+        },
+        cache: !!env.EDITFLIX_CACHE,
+      });
+    }
+
     return json({ error: 'not_found' }, 404);
   },
 };
@@ -369,9 +379,13 @@ async function searchReddit(q, page, category) {
 
 /* ---------- Internet Archive ---------- */
 async function searchArchive(q, page, category) {
-  const mediatype = category === 'movies' || category === 'series' ? 'movies' : 'movies';
+  // Archive.org só tem material em domínio público. Séries modernas / IP ativo NÃO estão lá.
+  // Query rigorosa: match no TÍTULO + downloads mínimos → evita lixo aleatório.
+  const cleaned = q.replace(/[^\w\s-]/g, '').trim();
+  if (!cleaned) return [];
+  const query = `title:(${cleaned}) AND mediatype:movies AND downloads:[500 TO *]`;
   const params = new URLSearchParams({
-    q: `${q} AND mediatype:${mediatype}`,
+    q: query,
     fl: 'identifier,title,description,year,downloads',
     rows: '10',
     page: String(page),
