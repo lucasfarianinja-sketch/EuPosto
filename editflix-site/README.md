@@ -45,7 +45,7 @@ O `app.js` deteta `localhost` e aponta para `http://localhost:8787` automaticame
    cd editflix-site
    npx wrangler deploy
    ```
-2. **Pages** (frontend): sobe `editflix-site/` como projeto Pages novo, ou reaproveita o pipeline existente do `euposto` apontando para esta pasta.
+2. **Pages** (frontend): sobe `editflix-site/` como projeto Pages.
 3. **Domínio**: aponta `editflix.pt` para o Pages e adiciona rota `editflix.pt/api/*` no Worker (descomenta em `wrangler.toml`).
 
 ## Configuração opcional
@@ -81,7 +81,7 @@ wrangler deploy
 - **Interpolação RIFE** para 60fps opcional (server-side, GPU)
 - **Índice manual de packs** (Drive/Mega curados pela comunidade)
 - **Autocomplete** de personagens/animes (base de dados própria)
-- **Favoritos** por utilizador (localStorage → conta ligada ao EuPosto)
+- **Favoritos** por utilizador (localStorage → conta própria)
 
 ## Notas de qualidade
 

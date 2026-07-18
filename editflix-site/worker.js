@@ -316,86 +316,174 @@ async function searchTMDb(q, page, apiKey, category) {
 }
 
 /* ---------- Reddit ---------- */
+// Reddit exige User-Agent identificável ou devolve 403/429 silenciosamente.
+const REDDIT_UA = 'EditFlix/0.2 (clip finder for editors; +https://eupostoapp.pages.dev/editflix-site/)';
+
+// Subs de packs (Twitter/Discord são a fonte principal mas Reddit tem mirrors)
+const PACK_SUBS = ['scenepacks', 'AnimeSceneSource', 'AMVSourcing', 'sceneSourceRequests'];
+
 async function searchReddit(q, page, category) {
-  const subs = category === 'anime' ? ['sakuga', 'AnimeSakuga', 'anime']
+  const contentSubs = category === 'anime' ? ['sakuga', 'AnimeSakuga', 'anime']
     : category === 'movies' ? ['moviescenes', 'cinemagems', 'HighQualityGifs']
     : category === 'series' ? ['tvscenes', 'HighQualityGifs']
     : ['moviescenes', 'sakuga', 'cinemagems', 'HighQualityGifs', 'tvscenes'];
+  const subs = [...new Set([...PACK_SUBS, ...contentSubs])];
 
-  const results = [];
-  const perSub = 6;
+  // Reddit bloqueou JSON. RSS ainda funciona. Uma query global search.rss filtrada por sub.
+  const perSub = 15;
   const searches = subs.map(sub =>
-    fetch(`https://www.reddit.com/r/${sub}/search.json?q=${encodeURIComponent(q)}&restrict_sr=1&limit=${perSub}&sort=top`, {
-      headers: { 'User-Agent': 'EditFlix/0.1 (+https://editflix.pt)' },
+    fetch(`https://www.reddit.com/r/${sub}/search.rss?q=${encodeURIComponent(q)}&restrict_sr=on&limit=${perSub}&sort=relevance&t=all&include_over_18=on`, {
+      headers: { 'User-Agent': REDDIT_UA, 'Accept': 'application/atom+xml,application/xml' },
     })
-      .then(r => r.ok ? r.json() : null)
-      .catch(() => null)
+      .then(r => r.ok ? r.text() : null)
+      .then(xml => xml ? parseRedditRss(xml, sub) : [])
+      .catch(() => [])
   );
 
-  const responses = await Promise.all(searches);
-  for (const data of responses) {
-    if (!data || !data.data || !data.data.children) continue;
-    for (const child of data.data.children) {
-      const p = child.data;
-      if (!p) continue;
+  const perSubResults = await Promise.all(searches);
+  return perSubResults.flat();
+}
 
-      let fileUrl = null;
-      let previewVideo = null;
-      let previewImage = null;
-      let height = 0;
-      let width = 0;
-      let canCut = false;
+function parseRedditRss(xml, sub) {
+  const entries = xml.split('<entry>').slice(1);
+  const out = [];
+  for (const raw of entries) {
+    const entry = raw.split('</entry>')[0];
+    const title = htmlDecode(pick(entry, /<title[^>]*>([\s\S]*?)<\/title>/));
+    const author = pick(entry, /<name>([\s\S]*?)<\/name>/)?.replace(/^\/u\//, '') || null;
+    const permalink = pick(entry, /<link[^>]*rel=["']alternate["'][^>]*href=["']([^"']+)["']/) || pick(entry, /<link[^>]*href=["']([^"']+)["']/);
+    const content = htmlDecode(pick(entry, /<content[^>]*>([\s\S]*?)<\/content>/) || '');
+    const postId = permalink ? (permalink.match(/comments\/([a-z0-9]+)/i) || [])[1] : null;
+    if (!title) continue;
 
-      // Reddit-hosted video (v.redd.it)
-      if (p.is_video && p.media && p.media.reddit_video) {
-        fileUrl = p.media.reddit_video.fallback_url;
-        previewVideo = fileUrl;
-        height = p.media.reddit_video.height || 0;
-        width = p.media.reddit_video.width || 0;
-        canCut = true;
-      }
-      // Direct .mp4/.gifv
-      else if (p.url && /\.(mp4|webm|gifv)(\?|$)/i.test(p.url)) {
-        fileUrl = p.url.replace(/\.gifv$/, '.mp4');
-        previewVideo = fileUrl;
-        canCut = true;
-      }
-      // Imgur .mp4
-      else if (p.url && /imgur\.com\/[a-z0-9]+$/i.test(p.url)) {
-        fileUrl = p.url + '.mp4';
-        previewVideo = fileUrl;
-        canCut = true;
-      }
-      // Preview image
-      if (p.preview && p.preview.images && p.preview.images[0]) {
-        const src = p.preview.images[0].source;
-        previewImage = String(src.url).replace(/&amp;/g, '&');
-        if (!height) height = src.height || 0;
-        if (!width) width = src.width || 0;
-      }
-      if (!fileUrl && !previewImage) continue;
+    // Extrai link do "conteúdo" ([link] aponta para o media do post)
+    const mediaLinkMatch = content.match(/<a\s+href=["']([^"']+)["']>\s*\[link\]\s*<\/a>/i);
+    const mediaUrl = mediaLinkMatch ? mediaLinkMatch[1] : null;
+    // Extrai thumbnail
+    const imgMatch = content.match(/<img[^>]+src=["']([^"']+)["']/i);
+    const previewImage = imgMatch ? imgMatch[1] : null;
 
-      results.push({
-        id: `reddit_${p.id}`,
-        source: `r/${p.subreddit}`,
-        type: 'scene',
-        title: p.title || 'Reddit post',
+    const packUrl = extractPackUrl(content) || extractPackUrl(mediaUrl || '');
+    const isPackSub = PACK_SUBS.includes(sub);
+    const isTwixtor = /twixtor/i.test(title);
+    const is4k = /\b(2160p|4k)\b/i.test(title);
+    const isEpisode = /\b(episode|episódio|full episode|complete)\b/i.test(title);
+
+    // Caminho pack: URL de host de partilha detetada, ou sub de packs
+    if (packUrl || isPackSub) {
+      if (!packUrl) continue;
+      out.push({
+        id: `reddit_pack_${postId || Math.random().toString(36).slice(2)}`,
+        source: `r/${sub}`,
+        type: isTwixtor ? 'twixtor' : (is4k ? '4k' : 'scenepack'),
+        title,
         anime: null,
-        animator: p.author ? `u/${p.author}` : null,
-        resolution: height ? `${height}p` : null,
-        height,
-        width,
-        fps: null,
+        animator: author ? `u/${author}` : null,
+        resolution: extractResolutionFromTitle(title),
+        height: extractHeightFromTitle(title),
+        width: 0,
+        fps: extractFpsFromTitle(title),
         duration: null,
-        previewVideo,
+        previewVideo: null,
         previewImage,
-        fileUrl,
-        canCut,
-        externalUrl: `https://www.reddit.com${p.permalink}`,
+        fileUrl: packUrl,
+        canCut: false,
+        externalUrl: permalink,
       });
+      continue;
     }
+
+    // Caminho cena/clipe direto (v.redd.it, imgur, .mp4, .gifv)
+    let fileUrl = null, previewVideo = null, canCut = false;
+    if (mediaUrl) {
+      if (/v\.redd\.it\/[a-z0-9]+/i.test(mediaUrl)) {
+        fileUrl = mediaUrl + '/DASH_720.mp4';
+        previewVideo = fileUrl;
+        canCut = true;
+      } else if (/\.(mp4|webm|gifv)(\?|$)/i.test(mediaUrl)) {
+        fileUrl = mediaUrl.replace(/\.gifv$/, '.mp4');
+        previewVideo = fileUrl;
+        canCut = true;
+      } else if (/imgur\.com\/[a-z0-9]+$/i.test(mediaUrl)) {
+        fileUrl = mediaUrl + '.mp4';
+        previewVideo = fileUrl;
+        canCut = true;
+      }
+    }
+    if (!fileUrl && !previewImage) continue;
+
+    out.push({
+      id: `reddit_${postId || Math.random().toString(36).slice(2)}`,
+      source: `r/${sub}`,
+      type: isEpisode ? 'episode' : 'scene',
+      title,
+      anime: null,
+      animator: author ? `u/${author}` : null,
+      resolution: extractResolutionFromTitle(title),
+      height: extractHeightFromTitle(title),
+      width: 0,
+      fps: null,
+      duration: null,
+      previewVideo,
+      previewImage,
+      fileUrl,
+      canCut,
+      externalUrl: permalink,
+    });
   }
-  return results;
+  return out;
+}
+
+function pick(text, re) {
+  const m = text.match(re);
+  return m ? m[1].trim() : null;
+}
+function htmlDecode(s) {
+  if (!s) return s;
+  return String(s)
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&#32;/g, ' ')
+    .replace(/&amp;/g, '&');
+}
+
+function extractPackUrl(text) {
+  const patterns = [
+    /https?:\/\/drive\.google\.com\/[^\s)>\]]+/i,
+    /https?:\/\/mega\.nz\/[^\s)>\]]+/i,
+    /https?:\/\/(?:www\.)?dropbox\.com\/[^\s)>\]]+/i,
+    /https?:\/\/we\.tl\/[^\s)>\]]+/i,
+    /https?:\/\/(?:www\.)?mediafire\.com\/[^\s)>\]]+/i,
+    /https?:\/\/pixeldrain\.com\/[^\s)>\]]+/i,
+  ];
+  for (const re of patterns) {
+    const m = text.match(re);
+    if (m) return m[0].replace(/[),.\]]+$/, '');
+  }
+  return null;
+}
+function extractResolutionFromTitle(title) {
+  if (!title) return null;
+  const m = title.match(/(\d{3,4})p/i);
+  return m ? `${m[1]}p` : null;
+}
+function extractHeightFromTitle(title) {
+  const r = extractResolutionFromTitle(title);
+  return r ? parseInt(r) : 0;
+}
+function extractFpsFromTitle(title) {
+  if (!title) return null;
+  const m = title.match(/(\d{2,3})\s*fps/i);
+  return m ? parseInt(m[1]) : null;
+}
+function extractPreviewImage(p) {
+  if (p.preview && p.preview.images && p.preview.images[0]) {
+    return String(p.preview.images[0].source.url).replace(/&amp;/g, '&');
+  }
+  if (p.thumbnail && /^https?:/.test(p.thumbnail)) return p.thumbnail;
+  return null;
 }
 
 /* ---------- Internet Archive ---------- */
