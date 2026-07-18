@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "updated": "2026-07-18",
+  "notes": "Índice curado de scenepacks. Estrutura livre — user/community adiciona URLs de Drive/MEGA/Dropbox. Type: scenepack | twixtor | episode | 4k",
+  "packs": [
+    {
+      "id": "example-1",
+      "title": "EXEMPLO — Maki Zenin scenepack 1080p",
+      "type": "scenepack",
+      "series": "Jujutsu Kaisen",
+      "character": "Maki Zenin",
+      "resolution": "1080p",
+      "fps": 24,
+      "source": "411scenes (Discord)",
+      "url": "https://drive.google.com/file/d/EXAMPLE",
+      "thumbnail": null,
+      "tags": ["anime", "jjk"],
+      "added": "2026-07-18",
+      "notes": "Substitui este exemplo por packs reais. Não fabriquei URLs."
+    }
+  ]
+}

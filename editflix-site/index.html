@@ -62,13 +62,11 @@
             <label class="chip"><input type="checkbox" id="src_tmdb" checked /><span>TMDb</span></label>
             <label class="chip"><input type="checkbox" id="src_reddit" checked /><span>Reddit</span></label>
             <label class="chip"><input type="checkbox" id="src_archive" checked /><span>Archive.org</span></label>
+            <label class="chip"><input type="checkbox" id="src_packs" checked /><span>Packs (curados)</span></label>
           </div>
         </details>
         <select id="minRes" class="select">
-          <option value="0" selected>Qualquer resolução</option>
-          <option value="480">≥ 480p</option>
-          <option value="720">≥ 720p</option>
-          <option value="1080">≥ 1080p</option>
+          <option value="1080" selected>≥ 1080p (obrigatório)</option>
           <option value="1440">≥ 1440p</option>
           <option value="2160">≥ 2160p (4K)</option>
         </select>
@@ -78,6 +76,10 @@
           <option value="30">≥ 30 fps</option>
           <option value="60">≥ 60 fps (interpolado)</option>
         </select>
+        <label class="chip">
+          <input type="checkbox" id="twixtorOnly" />
+          <span>Só Twixtor</span>
+        </label>
       </div>
       <button class="cta" type="submit">
         <span>Buscar</span>

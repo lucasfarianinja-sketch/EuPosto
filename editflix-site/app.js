@@ -16,6 +16,8 @@ const els = {
   srcTmdb: document.getElementById('src_tmdb'),
   srcReddit: document.getElementById('src_reddit'),
   srcArchive: document.getElementById('src_archive'),
+  srcPacks: document.getElementById('src_packs'),
+  twixtorOnly: document.getElementById('twixtorOnly'),
   minRes: document.getElementById('minRes'),
   minFps: document.getElementById('minFps'),
   results: document.getElementById('results'),
@@ -96,7 +98,7 @@ async function runSearch(q, page = 1, append = false) {
     minFps: els.minFps.value,
     category,
   });
-  // A categoria filtra automaticamente; checkboxes são refinamento fino
+  if (els.twixtorOnly.checked) params.set('twixtor', '1');
   const wantAnime = category === 'all' || category === 'anime';
   const wantMedia = category === 'all' || category === 'movies' || category === 'series';
   if (els.srcSakuga.checked && wantAnime) params.append('src', 'sakuga');
@@ -105,12 +107,33 @@ async function runSearch(q, page = 1, append = false) {
   if (els.srcTmdb.checked && wantMedia) params.append('src', 'tmdb');
   if (els.srcReddit.checked) params.append('src', 'reddit');
   if (els.srcArchive.checked && wantMedia) params.append('src', 'archive');
+  const wantPacks = els.srcPacks.checked;
 
   try {
-    const res = await fetch(`${API_BASE}/api/search?${params}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    const items = data.results || [];
+    const [searchRes, packsRes] = await Promise.all([
+      fetch(`${API_BASE}/api/search?${params}`),
+      wantPacks ? fetch(`${API_BASE}/api/packs?q=${encodeURIComponent(q)}${els.twixtorOnly.checked ? '&type=twixtor' : ''}`).then(r => r.json()).catch(() => ({ packs: [] })) : Promise.resolve({ packs: [] }),
+    ]);
+    if (!searchRes.ok) throw new Error(`HTTP ${searchRes.status}`);
+    const data = await searchRes.json();
+    const packItems = (packsRes.packs || []).map(p => ({
+      id: `pack_${p.id}`,
+      source: p.source || 'Pack',
+      type: p.type || 'scenepack',
+      title: p.title,
+      anime: p.series,
+      animator: p.character,
+      resolution: p.resolution || null,
+      height: parseInt((p.resolution || '0').replace(/\D/g, '')) || 0,
+      fps: p.fps || null,
+      duration: null,
+      previewVideo: null,
+      previewImage: p.thumbnail,
+      fileUrl: null,
+      canCut: false,
+      externalUrl: p.url,
+    }));
+    const items = [...packItems, ...(data.results || [])];
     if (!append) els.grid.innerHTML = '';
     if (append) {
       state.currentResults.push(...items);
@@ -188,6 +211,7 @@ function makeCard(item) {
   badges.className = 'card-badges';
   badges.innerHTML = `
     <span class="badge src">${escapeHtml(item.source)}</span>
+    ${item.type ? `<span class="badge type type-${escapeHtml(item.type)}">${labelType(item.type)}</span>` : ''}
     ${item.resolution ? `<span class="badge res">${escapeHtml(item.resolution)}</span>` : ''}
     ${item.fps ? `<span class="badge fps">${item.fps}fps</span>` : ''}
     ${item.duration ? `<span class="badge">${formatDuration(item.duration)}</span>` : ''}
@@ -415,6 +439,21 @@ function buildFilename(item, ext, cut) {
 function guessExt(url) {
   const m = String(url).match(/\.(mp4|webm|mkv|mov|m4v)(\?|$)/i);
   return m ? m[1].toLowerCase() : null;
+}
+
+function labelType(t) {
+  return ({
+    trailer: 'Trailer',
+    clip: 'Cena',
+    teaser: 'Teaser',
+    scene: 'Cena',
+    opening: 'OP/ED',
+    episode: 'Episódio',
+    scenepack: 'Scenepack',
+    twixtor: 'Twixtor',
+    video: 'Vídeo',
+    '4k': '4K Pack',
+  }[String(t).toLowerCase()] || (t.charAt(0).toUpperCase() + t.slice(1)));
 }
 
 function formatDuration(s) {

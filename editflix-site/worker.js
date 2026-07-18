@@ -40,6 +40,10 @@ export default {
       });
     }
 
+    if (url.pathname === '/api/packs') {
+      return handlePacks(url, env);
+    }
+
     return json({ error: 'not_found' }, 404);
   },
 };
@@ -63,9 +67,10 @@ async function handleSearch(url, env, ctx) {
   }
 
   const category = (url.searchParams.get('category') || 'all').toLowerCase();
+  const twixtorOnly = url.searchParams.get('twixtor') === '1';
 
   const tasks = [];
-  if (sources.has('sakuga')) tasks.push(searchSakuga(q, page).catch(err => logErr('sakuga', err) || []));
+  if (sources.has('sakuga')) tasks.push(searchSakuga(q, page, { twixtor: twixtorOnly }).catch(err => logErr('sakuga', err) || []));
   if (sources.has('themes')) tasks.push(searchAnimeThemes(q, page).catch(err => logErr('themes', err) || []));
   if (sources.has('youtube') && env.YOUTUBE_API_KEY) tasks.push(searchYouTube(q, page, env.YOUTUBE_API_KEY, category).catch(err => logErr('youtube', err) || []));
   if (sources.has('tmdb')) tasks.push(searchTMDb(q, page, env.TMDB_API_KEY, category).catch(err => logErr('tmdb', err) || []));
@@ -76,8 +81,12 @@ async function handleSearch(url, env, ctx) {
   let results = groups.flat();
 
   // Filtro de conteúdo — remove reactions, gameplay, parodias, memes.
-  // Só filma/série/anime "puro", como pedido.
   results = results.filter(r => !isNoise(r.title));
+
+  // Se pediu só twixtor, apenas resultados marcados.
+  if (twixtorOnly) {
+    results = results.filter(r => r.type === 'twixtor' || /twixtor/i.test(r.title));
+  }
 
   // Filtro por resolução mínima — só exclui quando a resolução É conhecida e inferior.
   // Resultados sem resolução conhecida passam (mostram-se ao user, que decide).
@@ -110,8 +119,9 @@ async function handleSearch(url, env, ctx) {
 }
 
 /* ---------- Sakugabooru ---------- */
-async function searchSakuga(q, page) {
-  const tags = q.trim().toLowerCase().replace(/\s+/g, '_');
+async function searchSakuga(q, page, opts = {}) {
+  let tags = q.trim().toLowerCase().replace(/\s+/g, '_');
+  if (opts.twixtor) tags += ' twixtor';
   const params = new URLSearchParams({
     tags,
     limit: '20',
@@ -130,16 +140,18 @@ async function searchSakuga(q, page) {
     const width = p.width || p.image_width || 0;
     const anime = extractSakugaAnime(p.tags);
     const animator = extractSakugaAnimator(p.tags);
+    const isTwixtor = /(^|\s)twixtor(\s|$)/i.test(p.tags || '');
     return {
       id: `sakuga_${p.id}`,
       source: 'Sakugabooru',
+      type: isTwixtor ? 'twixtor' : 'scene',
       title: (p.tags || '').replace(/_/g, ' ').split(' ').slice(0, 6).join(' ') || `sakuga #${p.id}`,
       anime,
       animator,
       resolution: height ? `${height}p` : null,
       height,
       width,
-      fps: null, // Sakuga não expõe fps de forma fiável; anime é 24 nativo
+      fps: null,
       duration: null,
       previewVideo: isVideo ? p.file_url : null,
       previewImage: p.preview_url || p.sample_url,
@@ -184,6 +196,7 @@ async function searchAnimeThemes(q, page) {
           results.push({
             id: `themes_${video.id}`,
             source: 'AnimeThemes',
+            type: 'opening',
             title: `${anime.name} — ${theme.slug || theme.type}`,
             anime: anime.name,
             animator: null,
@@ -228,6 +241,7 @@ async function searchYouTube(q, page, apiKey, category) {
   return (data.items || []).map(it => ({
     id: `yt_${it.id.videoId}`,
     source: 'YouTube',
+    type: 'video',
     title: it.snippet.title,
     anime: it.snippet.channelTitle,
     animator: null,
@@ -282,6 +296,7 @@ async function searchTMDb(q, page, apiKey, category) {
     results.push({
       id: `tmdb_${mtype}_${it.id}`,
       source: mtype === 'tv' ? 'TMDb (série)' : 'TMDb (filme)',
+      type: (yt.type || 'trailer').toLowerCase(),
       title: `${title}${year ? ` (${year})` : ''} — ${yt.name || 'trailer'}`,
       anime: null,
       animator: null,
@@ -363,6 +378,7 @@ async function searchReddit(q, page, category) {
       results.push({
         id: `reddit_${p.id}`,
         source: `r/${p.subreddit}`,
+        type: 'scene',
         title: p.title || 'Reddit post',
         anime: null,
         animator: p.author ? `u/${p.author}` : null,
@@ -418,6 +434,7 @@ async function searchArchive(q, page, category) {
       return {
         id: `archive_${d.identifier}`,
         source: 'Archive.org',
+        type: 'episode',
         title: d.title || d.identifier,
         anime: null,
         animator: null,
@@ -435,6 +452,34 @@ async function searchArchive(q, page, category) {
     } catch { return null; }
   }));
   return results.filter(Boolean);
+}
+
+/* ---------- Packs (curated index) ---------- */
+// packs.json vive junto do Worker mas o Worker não pode ler ficheiros do repo diretamente;
+// serve-se a partir da mesma Pages (raw) usando o commit atual.
+const PACKS_URL = 'https://raw.githubusercontent.com/lucasfarianinja-sketch/EuPosto/master/editflix-site/packs.json';
+
+async function handlePacks(url, env) {
+  const q = (url.searchParams.get('q') || '').trim().toLowerCase();
+  const type = (url.searchParams.get('type') || '').toLowerCase();
+
+  const res = await fetch(PACKS_URL, { cf: { cacheTtl: 300 } });
+  if (!res.ok) return json({ packs: [], error: 'packs.json unreachable' }, 502);
+  const data = await res.json();
+
+  let packs = data.packs || [];
+  // esconde entradas de exemplo
+  packs = packs.filter(p => !/^example/i.test(p.id || ''));
+
+  if (q) {
+    packs = packs.filter(p => {
+      const hay = [p.title, p.series, p.character, ...(p.tags || [])].join(' ').toLowerCase();
+      return hay.includes(q);
+    });
+  }
+  if (type) packs = packs.filter(p => (p.type || '').toLowerCase() === type);
+
+  return json({ count: packs.length, updated: data.updated, packs });
 }
 
 /* ---------- Content noise filter ---------- */
