@@ -75,6 +75,10 @@ async function handleSearch(url, env, ctx) {
   const groups = await Promise.all(tasks);
   let results = groups.flat();
 
+  // Filtro de conteúdo — remove reactions, gameplay, parodias, memes.
+  // Só filma/série/anime "puro", como pedido.
+  results = results.filter(r => !isNoise(r.title));
+
   // Filtro por resolução mínima — só exclui quando a resolução É conhecida e inferior.
   // Resultados sem resolução conhecida passam (mostram-se ao user, que decide).
   if (minRes > 0) {
@@ -205,10 +209,11 @@ async function searchAnimeThemes(q, page) {
 async function searchYouTube(q, page, apiKey, category) {
   // Data API v3 não tem "page number" tradicional, usa pageToken. Simplificação: só página 1 por agora.
   if (page > 1) return [];
-  const qualifier = category === 'anime' ? ' AMV source 1080p'
-    : category === 'movies' ? ' movieclips scene 1080p'
-    : category === 'series' ? ' scene 1080p'
-    : ' 1080p';
+  const negatives = ' -react -reaction -reacts -gameplay -walkthrough -parody -meme -review -analysis -tierlist';
+  const qualifier = category === 'anime' ? ' AMV source 1080p' + negatives
+    : category === 'movies' ? ' movieclips scene 1080p' + negatives
+    : category === 'series' ? ' scene 1080p' + negatives
+    : ' 1080p' + negatives;
   const params = new URLSearchParams({
     part: 'snippet',
     q: q + qualifier,
@@ -430,6 +435,27 @@ async function searchArchive(q, page, category) {
     } catch { return null; }
   }));
   return results.filter(Boolean);
+}
+
+/* ---------- Content noise filter ---------- */
+// Termos que indicam conteúdo derivado (não é a obra em si)
+const NOISE_TERMS = [
+  'react', 'reaction', 'reacts', 'reacting', 'reacted',
+  'gameplay', 'game play', 'walkthrough', 'playthrough', 'lets play', "let's play",
+  'parody', 'parodia', 'meme', 'crack', 'shitpost',
+  'review', 'analysis', 'analise', 'breakdown', 'explained',
+  'tier list', 'ranking', 'top 10', 'top10', 'top 5',
+  'edit compilation', 'amv compilation', 'best of', 'moments compilation',
+  'fan animation', 'fan made', 'fanmade',
+  'tutorial', 'how to edit', 'como editar',
+  'behind the scenes', 'making of', 'interview', 'entrevista',
+  'unboxing', 'podcast',
+];
+
+function isNoise(title) {
+  if (!title) return false;
+  const t = String(title).toLowerCase();
+  return NOISE_TERMS.some(term => t.includes(term));
 }
 
 /* ---------- Helpers ---------- */
