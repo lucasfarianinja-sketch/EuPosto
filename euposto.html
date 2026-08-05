@@ -2750,6 +2750,17 @@
       color: var(--text);
     }
     .tt-commercial-sub .tt-check input { accent-color: #fbbf24; }
+    .tt-brand-label {
+      display: none; font-size: .75rem; margin: 2px 0 0 26px;
+      padding: 4px 10px; border-radius: 6px; font-weight: 600;
+    }
+    .tt-brand-label.promo {
+      color: #fbbf24; background: rgba(251,191,36,.1);
+    }
+    .tt-brand-label.paid {
+      color: #f472b6; background: rgba(244,114,182,.1);
+    }
+    .tt-check:has(input:checked) + .tt-brand-label { display: block; }
 
     /* Disclosure box */
     .tt-opt-disclosure {
@@ -3317,13 +3328,18 @@
         <label class="tt-check tt-commercial-main"><input type="checkbox" id="tt-commercial" /> <span>Divulgar conteúdo comercial</span></label>
         <div class="tt-commercial-sub" id="tt-commercial-sub" style="display:none;">
           <label class="tt-check"><input type="checkbox" id="tt-your-brand" /> <span>A tua marca — promoves a ti próprio ou o teu negócio</span></label>
+          <div class="tt-brand-label promo">O teu vídeo será marcado como «Conteúdo promocional»</div>
           <label class="tt-check"><input type="checkbox" id="tt-branded-content" /> <span>Conteúdo de marca — promoves outra marca (parceria paga)</span></label>
+          <div class="tt-brand-label paid">O teu vídeo será marcado como «Parceria paga»</div>
         </div>
       </div>
 
       <!-- Music usage / compliance declaration -->
       <div class="tt-opt-disclosure" id="tt-disclosure">
         Ao publicar, concordas com a <a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/en" target="_blank" rel="noopener">Confirmação de Uso de Música do TikTok</a>.
+      </div>
+      <div class="tt-opt-disclosure" id="tt-disclosure-branded" style="display:none;">
+        Ao publicar, concordas com a <a href="https://www.tiktok.com/legal/page/global/bc-policy" target="_blank" rel="noopener">Política de Branded Content</a> e a <a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/en" target="_blank" rel="noopener">Confirmação de Uso de Música do TikTok</a>.
       </div>
     </div>
   </div>
@@ -5467,17 +5483,29 @@ document.getElementById('tt-commercial')?.addEventListener('change', e => {
     const bc = document.getElementById('tt-branded-content');
     if (yb) yb.checked = false;
     if (bc) bc.checked = false;
+    updateTTBrandedState();
   }
 });
-// Branded content não pode ser privado (regra TikTok)
-document.getElementById('tt-branded-content')?.addEventListener('change', e => {
+// Branded content não pode ser privado (regra TikTok) + disclosure dinâmica
+function updateTTBrandedState() {
+  const bc = document.getElementById('tt-branded-content');
   const sel = document.getElementById('tt-privacy');
-  if (e.target.checked && sel && sel.value === 'SELF_ONLY') {
-    const pub = [...sel.options].find(o => o.value === 'PUBLIC_TO_EVERYONE');
-    if (pub) sel.value = 'PUBLIC_TO_EVERYONE';
-    alert('Conteúdo de marca não pode ser privado. Visibilidade alterada para Público.');
+  const discDefault = document.getElementById('tt-disclosure');
+  const discBranded = document.getElementById('tt-disclosure-branded');
+  if (!bc || !sel) return;
+  const selfOpt = [...sel.options].find(o => o.value === 'SELF_ONLY');
+  if (bc.checked) {
+    if (selfOpt) { selfOpt.disabled = true; selfOpt.textContent = 'Só eu — indisponível para conteúdo de marca'; }
+    if (sel.value === 'SELF_ONLY') sel.value = 'PUBLIC_TO_EVERYONE';
+    if (discDefault) discDefault.style.display = 'none';
+    if (discBranded) discBranded.style.display = '';
+  } else {
+    if (selfOpt) { selfOpt.disabled = false; selfOpt.textContent = 'Só eu — privado'; }
+    if (discDefault) discDefault.style.display = '';
+    if (discBranded) discBranded.style.display = 'none';
   }
-});
+}
+document.getElementById('tt-branded-content')?.addEventListener('change', updateTTBrandedState);
 
 document.querySelectorAll('.platform-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -6523,13 +6551,50 @@ uploadTikTok = async function(scheduledTime, acct, statusKey='tt') {
   setProgress(statusKey, 100);
   // Guarda o modo usado para o orquestrador mostrar a mensagem certa
   window._ttLastUploadMode = useInbox ? 'inbox' : 'direct';
-  return initData?.data?.publish_id || null;
+  const publishId = initData?.data?.publish_id || null;
+
+  // Status polling — o TikTok processa o vídeo em background após o upload.
+  // Sem polling não sabemos se falhou (o upload pode ter 200 mas o post não é criado).
+  if (publishId) {
+    setStatus(statusKey, 'uploading', 'A processar no TikTok...');
+    const started = Date.now();
+    const MAX_MS = 5 * 60 * 1000; // 5 min max
+    let last = null;
+    while (Date.now() - started < MAX_MS) {
+      if (publishCancelled) throw new Error('Cancelado');
+      await new Promise(r => setTimeout(r, 3000));
+      try {
+        const sr = await fetch(WORKER + '?action=tt_status', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ publish_id: publishId })
+        });
+        const sd = await sr.json();
+        last = sd?.data;
+        const st = sd?.data?.status;
+        if (st === 'PUBLISH_COMPLETE' || st === 'SEND_TO_USER_INBOX') break;
+        if (st === 'FAILED') {
+          const reason = sd?.data?.fail_reason || sd?.error?.message || 'motivo desconhecido';
+          throw new Error(`TikTok recusou o vídeo: ${reason}`);
+        }
+      } catch (e) {
+        if (e.message?.startsWith('TikTok recusou')) throw e;
+        // Erro de rede no poll — tenta de novo
+      }
+    }
+    if (!last || (last.status !== 'PUBLISH_COMPLETE' && last.status !== 'SEND_TO_USER_INBOX')) {
+      throw new Error('TikTok: timeout à espera de processamento (5 min)');
+    }
+  }
+
+  return publishId;
 };
 
 // Mensagem de sucesso TikTok conforme o modo (rascunho vs publicação direta)
 function ttDoneMsg(scheduledTime) {
   if (window._ttLastUploadMode === 'inbox') return '✓ Enviado para rascunhos — finaliza na app TikTok';
-  return scheduledTime ? '✓ Agendado no TikTok' : '✓ Publicado no TikTok';
+  const base = scheduledTime ? '✓ Agendado no TikTok' : '✓ Publicado no TikTok';
+  return base + ' — o processamento pode demorar alguns minutos';
 }
 
 // ─────────────────────────────────────────────

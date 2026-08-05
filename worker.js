@@ -34,6 +34,7 @@ var worker_default = {
         case "tt_token":   res = await ttToken(request); break;
         case "tt_user":    res = await ttUser(url); break;
         case "tt_init":    res = await ttInit(request); break;
+        case "tt_status":  res = await ttStatus(request); break;
         case "r2-presign": res = await r2Presign(url); break;
         case "queue_jobs": res = await queueJobs(request, env); break;
         case "get_jobs":   res = await getJobs(url, env); break;
@@ -423,6 +424,18 @@ async function ttInit(req) {
   return json(await r.json(), r.status);
 }
 __name(ttInit, "ttInit");
+
+async function ttStatus(req) {
+  const auth = req.headers.get("Authorization");
+  const body = await req.text();
+  const r = await fetch("https://open.tiktokapis.com/v2/post/publish/status/fetch/", {
+    method: "POST",
+    headers: { "Authorization": auth, "Content-Type": "application/json; charset=UTF-8" },
+    body
+  });
+  return json(await r.json(), r.status);
+}
+__name(ttStatus, "ttStatus");
 
 async function r2Presign(url) {
   const ext = (url.searchParams.get("ext") || "mp4").replace(/^\./, "");
