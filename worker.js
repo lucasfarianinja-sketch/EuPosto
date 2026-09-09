@@ -41,6 +41,7 @@ var worker_default = {
         case "cancel_job": res = await cancelJob(url, env); break;
         case "ai_chat":    res = await aiChat(request, env); break;
         case "ai_caption": res = await aiCaption(request, env); break;
+        case "financas_chat": res = await financasChat(request, env); break;
         case "tt_creator_info": res = await ttCreatorInfo(request); break;
         default:           res = json({ error: "Unknown action" }, 400);
       }
@@ -549,5 +550,78 @@ Gera uma legenda curta e cativante.`;
   }
 }
 __name(aiCaption, "aiCaption");
+
+async function financasChat(request, env) {
+  const body = await request.json();
+  const userText = String(body.text || "").slice(0, 800);
+  const context = String(body.context || "").slice(0, 500);
+  const today = String(body.today || new Date().toISOString().slice(0, 10));
+  const history = Array.isArray(body.history) ? body.history.slice(-8) : [];
+
+  const systemPrompt = `És o "FINANCEIRO", um assistente de finanças pessoais em português europeu que responde como se fosse uma conversa de WhatsApp.
+
+Categorias válidas:
+- Entradas (type "in"): salario, freelance, investimento, reembolso, prenda, outros
+- Saidas (type "out"): alimentacao, mercearia, transportes, habitacao, saude, lazer, compras, subscricoes, educacao, viagens, outros
+
+Data de hoje: ${today}.
+Contexto do mês actual: ${context}.
+
+Responde SEMPRE com um único objeto JSON válido, sem qualquer texto antes ou depois, com esta forma:
+{
+  "intent": "add" | "summary" | "list" | "delete_last" | "help" | "clarify",
+  "entries": [ { "type": "in"|"out", "amount": number_euros, "desc": "curta", "cat": "categoria", "date": "YYYY-MM-DD" } ],
+  "month": "YYYY-MM",
+  "reply": "resposta curta e natural em pt-PT, tom WhatsApp, podes usar 1 emoji"
+}
+
+Regras:
+- "add": quando o utilizador declara um ou mais movimentos. Extrai valor, descrição curta, categoria e data (assume hoje se não disser).
+- "summary": pedidos como "resumo", "quanto gastei", "saldo", "total do mês". Inclui "month" só se pediu um mês específico.
+- "list": "mostra os últimos", "histórico".
+- "delete_last": "apaga o último", "cancela".
+- "clarify": mensagem ambígua — pede detalhe curto.
+- "help": pergunta como funciona.
+- "15", "15€", "15 euros" → 15. "1,50" → 1.5. "1.500" → 1500.
+- Descrição curta e humana ("Almoço", "Netflix", "Salário").
+- "reply" é o texto visível no chat (sem repetir o JSON). Se registares algo, confirma naturalmente. Nunca listes o JSON no reply.
+- Se não tiveres a certeza da categoria, usa "outros".
+- Não inventes movimentos.`;
+
+  const messages = [
+    { role: "system", content: systemPrompt },
+    ...history.map(h => ({ role: h.role === "user" ? "user" : "assistant", content: String(h.content || "").slice(0, 400) })),
+    { role: "user", content: userText }
+  ];
+
+  if (!env.AI) {
+    return json({ intent: "clarify", reply: "IA não configurada." });
+  }
+
+  try {
+    const out = await env.AI.run("@cf/meta/llama-3.3-70b-instruct-fp8-fast", {
+      messages,
+      max_tokens: 400,
+      response_format: { type: "json_object" }
+    });
+    const raw = out.response ?? out.result?.response ?? out;
+    let parsed;
+    if (raw && typeof raw === "object" && !Array.isArray(raw)) {
+      parsed = raw;
+    } else if (typeof raw === "string") {
+      try { parsed = JSON.parse(raw); }
+      catch {
+        const m = raw.match(/\{[\s\S]*\}/);
+        parsed = m ? JSON.parse(m[0]) : { intent: "clarify", reply: "Não percebi. Tenta escrever assim: 'gastei 12€ no almoço'." };
+      }
+    } else {
+      parsed = { intent: "clarify", reply: "Resposta inesperada da IA." };
+    }
+    return json(parsed);
+  } catch (e) {
+    return json({ intent: "clarify", reply: "Falha na IA: " + e.message }, 500);
+  }
+}
+__name(financasChat, "financasChat");
 
 export { worker_default as default };

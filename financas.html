@@ -1,0 +1,1136 @@
+<title>FINANCEIRO</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FINANCEIRO">
+<meta name="application-name" content="FINANCEIRO">
+<meta name="theme-color" content="#008069" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#202C33" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230F1620'/><path d='M 8 100 L 18 72 L 40 64 L 50 74 L 60 64 L 82 72 L 92 100 Z' fill='%23171C26'/><path d='M 40 64 L 50 74 L 60 64 L 56 84 L 44 84 Z' fill='white'/><path d='M 47 64 L 53 64 L 55 70 L 54 94 L 46 94 L 45 70 Z' fill='%23B01818'/><circle cx='50' cy='42' r='15' fill='%23232936'/><ellipse cx='50' cy='30' rx='22' ry='4' fill='black'/><path d='M 35 30 Q 35 16 50 16 Q 65 16 65 30 Z' fill='black'/><rect x='35' y='26' width='30' height='3' fill='%231A1A1A'/><rect x='35' y='39' width='30' height='6' rx='2' fill='black'/><rect x='48' y='41' width='4' height='2' fill='black'/></svg>">
+<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230F1620'/><path d='M 8 100 L 18 72 L 40 64 L 50 74 L 60 64 L 82 72 L 92 100 Z' fill='%23171C26'/><path d='M 40 64 L 50 74 L 60 64 L 56 84 L 44 84 Z' fill='white'/><path d='M 47 64 L 53 64 L 55 70 L 54 94 L 46 94 L 45 70 Z' fill='%23B01818'/><circle cx='50' cy='42' r='15' fill='%23232936'/><ellipse cx='50' cy='30' rx='22' ry='4' fill='black'/><path d='M 35 30 Q 35 16 50 16 Q 65 16 65 30 Z' fill='black'/><rect x='35' y='26' width='30' height='3' fill='%231A1A1A'/><rect x='35' y='39' width='30' height='6' rx='2' fill='black'/></svg>">
+<link rel="manifest" href='data:application/manifest+json;utf8,{"name":"FINANCEIRO","short_name":"FINANCEIRO","start_url":".","display":"standalone","background_color":"%230F1620","theme_color":"%23008069","icons":[{"src":"data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><rect width=%27100%27 height=%27100%27 rx=%2722%27 fill=%27%230F1620%27/><path d=%27M 8 100 L 18 72 L 40 64 L 50 74 L 60 64 L 82 72 L 92 100 Z%27 fill=%27%23171C26%27/><path d=%27M 40 64 L 50 74 L 60 64 L 56 84 L 44 84 Z%27 fill=%27white%27/><path d=%27M 47 64 L 53 64 L 55 70 L 54 94 L 46 94 L 45 70 Z%27 fill=%27%23B01818%27/><circle cx=%2750%27 cy=%2742%27 r=%2715%27 fill=%27%23232936%27/><ellipse cx=%2750%27 cy=%2730%27 rx=%2722%27 ry=%274%27 fill=%27black%27/><path d=%27M 35 30 Q 35 16 50 16 Q 65 16 65 30 Z%27 fill=%27black%27/><rect x=%2735%27 y=%2726%27 width=%2730%27 height=%273%27 fill=%27%231A1A1A%27/><rect x=%2735%27 y=%2739%27 width=%2730%27 height=%276%27 rx=%272%27 fill=%27black%27/></svg>","sizes":"512x512","type":"image/svg+xml","purpose":"any maskable"}]}'>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --wa-header: #008069;
+  --wa-header-ink: #FFFFFF;
+  --wa-header-ink-2: rgba(255,255,255,.75);
+  --wa-chat-bg: #E5DDD5;
+  --wa-chat-pattern: #D9D3CB;
+  --wa-bubble-in: #FFFFFF;
+  --wa-bubble-out: #D9FDD3;
+  --wa-ink: #111B21;
+  --wa-ink-2: #667781;
+  --wa-tick: #53BDEB;
+  --wa-composer: #F0F2F5;
+  --wa-composer-input: #FFFFFF;
+  --wa-icon: #54656F;
+  --wa-date-pill: #D1E7DD;
+  --wa-date-ink: #4B5762;
+  --wa-link: #027EB5;
+  --wa-shadow: 0 1px .5px rgba(11,20,26,.13);
+  --panel-bg: #F0F2F5;
+  color-scheme: light;
+}
+
+:root:not([data-theme="light"]) {
+  @media (prefers-color-scheme: dark) {
+    --wa-header: #202C33;
+    --wa-header-ink: #E9EDEF;
+    --wa-header-ink-2: rgba(233,237,239,.6);
+    --wa-chat-bg: #0B141A;
+    --wa-chat-pattern: #111C22;
+    --wa-bubble-in: #202C33;
+    --wa-bubble-out: #005C4B;
+    --wa-ink: #E9EDEF;
+    --wa-ink-2: #8696A0;
+    --wa-tick: #53BDEB;
+    --wa-composer: #202C33;
+    --wa-composer-input: #2A3942;
+    --wa-icon: #AEBAC1;
+    --wa-date-pill: #1D282F;
+    --wa-date-ink: #8696A0;
+    --wa-link: #53BDEB;
+    --wa-shadow: 0 1px .5px rgba(0,0,0,.4);
+    --panel-bg: #111B21;
+    color-scheme: dark;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --wa-header: #202C33;
+    --wa-header-ink: #E9EDEF;
+    --wa-header-ink-2: rgba(233,237,239,.6);
+    --wa-chat-bg: #0B141A;
+    --wa-chat-pattern: #111C22;
+    --wa-bubble-in: #202C33;
+    --wa-bubble-out: #005C4B;
+    --wa-ink: #E9EDEF;
+    --wa-ink-2: #8696A0;
+    --wa-tick: #53BDEB;
+    --wa-composer: #202C33;
+    --wa-composer-input: #2A3942;
+    --wa-icon: #AEBAC1;
+    --wa-date-pill: #1D282F;
+    --wa-date-ink: #8696A0;
+    --wa-link: #53BDEB;
+    --wa-shadow: 0 1px .5px rgba(0,0,0,.4);
+    --panel-bg: #111B21;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --wa-header: #202C33;
+  --wa-header-ink: #E9EDEF;
+  --wa-header-ink-2: rgba(233,237,239,.6);
+  --wa-chat-bg: #0B141A;
+  --wa-chat-pattern: #111C22;
+  --wa-bubble-in: #202C33;
+  --wa-bubble-out: #005C4B;
+  --wa-ink: #E9EDEF;
+  --wa-ink-2: #8696A0;
+  --wa-tick: #53BDEB;
+  --wa-composer: #202C33;
+  --wa-composer-input: #2A3942;
+  --wa-icon: #AEBAC1;
+  --wa-date-pill: #1D282F;
+  --wa-date-ink: #8696A0;
+  --wa-link: #53BDEB;
+  --wa-shadow: 0 1px .5px rgba(0,0,0,.4);
+  --panel-bg: #111B21;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--panel-bg);
+  color: var(--wa-ink);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  font-size: 14.2px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  display: grid;
+  place-items: center;
+}
+
+/* ---------- Phone frame ---------- */
+.phone {
+  width: 100%;
+  max-width: 460px;
+  height: min(100dvh, 900px);
+  background: var(--wa-chat-bg);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 30px rgba(0,0,0,.15);
+}
+@media (min-width: 500px) {
+  .phone {
+    border-radius: 18px;
+    height: min(100dvh - 24px, 860px);
+    margin: 12px 0;
+  }
+}
+
+/* ---------- Header ---------- */
+.wa-header {
+  background: var(--wa-header);
+  color: var(--wa-header-ink);
+  display: grid;
+  grid-template-columns: auto auto 1fr auto auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px 8px 4px;
+  min-height: 56px;
+}
+.wa-header .back {
+  background: transparent; border: 0; color: inherit; cursor: pointer;
+  width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
+}
+.wa-header .avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: #0F1620;
+  display: grid; place-items: center;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.08);
+}
+.wa-header .avatar svg { width: 100%; height: 100%; display: block; }
+.wa-header .id { min-width: 0; display: grid; }
+.wa-header .name {
+  font-weight: 600; font-size: 16.5px; letter-spacing: -.005em;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.wa-header .status {
+  font-size: 12px; color: var(--wa-header-ink-2); font-weight: 400;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.wa-header .icon-btn {
+  background: transparent; border: 0; color: inherit; cursor: pointer;
+  width: 40px; height: 40px; border-radius: 50%;
+  display: grid; place-items: center;
+  transition: background .15s;
+}
+.wa-header .icon-btn:hover { background: rgba(255,255,255,.1); }
+
+.i { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.i-sm { width: 16px; height: 16px; }
+
+/* ---------- Chat area ---------- */
+.wa-chat {
+  overflow-y: auto;
+  padding: 12px 6% 8px;
+  background-color: var(--wa-chat-bg);
+  background-image:
+    radial-gradient(var(--wa-chat-pattern) 1px, transparent 1px),
+    radial-gradient(var(--wa-chat-pattern) 1px, transparent 1px);
+  background-size: 22px 22px, 22px 22px;
+  background-position: 0 0, 11px 11px;
+  scroll-behavior: smooth;
+}
+.wa-chat::-webkit-scrollbar { width: 6px; }
+.wa-chat::-webkit-scrollbar-thumb { background: rgba(0,0,0,.15); border-radius: 999px; }
+
+.date-sep {
+  display: flex; justify-content: center; margin: 12px 0;
+}
+.date-sep span {
+  background: var(--wa-date-pill);
+  color: var(--wa-date-ink);
+  font-size: 12.5px; font-weight: 500;
+  padding: 5px 12px; border-radius: 8px;
+  box-shadow: var(--wa-shadow);
+  text-transform: uppercase; letter-spacing: .04em;
+}
+
+.system-msg {
+  display: flex; justify-content: center; margin: 8px 0;
+}
+.system-msg span {
+  background: var(--wa-date-pill);
+  color: var(--wa-date-ink);
+  font-size: 12px;
+  padding: 5px 12px; border-radius: 8px;
+  box-shadow: var(--wa-shadow);
+  max-width: 82%; text-align: center;
+}
+
+.msg-row { display: flex; margin: 2px 0; }
+.msg-row.in { justify-content: flex-start; }
+.msg-row.out { justify-content: flex-end; }
+
+.msg {
+  max-width: 85%;
+  padding: 6px 8px 8px 10px;
+  border-radius: 8px;
+  position: relative;
+  box-shadow: var(--wa-shadow);
+  word-wrap: break-word;
+  min-width: 60px;
+}
+.msg.in { background: var(--wa-bubble-in); }
+.msg.out { background: var(--wa-bubble-out); }
+
+/* Tails only on first message of a run */
+.msg-row.in.first .msg { border-top-left-radius: 0; }
+.msg-row.out.first .msg { border-top-right-radius: 0; }
+
+.msg-row.in.first .msg::before,
+.msg-row.out.first .msg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 8px; height: 13px;
+  background-repeat: no-repeat;
+}
+.msg-row.in.first .msg::before {
+  left: -8px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 13'><path d='M8 0 L0 0 C4 0 8 3 8 8 Z' fill='%23FFFFFF'/></svg>");
+}
+.msg-row.out.first .msg::before {
+  right: -8px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 13'><path d='M0 0 L8 0 C4 0 0 3 0 8 Z' fill='%23D9FDD3'/></svg>");
+}
+:root[data-theme="dark"] .msg-row.in.first .msg::before {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 13'><path d='M8 0 L0 0 C4 0 8 3 8 8 Z' fill='%23202C33'/></svg>");
+}
+:root[data-theme="dark"] .msg-row.out.first .msg::before {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 13'><path d='M0 0 L8 0 C4 0 0 3 0 8 Z' fill='%23005C4B'/></svg>");
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .msg-row.in.first .msg::before {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 13'><path d='M8 0 L0 0 C4 0 8 3 8 8 Z' fill='%23202C33'/></svg>");
+  }
+  :root:not([data-theme="light"]) .msg-row.out.first .msg::before {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 13'><path d='M0 0 L8 0 C4 0 0 3 0 8 Z' fill='%23005C4B'/></svg>");
+  }
+}
+
+.msg .txt {
+  font-size: 14.2px;
+  color: var(--wa-ink);
+  white-space: pre-wrap;
+  padding-right: 60px;
+}
+.msg .meta {
+  position: absolute;
+  right: 8px; bottom: 4px;
+  font-size: 11px;
+  color: var(--wa-ink-2);
+  display: flex; align-items: center; gap: 3px;
+  font-variant-numeric: tabular-nums;
+}
+.msg .ticks {
+  display: inline-flex;
+  color: var(--wa-tick);
+}
+.msg.pending .ticks { color: var(--wa-ink-2); opacity: .7; }
+
+/* Card inside a bubble */
+.card {
+  background: rgba(0,0,0,.03);
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin: 4px 0 6px;
+  border-left: 3px solid var(--wa-header);
+}
+:root[data-theme="dark"] .card { background: rgba(255,255,255,.06); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .card { background: rgba(255,255,255,.06); }
+}
+.msg.out .card { border-left-color: transparent; }
+
+.card .title {
+  font-weight: 600; font-size: 13.5px; letter-spacing: -.005em;
+  display: flex; align-items: center; gap: 6px;
+}
+.card .row {
+  display: flex; justify-content: space-between;
+  font-size: 13px; margin-top: 4px;
+  gap: 12px;
+}
+.card .row .k { color: var(--wa-ink-2); }
+.card .row .v { font-weight: 500; font-variant-numeric: tabular-nums; }
+.card .row .v.pos { color: #06846F; font-weight: 600; }
+.card .row .v.neg { color: #B4353A; font-weight: 600; }
+:root[data-theme="dark"] .card .row .v.pos { color: #7BE0B8; }
+:root[data-theme="dark"] .card .row .v.neg { color: #FFA0A3; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .card .row .v.pos { color: #7BE0B8; }
+  :root:not([data-theme="light"]) .card .row .v.neg { color: #FFA0A3; }
+}
+
+/* Summary card */
+.sum-card .big {
+  font-size: 22px; font-weight: 700; letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums; margin: 4px 0 2px;
+}
+.sum-card .big.neg { color: #B4353A; }
+.sum-card .big.pos { color: #06846F; }
+:root[data-theme="dark"] .sum-card .big.neg { color: #FFA0A3; }
+:root[data-theme="dark"] .sum-card .big.pos { color: #7BE0B8; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .sum-card .big.neg { color: #FFA0A3; }
+  :root:not([data-theme="light"]) .sum-card .big.pos { color: #7BE0B8; }
+}
+.sum-card .cats { margin-top: 8px; display: grid; gap: 5px; }
+.sum-card .catrow {
+  display: grid; grid-template-columns: 1fr auto;
+  font-size: 12.5px;
+  align-items: baseline;
+}
+.sum-card .catrow .bar {
+  grid-column: 1 / 3;
+  height: 3px; background: rgba(0,0,0,.06); border-radius: 999px;
+  overflow: hidden; margin-top: 2px;
+}
+:root[data-theme="dark"] .sum-card .catrow .bar { background: rgba(255,255,255,.1); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .sum-card .catrow .bar { background: rgba(255,255,255,.1); }
+}
+.sum-card .catrow .bar > i {
+  display: block; height: 100%; background: var(--wa-header); border-radius: 999px;
+}
+
+/* Typing indicator */
+.typing {
+  display: inline-flex; gap: 3px; align-items: center; padding: 4px 2px;
+}
+.typing span {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--wa-ink-2); opacity: .55;
+  animation: bounce 1.2s infinite ease-in-out;
+}
+.typing span:nth-child(2) { animation-delay: .15s; }
+.typing span:nth-child(3) { animation-delay: .3s; }
+@keyframes bounce { 0%, 60%, 100% { transform: translateY(0); opacity: .35; } 30% { transform: translateY(-3px); opacity: .85; } }
+@media (prefers-reduced-motion: reduce) { .typing span { animation: none; } }
+
+/* Suggestions */
+.suggests {
+  display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 4px;
+}
+.suggests button {
+  background: var(--wa-bubble-in); color: var(--wa-link);
+  border: 1px solid rgba(0,0,0,.06);
+  padding: 6px 10px; border-radius: 14px;
+  font-size: 12.5px; font-weight: 500; cursor: pointer;
+  font-family: inherit;
+  box-shadow: var(--wa-shadow);
+}
+:root[data-theme="dark"] .suggests button { background: var(--wa-bubble-in); border-color: rgba(255,255,255,.08); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .suggests button { background: var(--wa-bubble-in); border-color: rgba(255,255,255,.08); }
+}
+
+/* ---------- Composer ---------- */
+.composer {
+  background: var(--wa-composer);
+  padding: 8px 8px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: end;
+}
+.composer .input-wrap {
+  background: var(--wa-composer-input);
+  border-radius: 24px;
+  padding: 6px 6px 6px 10px;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  box-shadow: var(--wa-shadow);
+}
+.composer .icon-btn {
+  background: transparent; border: 0; color: var(--wa-icon); cursor: pointer;
+  width: 36px; height: 36px; border-radius: 50%;
+  display: grid; place-items: center;
+}
+.composer .icon-btn:hover { background: rgba(0,0,0,.05); }
+:root[data-theme="dark"] .composer .icon-btn:hover { background: rgba(255,255,255,.05); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .composer .icon-btn:hover { background: rgba(255,255,255,.05); }
+}
+
+.composer textarea {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--wa-ink);
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.35;
+  resize: none;
+  outline: none;
+  padding: 8px 4px;
+  max-height: 96px;
+}
+.composer textarea::placeholder { color: var(--wa-ink-2); }
+
+.composer .send {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--wa-header); color: white;
+  border: 0; cursor: pointer;
+  display: grid; place-items: center;
+  transition: transform .1s;
+}
+.composer .send:active { transform: scale(.94); }
+
+/* ---------- Menu ---------- */
+.menu {
+  position: absolute;
+  top: 52px; right: 8px;
+  background: var(--wa-bubble-in);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.2);
+  min-width: 200px;
+  padding: 6px 0;
+  z-index: 20;
+  transform-origin: top right;
+  animation: menuOpen .12s ease-out;
+}
+@keyframes menuOpen { from { transform: scale(.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.menu[hidden] { display: none; }
+.menu button {
+  width: 100%; background: transparent; border: 0;
+  text-align: left; padding: 12px 20px;
+  font-family: inherit; font-size: 14.5px; color: var(--wa-ink);
+  cursor: pointer;
+}
+.menu button:hover { background: rgba(0,0,0,.05); }
+:root[data-theme="dark"] .menu button:hover { background: rgba(255,255,255,.05); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .menu button:hover { background: rgba(255,255,255,.05); }
+}
+.menu button.danger { color: #E53935; }
+
+.overlay {
+  position: absolute; inset: 0; z-index: 15;
+}
+.overlay[hidden] { display: none; }
+
+/* ---------- Onboarding banner ---------- */
+.onboard {
+  padding: 8px 12px; margin: 8px auto;
+  background: rgba(255, 250, 205, .95);
+  color: #6D5900;
+  border-radius: 8px;
+  font-size: 12.5px;
+  text-align: center;
+  max-width: 86%;
+  box-shadow: var(--wa-shadow);
+}
+:root[data-theme="dark"] .onboard { background: #3A3620; color: #F5E4A0; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .onboard { background: #3A3620; color: #F5E4A0; }
+}
+</style>
+
+<div class="phone">
+  <header class="wa-header">
+    <button class="back" aria-label="Voltar">
+      <svg class="i" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="avatar">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M 8 100 L 18 72 L 40 64 L 50 74 L 60 64 L 82 72 L 92 100 Z" fill="#171C26"/>
+        <path d="M 40 64 L 50 74 L 60 64 L 56 84 L 44 84 Z" fill="#FFFFFF"/>
+        <path d="M 47 64 L 53 64 L 55 70 L 54 94 L 46 94 L 45 70 Z" fill="#B01818"/>
+        <circle cx="50" cy="42" r="15" fill="#232936"/>
+        <ellipse cx="50" cy="30" rx="22" ry="4" fill="#000"/>
+        <path d="M 35 30 Q 35 16 50 16 Q 65 16 65 30 Z" fill="#000"/>
+        <rect x="35" y="26" width="30" height="3" fill="#1A1A1A"/>
+        <rect x="35" y="39" width="30" height="6" rx="2" fill="#000"/>
+        <line x1="49" y1="42" x2="51" y2="42" stroke="#333" stroke-width="1"/>
+      </svg>
+    </div>
+    <div class="id">
+      <div class="name">FINANCEIRO</div>
+      <div class="status" id="statusText">online</div>
+    </div>
+    <button class="icon-btn" aria-label="Videochamada">
+      <svg class="i" viewBox="0 0 24 24"><rect x="2" y="6" width="15" height="12" rx="2"/><path d="M17 10l5-3v10l-5-3z"/></svg>
+    </button>
+    <button class="icon-btn" aria-label="Chamada">
+      <svg class="i" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    </button>
+    <button class="icon-btn" id="menuBtn" aria-label="Menu">
+      <svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+    </button>
+  </header>
+
+  <div class="overlay" id="overlay" hidden></div>
+  <div class="menu" id="menu" hidden>
+    <button data-action="summary">Ver resumo do mês</button>
+    <button data-action="last">Últimos movimentos</button>
+    <button data-action="theme">Alternar tema</button>
+    <button data-action="export">Exportar dados</button>
+    <button data-action="clear" class="danger">Apagar conversa e dados</button>
+  </div>
+
+  <main class="wa-chat" id="chat"></main>
+
+  <form class="composer" id="composer">
+    <div class="input-wrap">
+      <button type="button" class="icon-btn" aria-label="Emoji">
+        <svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>
+      </button>
+      <textarea id="input" rows="1" placeholder="Escreve uma mensagem" autocomplete="off"></textarea>
+      <button type="button" class="icon-btn" aria-label="Anexar">
+        <svg class="i" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+      </button>
+      <button type="button" class="icon-btn" aria-label="Câmara">
+        <svg class="i" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </button>
+    </div>
+    <button type="submit" class="send" id="sendBtn" aria-label="Enviar">
+      <svg class="i" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z" fill="currentColor" stroke="currentColor"/></svg>
+    </button>
+  </form>
+</div>
+
+<script>
+/* ---------- Storage ---------- */
+const STORAGE = { tx: 'wa_contas_tx_v1', msgs: 'wa_contas_msgs_v1', onboard: 'wa_contas_onboard_v1', theme: 'wa_contas_theme' };
+const CATEGORIES = {
+  in:  ['salario','freelance','investimento','reembolso','prenda','outros'],
+  out: ['alimentacao','mercearia','transportes','habitacao','saude','lazer','compras','subscricoes','educacao','viagens','outros']
+};
+const CAT_LABELS = {
+  salario:'Salário', freelance:'Freelance', investimento:'Investimentos', reembolso:'Reembolso', prenda:'Prenda',
+  alimentacao:'Alimentação', mercearia:'Mercearia', transportes:'Transportes', habitacao:'Habitação', saude:'Saúde',
+  lazer:'Lazer', compras:'Compras', subscricoes:'Subscrições', educacao:'Educação', viagens:'Viagens', outros:'Outros'
+};
+const CAT_GLYPHS = {
+  salario:'💼', freelance:'🧾', investimento:'📈', reembolso:'↩️', prenda:'🎁',
+  alimentacao:'🍽️', mercearia:'🛒', transportes:'🚌', habitacao:'🏠', saude:'💊',
+  lazer:'🎬', compras:'🛍️', subscricoes:'🔁', educacao:'📚', viagens:'✈️', outros:'•'
+};
+
+const state = {
+  tx: loadJSON(STORAGE.tx) || [],
+  msgs: loadJSON(STORAGE.msgs) || [],
+  claude: null,
+  sending: false,
+};
+
+function loadJSON(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch { return null; } }
+function saveJSON(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+function uid() { return Math.random().toString(36).slice(2, 10); }
+
+/* ---------- Theme ---------- */
+const savedTheme = localStorage.getItem(STORAGE.theme);
+if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+
+/* ---------- Time helpers ---------- */
+const MONTHS_PT = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+function fmtTime(ts) {
+  const d = new Date(ts);
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+function fmtDateSep(ts) {
+  const d = new Date(ts); const today = new Date(); const y = new Date(today); y.setDate(y.getDate()-1);
+  const sameDay = (a,b) => a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+  if (sameDay(d, today)) return 'Hoje';
+  if (sameDay(d, y)) return 'Ontem';
+  const days = ['domingo','segunda','terça','quarta','quinta','sexta','sábado'];
+  if ((today - d) / 86400000 < 7) return days[d.getDay()];
+  return `${d.getDate()} de ${MONTHS_PT[d.getMonth()]} de ${d.getFullYear()}`;
+}
+function todayISO() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function fmtEUR(n) { return new Intl.NumberFormat('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n); }
+
+/* ---------- Rendering ---------- */
+const chatEl = document.getElementById('chat');
+
+function renderAll() {
+  chatEl.innerHTML = '';
+  const onboarded = localStorage.getItem(STORAGE.onboard);
+  if (!onboarded) {
+    const s = document.createElement('div');
+    s.className = 'system-msg';
+    s.innerHTML = `<span>🔒 As mensagens ficam guardadas só no teu telemóvel. Nada sai daqui.</span>`;
+    chatEl.appendChild(s);
+  }
+  let lastDate = null;
+  let lastAuthor = null;
+  state.msgs.forEach((m, i) => {
+    const d = new Date(m.ts).toDateString();
+    if (d !== lastDate) {
+      const sep = document.createElement('div');
+      sep.className = 'date-sep';
+      sep.innerHTML = `<span>${fmtDateSep(m.ts)}</span>`;
+      chatEl.appendChild(sep);
+      lastDate = d;
+      lastAuthor = null;
+    }
+    if (m.system) {
+      const s = document.createElement('div');
+      s.className = 'system-msg';
+      s.innerHTML = `<span>${escapeHtml(m.text)}</span>`;
+      chatEl.appendChild(s);
+      lastAuthor = null;
+      return;
+    }
+    const isFirst = m.author !== lastAuthor;
+    chatEl.appendChild(renderMsg(m, isFirst));
+    lastAuthor = m.author;
+  });
+  scrollBottom();
+}
+
+function renderMsg(m, isFirst) {
+  const row = document.createElement('div');
+  row.className = `msg-row ${m.author === 'user' ? 'out' : 'in'}${isFirst ? ' first' : ''}`;
+  const bubble = document.createElement('div');
+  bubble.className = `msg ${m.author === 'user' ? 'out' : 'in'}${m.pending ? ' pending' : ''}`;
+
+  let inner = '';
+  if (m.card) {
+    inner += cardHtml(m.card);
+  }
+  if (m.text) {
+    inner += `<div class="txt">${linkify(escapeHtml(m.text))}</div>`;
+  }
+  if (m.suggests?.length) {
+    inner += `<div class="suggests">${m.suggests.map(s => `<button data-send="${escapeHtml(s)}">${escapeHtml(s)}</button>`).join('')}</div>`;
+  }
+  const ticks = m.author === 'user'
+    ? `<span class="ticks">${m.pending ? clockSvg() : ticksSvg()}</span>` : '';
+  inner += `<div class="meta"><span>${fmtTime(m.ts)}</span>${ticks}</div>`;
+  bubble.innerHTML = inner;
+
+  bubble.querySelectorAll('.suggests button').forEach(b => {
+    b.addEventListener('click', () => {
+      const t = b.getAttribute('data-send');
+      sendUser(t);
+    });
+  });
+
+  row.appendChild(bubble);
+  return row;
+}
+
+function cardHtml(card) {
+  if (card.type === 'entry') {
+    const isIn = card.entry.type === 'in';
+    return `<div class="card">
+      <div class="title">${CAT_GLYPHS[card.entry.cat] || '•'} ${isIn ? 'Entrada registada' : 'Saída registada'}</div>
+      <div class="row"><span class="k">Descrição</span><span class="v">${escapeHtml(card.entry.desc)}</span></div>
+      <div class="row"><span class="k">Categoria</span><span class="v">${CAT_LABELS[card.entry.cat] || '—'}</span></div>
+      <div class="row"><span class="k">Data</span><span class="v">${card.entry.date}</span></div>
+      <div class="row"><span class="k">Valor</span><span class="v ${isIn ? 'pos' : 'neg'}">${isIn ? '+' : '−'}€${fmtEUR(card.entry.amount)}</span></div>
+    </div>`;
+  }
+  if (card.type === 'summary') {
+    const s = card.data;
+    const bal = s.in - s.out;
+    return `<div class="card sum-card">
+      <div class="title">📊 ${MONTHS_PT[s.month].charAt(0).toUpperCase() + MONTHS_PT[s.month].slice(1)} ${s.year}</div>
+      <div class="big ${bal < 0 ? 'neg' : 'pos'}">${bal < 0 ? '−' : ''}€${fmtEUR(Math.abs(bal))}</div>
+      <div class="row"><span class="k">Entradas</span><span class="v pos">+€${fmtEUR(s.in)}</span></div>
+      <div class="row"><span class="k">Saídas</span><span class="v neg">−€${fmtEUR(s.out)}</span></div>
+      ${s.cats?.length ? `<div class="cats">${s.cats.map(c => `
+        <div class="catrow">
+          <span>${CAT_GLYPHS[c.cat] || '•'} ${CAT_LABELS[c.cat] || c.cat}</span>
+          <span style="font-variant-numeric:tabular-nums;font-weight:500">€${fmtEUR(c.total)}</span>
+          <div class="bar"><i style="width:${c.pct}%"></i></div>
+        </div>`).join('')}</div>` : ''}
+    </div>`;
+  }
+  if (card.type === 'list') {
+    if (!card.items.length) return '';
+    return `<div class="card">
+      <div class="title">🧾 Últimos movimentos</div>
+      ${card.items.map(t => `
+        <div class="row">
+          <span class="k">${CAT_GLYPHS[t.cat] || '•'} ${escapeHtml(t.desc)}</span>
+          <span class="v ${t.type==='in'?'pos':'neg'}">${t.type==='in'?'+':'−'}€${fmtEUR(t.amount)}</span>
+        </div>`).join('')}
+    </div>`;
+  }
+  return '';
+}
+
+function linkify(s) { return s.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener" style="color:var(--wa-link)">$1</a>'); }
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function ticksSvg() { return `<svg width="16" height="11" viewBox="0 0 16 11" fill="none"><path d="M11.071.653a.5.5 0 0 1 .157.69L4.828 10.83a.5.5 0 0 1-.798.038L.612 6.42a.5.5 0 0 1 .794-.61l3.008 3.913L10.38.81a.5.5 0 0 1 .691-.157z" fill="currentColor"/><path d="M15.071.653a.5.5 0 0 1 .157.69L8.828 10.83a.5.5 0 0 1-.798.038L6.5 8.6l.63-.82 1.316 1.712L14.38.81a.5.5 0 0 1 .691-.157z" fill="currentColor"/></svg>`; }
+function clockSvg() { return `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`; }
+
+function scrollBottom() { requestAnimationFrame(() => chatEl.scrollTop = chatEl.scrollHeight); }
+
+/* ---------- Send flow ---------- */
+const input = document.getElementById('input');
+const composer = document.getElementById('composer');
+
+function autoGrow() { input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, 96) + 'px'; }
+input.addEventListener('input', autoGrow);
+input.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); composer.requestSubmit(); }
+});
+
+composer.addEventListener('submit', e => {
+  e.preventDefault();
+  const t = input.value.trim();
+  if (!t || state.sending) return;
+  input.value = ''; autoGrow();
+  sendUser(t);
+});
+
+async function sendUser(text) {
+  if (state.sending) return;
+
+  const userMsg = { id: uid(), author: 'user', ts: Date.now(), text, pending: true };
+  state.msgs.push(userMsg);
+  saveJSON(STORAGE.msgs, state.msgs);
+  renderAll();
+
+  // First-time onboarding note
+  if (!localStorage.getItem(STORAGE.onboard)) {
+    localStorage.setItem(STORAGE.onboard, '1');
+  }
+
+  state.sending = true;
+  setStatus('a escrever…');
+  const typingMsg = { id: 'typing', author: 'bot', ts: Date.now(), text: '__typing__' };
+  state.msgs.push(typingMsg);
+  renderAll();
+
+  // Mark user message delivered
+  setTimeout(() => { userMsg.pending = false; saveJSON(STORAGE.msgs, state.msgs); renderAll(); }, 200);
+
+  let reply;
+  try {
+    reply = await interpret(text);
+  } catch (err) {
+    reply = { intent: 'error', reply: fallbackErrorMsg(err) };
+  }
+
+  // Remove typing
+  state.msgs = state.msgs.filter(m => m.id !== 'typing');
+  await applyReply(reply, text);
+  state.sending = false;
+  setStatus('online');
+}
+
+function setStatus(s) { document.getElementById('statusText').textContent = s; }
+
+/* ---------- Fake typing bubble render ---------- */
+const origRenderMsg = renderMsg;
+renderMsg = function(m, isFirst) {
+  if (m.text === '__typing__') {
+    const row = document.createElement('div');
+    row.className = `msg-row in${isFirst ? ' first' : ''}`;
+    const b = document.createElement('div'); b.className = 'msg in';
+    b.innerHTML = `<div class="typing"><span></span><span></span><span></span></div>`;
+    row.appendChild(b);
+    return row;
+  }
+  return origRenderMsg(m, isFirst);
+};
+
+/* ---------- Apply bot reply to state ---------- */
+async function applyReply(reply, userText) {
+  const now = Date.now();
+
+  if (reply.intent === 'add' && reply.entries?.length) {
+    const entriesJust = [];
+    for (const e of reply.entries) {
+      const clean = normalizeEntry(e);
+      if (!clean) continue;
+      state.tx.push(clean);
+      entriesJust.push(clean);
+    }
+    saveJSON(STORAGE.tx, state.tx);
+    const totals = monthTotals(new Date());
+    state.msgs.push({
+      id: uid(), author: 'bot', ts: now,
+      text: buildAddReply(entriesJust, totals),
+      suggests: ['Resumo do mês']
+    });
+    saveJSON(STORAGE.msgs, state.msgs); renderAll(); return;
+  }
+
+  if (reply.intent === 'summary') {
+    const monthRef = reply.month ? new Date(reply.month + '-01') : new Date();
+    const totals = monthTotals(monthRef);
+    state.msgs.push({
+      id: uid(), author: 'bot', ts: now,
+      card: { type: 'summary', data: totals },
+      text: reply.reply || summaryLine(totals),
+      suggests: ['Últimos movimentos', 'Onde gastei mais?']
+    });
+    saveJSON(STORAGE.msgs, state.msgs); renderAll(); return;
+  }
+
+  if (reply.intent === 'list') {
+    const items = state.tx.slice(-10).reverse();
+    state.msgs.push({
+      id: uid(), author: 'bot', ts: now,
+      card: { type: 'list', items },
+      text: reply.reply || (items.length ? '' : 'Ainda não há movimentos.'),
+    });
+    saveJSON(STORAGE.msgs, state.msgs); renderAll(); return;
+  }
+
+  if (reply.intent === 'delete_last') {
+    const removed = state.tx.pop();
+    saveJSON(STORAGE.tx, state.tx);
+    state.msgs.push({
+      id: uid(), author: 'bot', ts: now,
+      text: removed
+        ? `Apaguei o último: ${CAT_GLYPHS[removed.cat] || '•'} ${removed.desc} — ${removed.type==='in'?'+':'−'}€${fmtEUR(removed.amount)}.`
+        : 'Não há movimentos para apagar.'
+    });
+    saveJSON(STORAGE.msgs, state.msgs); renderAll(); return;
+  }
+
+  // clarify / help / error / anything else
+  state.msgs.push({
+    id: uid(), author: 'bot', ts: now,
+    text: reply.reply || 'Não percebi. Diz-me quanto gastaste ou ganhaste (ex.: "gastei 12€ no almoço").',
+    suggests: reply.suggests || ['Ver resumo do mês', 'Como funciona?']
+  });
+  saveJSON(STORAGE.msgs, state.msgs); renderAll();
+}
+
+function normalizeEntry(e) {
+  if (!e) return null;
+  const amount = Number(e.amount);
+  if (!isFinite(amount) || amount <= 0) return null;
+  const type = e.type === 'in' ? 'in' : 'out';
+  const cat = (CATEGORIES[type].includes(e.cat) ? e.cat : 'outros');
+  const desc = (e.desc || '').toString().trim().slice(0, 80) || (type === 'in' ? 'Entrada' : 'Saída');
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(e.date) ? e.date : todayISO();
+  return { id: uid(), type, amount: Math.round(amount * 100) / 100, desc, cat, date };
+}
+
+function monthTotals(ref) {
+  const y = ref.getFullYear(), m = ref.getMonth();
+  const items = state.tx.filter(t => {
+    const [ty, tm] = t.date.split('-').map(Number);
+    return ty === y && tm - 1 === m;
+  });
+  const inSum = items.filter(t => t.type === 'in').reduce((a,t)=>a+t.amount, 0);
+  const outSum = items.filter(t => t.type === 'out').reduce((a,t)=>a+t.amount, 0);
+  const catTotals = {};
+  for (const t of items) if (t.type === 'out') catTotals[t.cat] = (catTotals[t.cat]||0) + t.amount;
+  const cats = Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([cat,total])=> ({
+    cat, total, pct: outSum > 0 ? Math.round(total/outSum*100) : 0
+  }));
+  return { year: y, month: m, in: inSum, out: outSum, count: items.length, cats };
+}
+
+function summaryLine(t) {
+  const bal = t.in - t.out;
+  const monthName = MONTHS_PT[t.month];
+  if (t.count === 0) return `Ainda não há movimentos em ${monthName}.`;
+  const sign = bal >= 0 ? '+' : '−';
+  return `${monthName}: ${sign}€${fmtEUR(Math.abs(bal))} (entrou €${fmtEUR(t.in)}, saiu €${fmtEUR(t.out)})`;
+}
+
+function buildAddReply(entries, totals) {
+  const lines = entries.map(e => {
+    const g = CAT_GLYPHS[e.cat] || '•';
+    const sign = e.type === 'in' ? '+' : '−';
+    const when = e.date === todayISO() ? '' : ` · ${e.date.slice(8,10)}/${e.date.slice(5,7)}`;
+    return `${g} ${sign}€${fmtEUR(e.amount)} · ${e.desc}${when}`;
+  });
+  const bal = totals.in - totals.out;
+  const balSign = bal >= 0 ? '+' : '−';
+  const foot = `\nMês: ${balSign}€${fmtEUR(Math.abs(bal))}`;
+  return lines.join('\n') + foot;
+}
+
+/* ---------- Interpret via Claude (with fallback) ---------- */
+const SYSTEM_PROMPT = `És o "FINANCEIRO", um assistente de finanças pessoais em português europeu que fala como se fosse uma conversa de WhatsApp. O utilizador escreve mensagens do dia-a-dia ("gastei 15€ no almoço", "recebi 800 do freela", "quanto gastei este mês?") e tu registas ou consultas.
+
+Categorias válidas:
+- Entradas (type "in"): salario, freelance, investimento, reembolso, prenda, outros
+- Saídas (type "out"): alimentacao, mercearia, transportes, habitacao, saude, lazer, compras, subscricoes, educacao, viagens, outros
+
+Data de hoje: __TODAY__.
+Contexto atual do mês: __CONTEXT__.
+
+Responde SEMPRE em JSON válido com esta forma:
+{
+  "intent": "add" | "summary" | "list" | "delete_last" | "help" | "clarify",
+  "entries": [ { "type": "in"|"out", "amount": number (euros), "desc": "curta", "cat": "categoria", "date": "YYYY-MM-DD" } ],
+  "month": "YYYY-MM" (só para summary de um mês específico, senão omite),
+  "reply": "resposta curta e natural em pt-PT, tom de conversa de WhatsApp, podes usar 1 emoji"
+}
+
+Regras:
+- "add": quando o utilizador declara um ou mais movimentos. Extrai valor, descrição curta, categoria e data (assume hoje se não disser).
+- "summary": pedidos como "resumo", "quanto gastei", "saldo", "total do mês".
+- "list": "mostra os últimos", "vê os movimentos", "histórico".
+- "delete_last": "apaga o último", "cancela o último", "não era isso".
+- "clarify": mensagem ambígua — pede detalhe curto (ex: "quanto foi?").
+- "help": pergunta como funciona.
+- Valores como "15", "15€", "15 euros", "quinze" → 15. "1,50" ou "1.50" → 1.5. "1500" ou "1.500" → 1500.
+- Descrição curta e humana ("Almoço", "Netflix", "Salário", "Uber").
+- O campo "reply" é a tua mensagem de chat visível (sem repetir o card). Se registares algo, confirma naturalmente ("Registado ✅. Este mês já gastaste €X."). Se só houver 1 entrada, ainda queres o reply. Nunca listes o JSON no reply.
+- Se não tiveres a certeza da categoria, usa "outros".
+- Não inventes movimentos. Se a mensagem for pergunta pura, não uses "add".`;
+
+const WORKER_URL = 'https://still-cloud-be15.lucasfarianinja.workers.dev/?action=financas_chat';
+
+async function interpret(text) {
+  const context = describeMonth(new Date());
+  const recent = state.msgs
+    .filter(m => !m.system && m.text && m.text !== '__typing__')
+    .slice(-6)
+    .map(m => ({ role: m.author === 'user' ? 'user' : 'assistant', content: m.text }));
+
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, context, today: todayISO(), history: recent })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (data && typeof data === 'object' && data.intent) return data;
+    return fallbackInterpret(text);
+  } catch (e) {
+    return fallbackInterpret(text);
+  }
+}
+
+function describeMonth(ref) {
+  const t = monthTotals(ref);
+  return `${MONTHS_PT[t.month]} ${t.year}: entradas €${fmtEUR(t.in)}, saídas €${fmtEUR(t.out)}, ${t.count} movimentos.`;
+}
+
+function fallbackErrorMsg() {
+  return 'Não consegui processar agora. Tenta escrever no formato "gastei 15€ no almoço".';
+}
+
+/* ---------- Fallback parser (regex, works without Claude) ---------- */
+function fallbackInterpret(text) {
+  const low = text.toLowerCase().trim();
+
+  if (/^(oi|olá|ola|hey|bom dia|boa tarde|boa noite)\b/i.test(low)) {
+    return { intent: 'help', reply: 'Olá! 👋 Sou o Contas. Escreve os teus gastos como se me contasses (ex.: "gastei 12€ no almoço") e eu vou somando tudo durante o mês.', suggests: ['Ver resumo do mês', 'Como funciona?'] };
+  }
+  if (/(como funciona|ajuda|help|o que fazes)/i.test(low)) {
+    return { intent: 'help', reply: 'Diz-me em linguagem normal:\n• Gastos: "gastei 8€ no café" ou "netflix 12,90"\n• Ganhos: "recebi 1450 do salário"\n• Consultar: "quanto gastei este mês?" ou "resumo"\n• Apagar: "apaga o último"', suggests: ['Ver resumo do mês'] };
+  }
+  if (/(resumo|saldo|total do mês|quanto gastei|quanto entrou|balanço)/i.test(low)) {
+    return { intent: 'summary', reply: '' };
+  }
+  if (/(últimos|ultimos|histórico|historico|movimentos|listar|mostra)/i.test(low)) {
+    return { intent: 'list', reply: '' };
+  }
+  if (/(apaga|apagar|remove|cancela|desfaz).*(último|ultimo|anterior)/i.test(low)) {
+    return { intent: 'delete_last', reply: '' };
+  }
+
+  // Parse amount
+  const amtMatch = low.match(/(\d+[.,]?\d*)\s*(€|eur|euros?)?/i);
+  if (!amtMatch) {
+    return { intent: 'clarify', reply: 'Quanto foi? Escreve o valor (ex.: "12€" ou "1450 do salário").' };
+  }
+  const amount = parseFloat(amtMatch[1].replace(',', '.'));
+  if (!isFinite(amount) || amount <= 0) {
+    return { intent: 'clarify', reply: 'Não consegui perceber o valor. Tenta assim: "gastei 12€ no almoço".' };
+  }
+
+  // Determine in/out
+  const inWords  = /(recebi|ganhei|entrou|salário|salario|freela|freelance|reembolso|prenda|prémio|premio|caiu)/i;
+  const outWords = /(gastei|paguei|comprei|saiu|almoç|jantar|caf[eé]|renda|luz|água|agua|netflix|spotify|uber|bolt|super|mercadona|pingo|lidl|continente|auchan|farmácia|farmacia)/i;
+  let type = inWords.test(low) ? 'in' : (outWords.test(low) ? 'out' : 'out');
+
+  // Category guess
+  const catMap = [
+    [/almoç|jantar|caf[eé]|restaurante|snack|padaria|pastelaria/i, 'out', 'alimentacao'],
+    [/super|mercado|mercadona|pingo|lidl|continente|auchan|minipreço/i, 'out', 'mercearia'],
+    [/uber|bolt|metro|comboio|autocarro|gasolina|combustível|combustivel|passe|via verde/i, 'out', 'transportes'],
+    [/renda|casa|luz|água|agua|internet|gás|gas|iptv/i, 'out', 'habitacao'],
+    [/farmácia|farmacia|médico|medico|dentista|consulta|hospital/i, 'out', 'saude'],
+    [/cinema|concerto|jogo|steam|playstation|bilhete/i, 'out', 'lazer'],
+    [/netflix|spotify|youtube|hbo|disney|prime|icloud|apple/i, 'out', 'subscricoes'],
+    [/roupa|sapatos|amazon|worten|fnac|zara|hm/i, 'out', 'compras'],
+    [/universidade|curso|livro|manual/i, 'out', 'educacao'],
+    [/hotel|voo|viagem|airbnb|booking/i, 'out', 'viagens'],
+    [/salário|salario/i, 'in', 'salario'],
+    [/freela|freelance/i, 'in', 'freelance'],
+    [/reembolso/i, 'in', 'reembolso'],
+    [/prenda|presente/i, 'in', 'prenda'],
+    [/dividendo|juros|ações|acoes|investimento/i, 'in', 'investimento'],
+  ];
+  let cat = type === 'in' ? 'outros' : 'outros';
+  for (const [re, t, c] of catMap) if (re.test(low)) { type = t; cat = c; break; }
+
+  // Description: take words after "no/na/do/da/em"
+  let desc = '';
+  const dm = low.match(/(?:no|na|nos|nas|do|da|em|para|pra|com)\s+([a-záàâãéèêíïóôõöúüç\s]+?)(?:\s+de\s+|\s*$)/i);
+  if (dm) desc = dm[1].trim();
+  if (!desc) {
+    const words = low.replace(amtMatch[0], '').replace(/(gastei|paguei|comprei|recebi|ganhei|entrou|saiu)/gi, '').replace(/€|eur|euros?/gi, '').trim();
+    desc = words.split(/\s+/).slice(0, 4).join(' ');
+  }
+  desc = (desc || (type === 'in' ? 'Entrada' : 'Compra')).replace(/^./, c => c.toUpperCase()).slice(0, 40);
+
+  return {
+    intent: 'add',
+    entries: [{ type, amount, desc, cat, date: todayISO() }],
+    reply: ''  // let summaryLine fill it
+  };
+}
+
+/* ---------- Menu ---------- */
+const menuBtn = document.getElementById('menuBtn');
+const menu = document.getElementById('menu');
+const overlay = document.getElementById('overlay');
+menuBtn.addEventListener('click', (e) => { e.stopPropagation(); menu.hidden = false; overlay.hidden = false; });
+overlay.addEventListener('click', () => { menu.hidden = true; overlay.hidden = true; });
+menu.addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  const action = b.dataset.action;
+  menu.hidden = true; overlay.hidden = true;
+  if (action === 'summary') sendUser('Resumo do mês');
+  else if (action === 'last') sendUser('Últimos movimentos');
+  else if (action === 'theme') {
+    const cur = document.documentElement.getAttribute('data-theme');
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem(STORAGE.theme, next);
+  } else if (action === 'export') {
+    exportData();
+  } else if (action === 'clear') {
+    if (confirm('Apagar toda a conversa e todos os movimentos?')) {
+      state.tx = []; state.msgs = [];
+      saveJSON(STORAGE.tx, state.tx); saveJSON(STORAGE.msgs, state.msgs);
+      localStorage.removeItem(STORAGE.onboard);
+      seedWelcome();
+      renderAll();
+    }
+  }
+});
+
+/* ---------- First-run welcome ---------- */
+const WELCOME_TEXT = 'Olá, sou o teu financeiro particular. Manda-me os teus ganhos e gastos.\n\nPor onde queres começar?';
+const WELCOME_SUGGESTS = ['Como funciona?', 'Ver resumo do mês'];
+
+function seedWelcome() {
+  if (state.msgs.length > 0) {
+    const first = state.msgs[0];
+    if (first?.author === 'bot' && first?.text && first.text !== WELCOME_TEXT
+        && /Sou o Contas|FINANÇAS|financeiro particular|FINANCEIRO|Aqui é o/.test(first.text)) {
+      first.text = WELCOME_TEXT;
+      first.suggests = WELCOME_SUGGESTS;
+      saveJSON(STORAGE.msgs, state.msgs);
+    }
+    return;
+  }
+  state.msgs.push({
+    id: uid(), author: 'bot', ts: Date.now(),
+    text: WELCOME_TEXT,
+    suggests: WELCOME_SUGGESTS
+  });
+  saveJSON(STORAGE.msgs, state.msgs);
+}
+
+async function exportData() {
+  const data = JSON.stringify(state.tx, null, 2);
+  const filename = `financas-${todayISO()}.json`;
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url);
+}
+
+/* ---------- Monthly auto-summary ---------- */
+function maybeAutoCloseMonth() {
+  const now = new Date();
+  const currentKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const lastSeen = localStorage.getItem('wa_contas_last_month');
+  localStorage.setItem('wa_contas_last_month', currentKey);
+  if (!lastSeen || lastSeen === currentKey) return;
+  // A new month has begun since the last visit — send the closing report for the last month seen
+  const [ly, lm] = lastSeen.split('-').map(Number);
+  const lastRef = new Date(ly, lm - 1, 1);
+  const totals = monthTotals(lastRef);
+  if (totals.count === 0) return;
+  state.msgs.push({
+    id: uid(), author: 'bot', ts: Date.now(),
+    card: { type: 'summary', data: totals },
+    text: `Fechei ${MONTHS_PT[totals.month]}. Aqui está o que aconteceu.`,
+    suggests: ['Resumo deste mês']
+  });
+  saveJSON(STORAGE.msgs, state.msgs);
+}
+
+/* ---------- Boot ---------- */
+seedWelcome();
+maybeAutoCloseMonth();
+renderAll();
+input.focus();
+</script>
