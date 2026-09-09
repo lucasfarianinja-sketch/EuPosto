@@ -42,6 +42,7 @@ var worker_default = {
         case "ai_chat":    res = await aiChat(request, env); break;
         case "ai_caption": res = await aiCaption(request, env); break;
         case "financas_chat": res = await financasChat(request, env); break;
+        case "financas_vision": res = await financasVision(request, env); break;
         case "tt_creator_info": res = await ttCreatorInfo(request); break;
         default:           res = json({ error: "Unknown action" }, 400);
       }
@@ -623,5 +624,66 @@ Regras:
   }
 }
 __name(financasChat, "financasChat");
+
+async function financasVision(request, env) {
+  const body = await request.json();
+  const image = String(body.image || "");
+  const today = String(body.today || new Date().toISOString().slice(0, 10));
+  const context = String(body.context || "");
+  const note   = String(body.text  || "").slice(0, 300);
+
+  const prompt = `Analisa esta imagem — é um print/foto de gastos ou ganhos (extracto bancário, notificação de app financeira, recibo, factura). Extrai TODOS os movimentos visíveis.
+
+Categorias válidas:
+- Entradas (type "in"): salario, freelance, investimento, reembolso, prenda, outros
+- Saidas (type "out"): alimentacao, mercearia, transportes, habitacao, saude, lazer, compras, subscricoes, educacao, viagens, outros
+
+Data de hoje: ${today}.
+${note ? `Nota do utilizador: "${note}".` : ""}
+
+Responde APENAS com um único objecto JSON válido:
+{
+  "intent": "add",
+  "entries": [ { "type":"in"|"out", "amount":number_em_euros, "desc":"curta", "cat":"categoria", "date":"YYYY-MM-DD" } ],
+  "reply": "resposta curta em pt-PT"
+}
+
+Regras:
+- Se a imagem mostra várias linhas de transacções, extrai cada uma como uma entry.
+- "amount" sempre positivo, o sinal está no "type".
+- "desc" curto (ex.: "Mercadona", "Netflix").
+- Data no formato YYYY-MM-DD; se não visível, usa a de hoje.
+- Se não conseguires ler nada útil, responde: {"intent":"clarify","reply":"Não consegui ler o print. Podes tirar mais nítido?"}
+- NUNCA respondas texto fora do JSON.`;
+
+  if (!env.AI) return json({ intent: "clarify", reply: "IA não configurada." });
+
+  try {
+    const b64 = image.replace(/^data:image\/[a-z]+;base64,/, "");
+    const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    const out = await env.AI.run("@cf/meta/llama-3.2-11b-vision-instruct", {
+      prompt,
+      image: [...bytes],
+      max_tokens: 900
+    });
+    const raw = out.response ?? out.result?.response ?? out;
+    let parsed;
+    if (raw && typeof raw === "object" && !Array.isArray(raw)) {
+      parsed = raw;
+    } else if (typeof raw === "string") {
+      try { parsed = JSON.parse(raw); }
+      catch {
+        const m = raw.match(/\{[\s\S]*\}/);
+        parsed = m ? JSON.parse(m[0]) : { intent: "clarify", reply: "Não consegui interpretar a imagem." };
+      }
+    } else {
+      parsed = { intent: "clarify", reply: "Resposta inesperada da IA." };
+    }
+    return json(parsed);
+  } catch (e) {
+    return json({ intent: "clarify", reply: "Erro a analisar imagem: " + e.message }, 500);
+  }
+}
+__name(financasVision, "financasVision");
 
 export { worker_default as default };

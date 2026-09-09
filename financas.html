@@ -275,6 +275,14 @@ body {
   padding-right: 52px;
   line-height: 1.45;
 }
+.msg .img {
+  display: block;
+  max-width: 100%;
+  max-height: 260px;
+  border: 1px solid var(--line-strong);
+  margin-bottom: 4px;
+  cursor: pointer;
+}
 
 .msg .meta {
   position: absolute;
@@ -426,9 +434,9 @@ body {
 .composer .input-wrap {
   background: var(--panel-2);
   border: 1px solid var(--line-strong);
-  padding: 2px 12px 2px 4px;
+  padding: 2px 4px 2px 4px;
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 4px;
   min-height: 46px;
@@ -574,6 +582,10 @@ body {
         <svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>
       </button>
       <textarea id="input" rows="1" placeholder="Mensagem" autocomplete="off"></textarea>
+      <button type="button" class="icon-btn attach" aria-label="Enviar imagem" id="attachBtn">
+        <svg class="i" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+      </button>
+      <input type="file" id="fileInput" accept="image/*" hidden>
     </div>
     <button type="submit" class="send" id="sendBtn" aria-label="Enviar">
       <svg class="i" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z" fill="currentColor" stroke="currentColor"/></svg>
@@ -678,6 +690,9 @@ function renderMsg(m, isFirst) {
   bubble.className = `msg ${m.author === 'user' ? 'out' : 'in'}${m.pending ? ' pending' : ''}`;
 
   let inner = '';
+  if (m.image) {
+    inner += `<img class="img" src="${m.image}" alt="Print enviado">`;
+  }
   if (m.card) {
     inner += cardHtml(m.card);
   }
@@ -804,6 +819,80 @@ composer.addEventListener('submit', e => {
   input.value = ''; autoGrow();
   sendUser(t);
 });
+
+/* ---------- Image upload (print analysis) ---------- */
+const attachBtn = document.getElementById('attachBtn');
+const fileInput = document.getElementById('fileInput');
+attachBtn.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', async (e) => {
+  const file = e.target.files?.[0];
+  e.target.value = '';
+  if (!file || state.sending) return;
+  try {
+    const dataUrl = await resizeImage(file, 1400, 0.82);
+    await sendImage(dataUrl);
+  } catch (err) {
+    state.msgs.push({ id: uid(), author: 'bot', ts: Date.now(), text: 'Não consegui carregar a imagem.' });
+    saveJSON(STORAGE.msgs, state.msgs); renderAll();
+  }
+});
+
+function resizeImage(file, maxDim, quality) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      const scale = Math.min(1, maxDim / Math.max(width, height));
+      width = Math.round(width * scale);
+      height = Math.round(height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+async function sendImage(dataUrl) {
+  if (state.sending) return;
+  const userMsg = { id: uid(), author: 'user', ts: Date.now(), image: dataUrl, pending: true };
+  state.msgs.push(userMsg);
+  saveJSON(STORAGE.msgs, state.msgs);
+  renderAll();
+
+  state.sending = true;
+  setStatus('a analisar imagem…');
+  const typingMsg = { id: 'typing', author: 'bot', ts: Date.now(), text: '__typing__' };
+  state.msgs.push(typingMsg);
+  renderAll();
+
+  setTimeout(() => { userMsg.pending = false; saveJSON(STORAGE.msgs, state.msgs); renderAll(); }, 200);
+
+  let reply;
+  try {
+    const res = await fetch(WORKER_URL_VISION, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        image: dataUrl,
+        today: todayISO(),
+        context: describeMonth(new Date())
+      })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    reply = await res.json();
+  } catch (e) {
+    reply = { intent: 'clarify', reply: 'Não consegui analisar o print agora. Tenta outra vez ou escreve à mão.' };
+  }
+
+  state.msgs = state.msgs.filter(m => m.id !== 'typing');
+  await applyReply(reply, '[imagem]');
+  state.sending = false;
+  setStatus('online');
+}
 
 async function sendUser(text) {
   if (state.sending) return;
@@ -1002,6 +1091,7 @@ Regras:
 - Não inventes movimentos. Se a mensagem for pergunta pura, não uses "add".`;
 
 const WORKER_URL = 'https://still-cloud-be15.lucasfarianinja.workers.dev/?action=financas_chat';
+const WORKER_URL_VISION = 'https://still-cloud-be15.lucasfarianinja.workers.dev/?action=financas_vision';
 
 async function interpret(text) {
   const context = describeMonth(new Date());
