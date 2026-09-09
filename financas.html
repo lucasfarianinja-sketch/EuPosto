@@ -760,51 +760,11 @@ document.addEventListener('touchend', e => {
   _lastTap = now;
 }, { passive: false });
 
-// Track the visual viewport so the app always fits exactly the visible area.
-// This eliminates any gap between the composer and the top of the keyboard on iOS.
-(function trackViewport() {
-  const root = document.documentElement;
-  const phone = document.querySelector('.phone');
-  const composer = document.querySelector('.composer');
-  const vv = window.visualViewport;
-
-  function apply() {
-    const h = vv ? vv.height : window.innerHeight;
-    const w = vv ? vv.width  : window.innerWidth;
-    root.style.setProperty('--vvh', h + 'px');
-    root.style.setProperty('--vvw', w + 'px');
-    if (phone) {
-      phone.style.height = h + 'px';
-      phone.style.width  = Math.min(w, 460) + 'px';
-    }
-    const keyboardUp = vv && (window.innerHeight - vv.height) > 100;
-    if (composer) {
-      composer.style.paddingBottom = keyboardUp ? '6px' : '';
-    }
-    // If the visual viewport was pushed down (iOS pulling the whole page),
-    // translate the whole app back into the visible area.
-    if (vv && phone) {
-      phone.style.transform = `translateY(${vv.offsetTop}px)`;
-    }
-  }
-
-  if (vv) {
-    vv.addEventListener('resize', apply);
-    vv.addEventListener('scroll', apply);
-  }
-  window.addEventListener('resize', apply);
-  // Re-apply after iOS finishes its own scroll/layout dance following focus.
-  document.addEventListener('focusin', () => {
-    apply();
-    setTimeout(apply, 100);
-    setTimeout(apply, 300);
-    setTimeout(apply, 600);
-  });
-  document.addEventListener('focusout', () => {
-    setTimeout(apply, 100);
-  });
-  apply();
-})();
+// Let iOS/CSS handle keyboard behavior via 100dvh — no manual tracking.
+// The only thing we do here: make sure the composer scrolls into view when focused.
+input.addEventListener('focus', () => {
+  setTimeout(() => input.scrollIntoView({ block: 'end', behavior: 'smooth' }), 200);
+});
 
 composer.addEventListener('submit', e => {
   e.preventDefault();
