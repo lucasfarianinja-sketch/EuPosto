@@ -594,12 +594,18 @@ Saídas (type "out"):
 - outros (qualquer saída que não encaixe)
 
 # INTENT (escolhe UM)
-- "add" — utilizador declara movimentos. Pode ter VÁRIOS numa só frase ("gastei 12 no almoço e 30 no super") — extrai todos.
+- "add" — utilizador declara UM movimento NOVO. Pode ter VÁRIOS numa só frase ("gastei 12 no almoço e 30 no super") — extrai todos.
 - "summary" — pede totais ("resumo", "quanto gastei", "saldo", "balanço", "quanto ganhei"). Se pediu mês específico, inclui "month":"YYYY-MM".
 - "list" — pede histórico ("mostra os últimos", "movimentos", "histórico").
-- "delete_last" — quer apagar ("apaga o último", "cancela", "não era isso", "erro").
+- "delete_last" — quer apagar ("apaga o último", "cancela", "não era isso", "erro", "naaoo", "isso está errado", "eu só ganhei X uma vez", correcções ao teu último registo).
 - "help" — pergunta como funciona.
-- "clarify" — falta info crítica (ex.: "gastei" sem valor).
+- "clarify" — falta info crítica OU o utilizador está apenas a informar-te de contexto sem pedir nada ("Tenho 500€ na conta", "esse mês entrou 800", frases descritivas do estado actual). NUNCA registes movimentos a partir de frases descritivas do saldo.
+
+# QUANDO NÃO REGISTAR (importante!)
+- Frases sobre o SALDO ATUAL ("tenho X na conta", "estou com Y de saldo") NÃO são movimentos — responde clarify.
+- Frases sobre TOTAIS já feitos ("esse mês entrou X", "já gastei Y") NÃO são movimentos NOVOS — se o total bate com o contexto, responde clarify ou summary; nunca add.
+- Se o utilizador está a corrigir-te ("nao era isso", "só uma vez", "isso está errado"), usa "delete_last", nunca "add".
+- Se acabaste de registar X e o utilizador diz "não" ou "errado", é delete_last.
 
 # FORMATO OBRIGATÓRIO (JSON puro, sem markdown, sem texto antes/depois)
 {
@@ -654,6 +660,18 @@ Utilizador: "olá"
 Utilizador: "gastei"
 {"intent":"clarify","entries":[],"reply":"Quanto foi e no quê?"}
 
+Utilizador: "Tenho 500€ na conta"
+{"intent":"clarify","entries":[],"reply":"Boa 👍 Isso é o teu saldo atual? Se quiseres registar entradas ou gastos, diz-me."}
+
+Utilizador: "esse mês entrou 806€"
+{"intent":"clarify","entries":[],"reply":"Isso é um resumo do que já entrou, ou queres registar uma entrada de 806€? Se já registámos, pede-me 'resumo'."}
+
+Utilizador: "naooo, eu só ganhei 806 uma vez"
+{"intent":"delete_last","entries":[],"reply":"Certo, apago o último ✅"}
+
+Utilizador: "não era isso"
+{"intent":"delete_last","entries":[],"reply":"Apagado ✅"}
+
 # REGRAS FINAIS
 - Descrição SEMPRE curta (1-3 palavras), começada com maiúscula ("Almoço", "Netflix", "Uber").
 - Não inventes movimentos que o utilizador não referiu.
@@ -666,6 +684,16 @@ Utilizador: "gastei"
     ...history.map(h => ({ role: h.role === "user" ? "user" : "assistant", content: String(h.content || "").slice(0, 400) })),
     { role: "user", content: userText }
   ];
+
+  // Prefer Claude Haiku when the ANTHROPIC_API_KEY secret is set; fall back to Llama.
+  if (env.ANTHROPIC_API_KEY) {
+    try {
+      const parsed = await claudeJSON(env.ANTHROPIC_API_KEY, systemPrompt, messages.slice(1));
+      return json(parsed);
+    } catch (e) {
+      // silent fallback to Llama on Claude error
+    }
+  }
 
   if (!env.AI) {
     return json({ intent: "clarify", reply: "IA não configurada." });
@@ -697,6 +725,70 @@ Utilizador: "gastei"
   }
 }
 __name(financasChat, "financasChat");
+
+async function claudeJSON(apiKey, systemPrompt, userAssistantTurns) {
+  const messages = userAssistantTurns.map(m => ({
+    role: m.role === "assistant" ? "assistant" : "user",
+    content: m.content
+  }));
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+      "content-type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "claude-haiku-4-5",
+      max_tokens: 800,
+      system: systemPrompt + "\n\nRESPONDE APENAS COM JSON VÁLIDO. NADA MAIS.",
+      messages
+    })
+  });
+  if (!res.ok) throw new Error("Claude HTTP " + res.status);
+  const data = await res.json();
+  const text = data?.content?.[0]?.text || "";
+  try { return JSON.parse(text); }
+  catch {
+    const m = text.match(/\{[\s\S]*\}/);
+    if (m) return JSON.parse(m[0]);
+    throw new Error("Claude replied non-JSON");
+  }
+}
+__name(claudeJSON, "claudeJSON");
+
+async function claudeVisionJSON(apiKey, prompt, imageBase64) {
+  const b64 = imageBase64.replace(/^data:image\/[a-z]+;base64,/, "");
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+      "content-type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "claude-haiku-4-5",
+      max_tokens: 1500,
+      messages: [{
+        role: "user",
+        content: [
+          { type: "image", source: { type: "base64", media_type: "image/jpeg", data: b64 } },
+          { type: "text", text: prompt + "\n\nRESPONDE APENAS COM JSON. Nenhum texto antes ou depois." }
+        ]
+      }]
+    })
+  });
+  if (!res.ok) throw new Error("Claude Vision HTTP " + res.status);
+  const data = await res.json();
+  const text = data?.content?.[0]?.text || "";
+  try { return JSON.parse(text); }
+  catch {
+    const m = text.match(/\{[\s\S]*\}/);
+    if (m) return JSON.parse(m[0]);
+    throw new Error("Claude Vision replied non-JSON");
+  }
+}
+__name(claudeVisionJSON, "claudeVisionJSON");
 
 async function financasVision(request, env) {
   const body = await request.json();
@@ -749,6 +841,16 @@ Se não conseguires ler:
 
 Data de hoje: ${today}.
 ${note ? `Nota do utilizador: "${note}"` : ""}`;
+
+  // Prefer Claude Vision when the key is set — MUCH better OCR/reasoning.
+  if (env.ANTHROPIC_API_KEY) {
+    try {
+      const parsed = await claudeVisionJSON(env.ANTHROPIC_API_KEY, prompt, image);
+      return json(parsed);
+    } catch (e) {
+      // silent fallback to Llama vision
+    }
+  }
 
   if (!env.AI) return json({ intent: "clarify", reply: "IA não configurada." });
 

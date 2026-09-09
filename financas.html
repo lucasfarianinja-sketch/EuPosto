@@ -1027,19 +1027,38 @@ async function applyReply(reply, userText) {
 
   if (reply.intent === 'add' && reply.entries?.length) {
     const entriesJust = [];
+    const skipped = [];
     for (const e of reply.entries) {
       const clean = normalizeEntry(e);
       if (!clean) continue;
+      // De-dup: same type + amount + date + cat within last 3 minutes → ask instead of adding
+      const dup = state.tx.slice(-5).find(t =>
+        t.type === clean.type &&
+        Math.abs(t.amount - clean.amount) < 0.01 &&
+        t.cat === clean.cat &&
+        t.date === clean.date
+      );
+      if (dup) { skipped.push(clean); continue; }
       state.tx.push(clean);
       entriesJust.push(clean);
     }
     saveJSON(STORAGE.tx, state.tx);
     const totals = monthTotals(new Date());
-    state.msgs.push({
-      id: uid(), author: 'bot', ts: now,
-      text: buildAddReply(entriesJust, totals),
-      suggests: ['Resumo do mês']
-    });
+    if (entriesJust.length) {
+      state.msgs.push({
+        id: uid(), author: 'bot', ts: now,
+        text: buildAddReply(entriesJust, totals),
+        suggests: ['Resumo do mês']
+      });
+    }
+    if (skipped.length) {
+      const s = skipped[0];
+      const g = CAT_GLYPHS[s.cat] || '•';
+      state.msgs.push({
+        id: uid(), author: 'bot', ts: now + 1,
+        text: `Já tinhas registado ${g} ${s.type==='in'?'+':'−'}€${fmtEUR(s.amount)} de ${s.desc} hoje. É mesmo outro? Se sim, escreve "adicionar de novo"; se não, ignoro.`
+      });
+    }
     saveJSON(STORAGE.msgs, state.msgs); renderAll(); return;
   }
 
