@@ -394,7 +394,8 @@ body {
   background: linear-gradient(180deg, rgba(11, 18, 32, 0.85), rgba(11, 18, 32, 0.98));
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  padding: 10px calc(10px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));
+  padding: 8px calc(10px + env(safe-area-inset-right)) 8px calc(10px + env(safe-area-inset-left));
+  padding-bottom: max(8px, calc(env(safe-area-inset-bottom) - 18px));
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 10px;
@@ -760,25 +761,51 @@ document.addEventListener('touchend', e => {
   _lastTap = now;
 }, { passive: false });
 
-// Follow the visual viewport so the composer sits flush with the top of the keyboard,
-// with no gap for the home indicator while typing.
-const _phoneEl = document.querySelector('.phone');
-const _composerEl = document.querySelector('.composer');
-function _fitViewport() {
+// Track the visual viewport so the app always fits exactly the visible area.
+// This eliminates any gap between the composer and the top of the keyboard on iOS.
+(function trackViewport() {
+  const root = document.documentElement;
+  const phone = document.querySelector('.phone');
+  const composer = document.querySelector('.composer');
   const vv = window.visualViewport;
-  if (!vv || !_phoneEl) return;
-  _phoneEl.style.height = vv.height + 'px';
-  const keyboardUp = (window.innerHeight - vv.height) > 100;
-  if (_composerEl) {
-    _composerEl.style.paddingBottom = keyboardUp ? '8px' : '';
-    _composerEl.style.transform = `translateY(${vv.offsetTop ? 0 : 0}px)`;
+
+  function apply() {
+    const h = vv ? vv.height : window.innerHeight;
+    const w = vv ? vv.width  : window.innerWidth;
+    root.style.setProperty('--vvh', h + 'px');
+    root.style.setProperty('--vvw', w + 'px');
+    if (phone) {
+      phone.style.height = h + 'px';
+      phone.style.width  = Math.min(w, 460) + 'px';
+    }
+    const keyboardUp = vv && (window.innerHeight - vv.height) > 100;
+    if (composer) {
+      composer.style.paddingBottom = keyboardUp ? '6px' : '';
+    }
+    // If the visual viewport was pushed down (iOS pulling the whole page),
+    // translate the whole app back into the visible area.
+    if (vv && phone) {
+      phone.style.transform = `translateY(${vv.offsetTop}px)`;
+    }
   }
-}
-if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', _fitViewport);
-  window.visualViewport.addEventListener('scroll', _fitViewport);
-  _fitViewport();
-}
+
+  if (vv) {
+    vv.addEventListener('resize', apply);
+    vv.addEventListener('scroll', apply);
+  }
+  window.addEventListener('resize', apply);
+  // Re-apply after iOS finishes its own scroll/layout dance following focus.
+  document.addEventListener('focusin', () => {
+    apply();
+    setTimeout(apply, 100);
+    setTimeout(apply, 300);
+    setTimeout(apply, 600);
+  });
+  document.addEventListener('focusout', () => {
+    setTimeout(apply, 100);
+  });
+  apply();
+})();
 
 composer.addEventListener('submit', e => {
   e.preventDefault();
