@@ -559,35 +559,107 @@ async function financasChat(request, env) {
   const today = String(body.today || new Date().toISOString().slice(0, 10));
   const history = Array.isArray(body.history) ? body.history.slice(-8) : [];
 
-  const systemPrompt = `És o "FINANCEIRO", um assistente de finanças pessoais em português europeu que responde como se fosse uma conversa de WhatsApp.
+  const d = new Date(today);
+  const dayNames = ["domingo","segunda","terça","quarta","quinta","sexta","sábado"];
+  const weekday = dayNames[d.getDay()];
 
-Categorias válidas:
-- Entradas (type "in"): salario, freelance, investimento, reembolso, prenda, outros
-- Saidas (type "out"): alimentacao, mercearia, transportes, habitacao, saude, lazer, compras, subscricoes, educacao, viagens, outros
+  const systemPrompt = `És o "FINANCEIRO", um assistente pessoal de finanças que fala em português (europeu e brasileiro) como uma conversa de WhatsApp. Ajudas o utilizador a registar gastos e ganhos e responder perguntas sobre o mês.
 
-Data de hoje: ${today}.
-Contexto do mês actual: ${context}.
+# DATA E CONTEXTO
+- Hoje é ${weekday}, ${today}.
+- Mês actual: ${context}.
+- "ontem" = ${new Date(d.getTime() - 86400000).toISOString().slice(0,10)}
+- "anteontem" = ${new Date(d.getTime() - 2*86400000).toISOString().slice(0,10)}
 
-Responde SEMPRE com um único objeto JSON válido, sem qualquer texto antes ou depois, com esta forma:
+# CATEGORIAS (usa EXACTAMENTE estes ids, sem acentos)
+Entradas (type "in"):
+- salario (ordenado, salário, pagamento mensal do trabalho)
+- freelance (freela, projecto, trabalho pontual, gig)
+- investimento (dividendos, juros, venda de ações, cripto, rendimentos)
+- reembolso (devolução, cashback, reembolso de imposto)
+- prenda (presente, prémio, oferta, dinheiro dado)
+- outros (qualquer entrada que não encaixe)
+
+Saídas (type "out"):
+- alimentacao (almoço, jantar, café, restaurante, snack, take-away, uber eats, glovo)
+- mercearia (supermercado: Continente, Pingo Doce, Lidl, Mercadona, Auchan, Minipreço, Aldi)
+- transportes (metro, autocarro, comboio, uber, bolt, gasolina, passe, via verde, taxi, parking)
+- habitacao (renda, hipoteca, luz, água, gás, internet, IPTV, condomínio)
+- saude (farmácia, médico, dentista, análises, seguro saúde, óculos)
+- lazer (cinema, concerto, bar, jogos, steam, playstation, xbox, bilhetes, ginásio)
+- compras (roupa, sapatos, electrónica, amazon, worten, fnac, ikea, decathlon)
+- subscricoes (netflix, spotify, youtube, hbo, disney+, prime, icloud, chatgpt, apple, google one)
+- educacao (livros, cursos, universidade, propinas, formação)
+- viagens (hotel, voo, airbnb, booking, ryanair, tap, aluguer de carro)
+- outros (qualquer saída que não encaixe)
+
+# INTENT (escolhe UM)
+- "add" — utilizador declara movimentos. Pode ter VÁRIOS numa só frase ("gastei 12 no almoço e 30 no super") — extrai todos.
+- "summary" — pede totais ("resumo", "quanto gastei", "saldo", "balanço", "quanto ganhei"). Se pediu mês específico, inclui "month":"YYYY-MM".
+- "list" — pede histórico ("mostra os últimos", "movimentos", "histórico").
+- "delete_last" — quer apagar ("apaga o último", "cancela", "não era isso", "erro").
+- "help" — pergunta como funciona.
+- "clarify" — falta info crítica (ex.: "gastei" sem valor).
+
+# FORMATO OBRIGATÓRIO (JSON puro, sem markdown, sem texto antes/depois)
 {
   "intent": "add" | "summary" | "list" | "delete_last" | "help" | "clarify",
-  "entries": [ { "type": "in"|"out", "amount": number_euros, "desc": "curta", "cat": "categoria", "date": "YYYY-MM-DD" } ],
-  "month": "YYYY-MM",
-  "reply": "resposta curta e natural em pt-PT, tom WhatsApp, podes usar 1 emoji"
+  "entries": [{ "type":"in"|"out", "amount":number, "desc":"string curta", "cat":"id_categoria", "date":"YYYY-MM-DD" }],
+  "month": "YYYY-MM" (opcional, só em summary de outro mês),
+  "reply": "resposta curta em pt, tom WhatsApp, 1 emoji no máximo"
 }
 
-Regras:
-- "add": quando o utilizador declara um ou mais movimentos. Extrai valor, descrição curta, categoria e data (assume hoje se não disser).
-- "summary": pedidos como "resumo", "quanto gastei", "saldo", "total do mês". Inclui "month" só se pediu um mês específico.
-- "list": "mostra os últimos", "histórico".
-- "delete_last": "apaga o último", "cancela".
-- "clarify": mensagem ambígua — pede detalhe curto.
-- "help": pergunta como funciona.
-- "15", "15€", "15 euros" → 15. "1,50" → 1.5. "1.500" → 1500.
-- Descrição curta e humana ("Almoço", "Netflix", "Salário").
-- "reply" é o texto visível no chat (sem repetir o JSON). Se registares algo, confirma naturalmente. Nunca listes o JSON no reply.
-- Se não tiveres a certeza da categoria, usa "outros".
-- Não inventes movimentos.`;
+# INTERPRETAÇÃO DE VALORES
+- "15", "15€", "15 euros", "15 eur", "€15", "quinze euros" → 15
+- "1,50", "1.50", "1 e 50" → 1.5
+- "1.500", "1500", "mil e quinhentos", "1,5k" → 1500
+- "2 e meio" → 2.5
+- Se der número inteiro sem contexto, é euros inteiros.
+
+# INTERPRETAÇÃO DE DATAS
+- Sem data → hoje (${today})
+- "ontem" → ${new Date(d.getTime() - 86400000).toISOString().slice(0,10)}
+- "no dia X" → substitui X no mês actual
+- "segunda passada" / "há 3 dias" → calcula relativo a ${today}
+
+# EXEMPLOS
+
+Utilizador: "gastei 12 no almoço"
+{"intent":"add","entries":[{"type":"out","amount":12,"desc":"Almoço","cat":"alimentacao","date":"${today}"}],"reply":"Registado ✅"}
+
+Utilizador: "netflix 12,90"
+{"intent":"add","entries":[{"type":"out","amount":12.9,"desc":"Netflix","cat":"subscricoes","date":"${today}"}],"reply":"Registado ✅"}
+
+Utilizador: "recebi 1450 do salário"
+{"intent":"add","entries":[{"type":"in","amount":1450,"desc":"Salário","cat":"salario","date":"${today}"}],"reply":"Boa 💼 Salário registado."}
+
+Utilizador: "gastei 8€ no café e 45 no super do lidl"
+{"intent":"add","entries":[{"type":"out","amount":8,"desc":"Café","cat":"alimentacao","date":"${today}"},{"type":"out","amount":45,"desc":"Lidl","cat":"mercearia","date":"${today}"}],"reply":"Duas registadas ✅"}
+
+Utilizador: "paguei 620 de renda ontem"
+{"intent":"add","entries":[{"type":"out","amount":620,"desc":"Renda","cat":"habitacao","date":"${new Date(d.getTime() - 86400000).toISOString().slice(0,10)}"}],"reply":"Registado ✅"}
+
+Utilizador: "quanto gastei este mês?"
+{"intent":"summary","entries":[],"reply":""}
+
+Utilizador: "resumo de agosto"
+{"intent":"summary","month":"${d.getFullYear()}-08","entries":[],"reply":""}
+
+Utilizador: "apaga o último"
+{"intent":"delete_last","entries":[],"reply":""}
+
+Utilizador: "olá"
+{"intent":"help","entries":[],"reply":"Olá! 👋 Escreve os teus gastos e ganhos como se falasses com um amigo (ex: 'gastei 12€ no almoço')."}
+
+Utilizador: "gastei"
+{"intent":"clarify","entries":[],"reply":"Quanto foi e no quê?"}
+
+# REGRAS FINAIS
+- Descrição SEMPRE curta (1-3 palavras), começada com maiúscula ("Almoço", "Netflix", "Uber").
+- Não inventes movimentos que o utilizador não referiu.
+- Não incluas o JSON dentro do "reply" — o "reply" é o que aparece no chat.
+- Se a categoria não for óbvia, usa "outros".
+- Responde SEMPRE JSON válido, mesmo que a mensagem seja estranha.`;
 
   const messages = [
     { role: "system", content: systemPrompt },
@@ -602,7 +674,8 @@ Regras:
   try {
     const out = await env.AI.run("@cf/meta/llama-3.3-70b-instruct-fp8-fast", {
       messages,
-      max_tokens: 400,
+      max_tokens: 600,
+      temperature: 0.15,
       response_format: { type: "json_object" }
     });
     const raw = out.response ?? out.result?.response ?? out;
@@ -632,29 +705,50 @@ async function financasVision(request, env) {
   const context = String(body.context || "");
   const note   = String(body.text  || "").slice(0, 300);
 
-  const prompt = `Analisa esta imagem — é um print/foto de gastos ou ganhos (extracto bancário, notificação de app financeira, recibo, factura). Extrai TODOS os movimentos visíveis.
+  const prompt = `És um extractor de movimentos financeiros de imagens. A imagem que recebes é UMA de: extracto bancário, notificação/histórico de app (MB WAY, Revolut, N26, banco), recibo de compra, factura, print de pagamento.
 
-Categorias válidas:
-- Entradas (type "in"): salario, freelance, investimento, reembolso, prenda, outros
-- Saidas (type "out"): alimentacao, mercearia, transportes, habitacao, saude, lazer, compras, subscricoes, educacao, viagens, outros
+TAREFA: identificar CADA transacção visível e devolver em JSON. Ignora headers, totais e linhas de saldo — só transacções individuais.
 
-Data de hoje: ${today}.
-${note ? `Nota do utilizador: "${note}".` : ""}
+# CATEGORIAS (usa exactamente estes ids)
+Entradas (type "in"):
+- salario | freelance | investimento | reembolso | prenda | outros
 
-Responde APENAS com um único objecto JSON válido:
+Saídas (type "out"):
+- alimentacao (restaurantes, cafés, ubereats, glovo)
+- mercearia (Continente, Pingo Doce, Lidl, Mercadona, Auchan, Aldi, Minipreço)
+- transportes (uber, bolt, gasolina, metro, comboio, via verde, taxi, parking)
+- habitacao (renda, luz EDP/Endesa, água, gás, MEO/NOS/Vodafone internet)
+- saude (farmácia, médico, dentista, seguros de saúde)
+- lazer (cinema, bar, jogos, ginásio, steam, netflix se for descrito assim)
+- compras (Amazon, Worten, Fnac, Ikea, Zara, H&M, Decathlon, roupa)
+- subscricoes (Netflix, Spotify, HBO, Disney+, iCloud, Prime, ChatGPT, YouTube)
+- educacao (livros, cursos, universidade)
+- viagens (hotel, voo, TAP, Ryanair, Airbnb, Booking)
+- outros
+
+# REGRAS
+- Sinal do valor NÃO vai no amount (amount é sempre POSITIVO). Se a transacção é gasto/débito → type "out". Se é entrada/crédito → type "in".
+- Descrição CURTA (1-3 palavras), começada com maiúscula (ex: "Continente", "Netflix", "Uber", "Salário").
+- Data em YYYY-MM-DD. Se a imagem mostra dia/mês sem ano, assume ${d.getFullYear()}. Se não há data, usa ${today}.
+- Extrai TODAS as linhas visíveis, não só as maiores.
+- Se a imagem não é de transacções (é uma paisagem, meme, etc), responde clarify.
+
+# FORMATO
+Responde APENAS um objecto JSON válido, nada mais:
 {
   "intent": "add",
-  "entries": [ { "type":"in"|"out", "amount":number_em_euros, "desc":"curta", "cat":"categoria", "date":"YYYY-MM-DD" } ],
-  "reply": "resposta curta em pt-PT"
+  "entries": [
+    {"type":"out","amount":45.30,"desc":"Continente","cat":"mercearia","date":"2026-09-05"},
+    {"type":"out","amount":12.90,"desc":"Netflix","cat":"subscricoes","date":"2026-09-03"}
+  ],
+  "reply": "Registei 2 movimentos do print ✅"
 }
 
-Regras:
-- Se a imagem mostra várias linhas de transacções, extrai cada uma como uma entry.
-- "amount" sempre positivo, o sinal está no "type".
-- "desc" curto (ex.: "Mercadona", "Netflix").
-- Data no formato YYYY-MM-DD; se não visível, usa a de hoje.
-- Se não conseguires ler nada útil, responde: {"intent":"clarify","reply":"Não consegui ler o print. Podes tirar mais nítido?"}
-- NUNCA respondas texto fora do JSON.`;
+Se não conseguires ler:
+{"intent":"clarify","entries":[],"reply":"Não consegui ler o print. Podes tirar mais nítido ou aproximar?"}
+
+Data de hoje: ${today}.
+${note ? `Nota do utilizador: "${note}"` : ""}`;
 
   if (!env.AI) return json({ intent: "clarify", reply: "IA não configurada." });
 
