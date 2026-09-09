@@ -750,14 +750,35 @@ input.addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); composer.requestSubmit(); }
 });
 
-// Belt-and-braces: prevent iOS Safari from zooming in on focus even if the meta gets ignored.
-const _vpMeta = document.querySelector('meta[name="viewport"]');
-input.addEventListener('focus', () => {
-  if (_vpMeta) _vpMeta.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover');
-});
-input.addEventListener('blur', () => {
-  if (_vpMeta) _vpMeta.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover');
-});
+// Kill any pinch/double-tap zoom (iOS ignores user-scalable=no in Safari otherwise)
+document.addEventListener('gesturestart', e => e.preventDefault());
+document.addEventListener('gesturechange', e => e.preventDefault());
+let _lastTap = 0;
+document.addEventListener('touchend', e => {
+  const now = Date.now();
+  if (now - _lastTap < 350) e.preventDefault();
+  _lastTap = now;
+}, { passive: false });
+
+// Follow the visual viewport so the composer sits flush with the top of the keyboard,
+// with no gap for the home indicator while typing.
+const _phoneEl = document.querySelector('.phone');
+const _composerEl = document.querySelector('.composer');
+function _fitViewport() {
+  const vv = window.visualViewport;
+  if (!vv || !_phoneEl) return;
+  _phoneEl.style.height = vv.height + 'px';
+  const keyboardUp = (window.innerHeight - vv.height) > 100;
+  if (_composerEl) {
+    _composerEl.style.paddingBottom = keyboardUp ? '8px' : '';
+    _composerEl.style.transform = `translateY(${vv.offsetTop ? 0 : 0}px)`;
+  }
+}
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', _fitViewport);
+  window.visualViewport.addEventListener('scroll', _fitViewport);
+  _fitViewport();
+}
 
 composer.addEventListener('submit', e => {
   e.preventDefault();
