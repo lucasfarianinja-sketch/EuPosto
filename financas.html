@@ -40,14 +40,15 @@
 
 * { box-sizing: border-box; }
 html, body {
+  margin: 0; padding: 0;
   height: 100%;
-  -webkit-text-size-adjust: 100%;
-  touch-action: pan-y;
-  overscroll-behavior: none;
+  width: 100%;
   overflow: hidden;
   position: fixed;
   inset: 0;
-  width: 100%;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+  touch-action: none;
 }
 input, textarea, select, button { font-size: 16px; }
 
@@ -71,13 +72,14 @@ body {
 .phone {
   width: 100%;
   max-width: 460px;
-  height: 100dvh;
+  height: 100%;
   background: var(--bg);
   display: grid;
   grid-template-rows: auto 1fr auto;
   position: relative;
   overflow: hidden;
   isolation: isolate;
+  touch-action: pan-y;
 }
 .phone::before {
   content: '';
@@ -769,15 +771,20 @@ document.addEventListener('touchend', e => {
   _lastTap = now;
 }, { passive: false });
 
-// Shrink the phone container to the visible area when the keyboard opens.
-// (iOS Safari's `100dvh` doesn't shrink reliably on all versions.)
-(function fitPhoneToViewport() {
+// Anchor html/body/phone exactly to the visible area at all times.
+// This eliminates both the iOS auto-scroll AND any layout jump on keyboard open.
+(function anchor() {
+  const html = document.documentElement;
+  const body = document.body;
   const phone = document.querySelector('.phone');
-  if (!phone) return;
   const vv = window.visualViewport;
   const apply = () => {
     const h = (vv && vv.height) || window.innerHeight;
-    phone.style.height = h + 'px';
+    html.style.height = h + 'px';
+    body.style.height = h + 'px';
+    if (phone) phone.style.height = h + 'px';
+    // If Safari has pulled the visual viewport down (offsetTop), stay pinned to top:0 by scrolling window back.
+    if (vv && vv.offsetTop) window.scrollTo(0, 0);
   };
   if (vv) {
     vv.addEventListener('resize', apply);
@@ -785,6 +792,8 @@ document.addEventListener('touchend', e => {
   }
   window.addEventListener('resize', apply);
   window.addEventListener('orientationchange', () => setTimeout(apply, 200));
+  document.addEventListener('focusin', () => { apply(); setTimeout(apply, 100); setTimeout(apply, 300); });
+  document.addEventListener('focusout', () => { setTimeout(apply, 100); });
   apply();
 })();
 
