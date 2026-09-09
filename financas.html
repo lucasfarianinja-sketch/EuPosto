@@ -760,11 +760,24 @@ document.addEventListener('touchend', e => {
   _lastTap = now;
 }, { passive: false });
 
-// Let iOS/CSS handle keyboard behavior via 100dvh — no manual tracking.
-// The only thing we do here: make sure the composer scrolls into view when focused.
-input.addEventListener('focus', () => {
-  setTimeout(() => input.scrollIntoView({ block: 'end', behavior: 'smooth' }), 200);
-});
+// Shrink the phone container to the visible area when the keyboard opens.
+// (iOS Safari's `100dvh` doesn't shrink reliably on all versions.)
+(function fitPhoneToViewport() {
+  const phone = document.querySelector('.phone');
+  if (!phone) return;
+  const vv = window.visualViewport;
+  const apply = () => {
+    const h = (vv && vv.height) || window.innerHeight;
+    phone.style.height = h + 'px';
+  };
+  if (vv) {
+    vv.addEventListener('resize', apply);
+    vv.addEventListener('scroll', apply);
+  }
+  window.addEventListener('resize', apply);
+  window.addEventListener('orientationchange', () => setTimeout(apply, 200));
+  apply();
+})();
 
 composer.addEventListener('submit', e => {
   e.preventDefault();
