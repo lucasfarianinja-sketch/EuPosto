@@ -685,14 +685,18 @@ Utilizador: "não era isso"
     { role: "user", content: userText }
   ];
 
-  // Prefer Claude Haiku when the ANTHROPIC_API_KEY secret is set; fall back to Llama.
+  // Preference: Gemini (free) > Claude Haiku (paid) > Llama (Workers AI free).
+  if (env.GEMINI_API_KEY) {
+    try {
+      const parsed = await geminiJSON(env.GEMINI_API_KEY, systemPrompt, messages.slice(1));
+      return json(parsed);
+    } catch (e) { /* fall through */ }
+  }
   if (env.ANTHROPIC_API_KEY) {
     try {
       const parsed = await claudeJSON(env.ANTHROPIC_API_KEY, systemPrompt, messages.slice(1));
       return json(parsed);
-    } catch (e) {
-      // silent fallback to Llama on Claude error
-    }
+    } catch (e) { /* fall through */ }
   }
 
   if (!env.AI) {
@@ -790,6 +794,74 @@ async function claudeVisionJSON(apiKey, prompt, imageBase64) {
 }
 __name(claudeVisionJSON, "claudeVisionJSON");
 
+async function geminiJSON(apiKey, systemPrompt, userAssistantTurns) {
+  const contents = userAssistantTurns.map(m => ({
+    role: m.role === "assistant" ? "model" : "user",
+    parts: [{ text: String(m.content || "") }]
+  }));
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        contents,
+        generationConfig: {
+          temperature: 0.15,
+          responseMimeType: "application/json",
+          maxOutputTokens: 800
+        }
+      })
+    }
+  );
+  if (!res.ok) throw new Error("Gemini HTTP " + res.status);
+  const data = await res.json();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  try { return JSON.parse(text); }
+  catch {
+    const m = text.match(/\{[\s\S]*\}/);
+    if (m) return JSON.parse(m[0]);
+    throw new Error("Gemini replied non-JSON");
+  }
+}
+__name(geminiJSON, "geminiJSON");
+
+async function geminiVisionJSON(apiKey, prompt, imageBase64) {
+  const b64 = imageBase64.replace(/^data:image\/[a-z]+;base64,/, "");
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        contents: [{
+          role: "user",
+          parts: [
+            { inlineData: { mimeType: "image/jpeg", data: b64 } },
+            { text: prompt }
+          ]
+        }],
+        generationConfig: {
+          temperature: 0.1,
+          responseMimeType: "application/json",
+          maxOutputTokens: 1500
+        }
+      })
+    }
+  );
+  if (!res.ok) throw new Error("Gemini Vision HTTP " + res.status);
+  const data = await res.json();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  try { return JSON.parse(text); }
+  catch {
+    const m = text.match(/\{[\s\S]*\}/);
+    if (m) return JSON.parse(m[0]);
+    throw new Error("Gemini Vision replied non-JSON");
+  }
+}
+__name(geminiVisionJSON, "geminiVisionJSON");
+
 async function financasVision(request, env) {
   const body = await request.json();
   const image = String(body.image || "");
@@ -842,14 +914,18 @@ Se não conseguires ler:
 Data de hoje: ${today}.
 ${note ? `Nota do utilizador: "${note}"` : ""}`;
 
-  // Prefer Claude Vision when the key is set — MUCH better OCR/reasoning.
+  // Preference: Gemini (free) > Claude (paid) > Llama Vision (free).
+  if (env.GEMINI_API_KEY) {
+    try {
+      const parsed = await geminiVisionJSON(env.GEMINI_API_KEY, prompt, image);
+      return json(parsed);
+    } catch (e) { /* fall through */ }
+  }
   if (env.ANTHROPIC_API_KEY) {
     try {
       const parsed = await claudeVisionJSON(env.ANTHROPIC_API_KEY, prompt, image);
       return json(parsed);
-    } catch (e) {
-      // silent fallback to Llama vision
-    }
+    } catch (e) { /* fall through */ }
   }
 
   if (!env.AI) return json({ intent: "clarify", reply: "IA não configurada." });
