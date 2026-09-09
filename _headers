@@ -1,6 +1,12 @@
 /euposto.html
   Cache-Control: no-cache, no-store, must-revalidate
 
+/financas.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/financas
+  Cache-Control: no-cache, no-store, must-revalidate
+
 /index.html
   Cache-Control: no-cache, no-store, must-revalidate
 
