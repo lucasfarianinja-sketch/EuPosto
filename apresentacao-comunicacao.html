@@ -142,7 +142,13 @@
     font-family:"Space Mono",monospace; font-size:12.5px; color:var(--faint); letter-spacing:1px}
   .cover-meta span{display:flex; align-items:center; gap:8px}
   .cover-meta span::before{content:""; width:7px; height:7px; border-radius:50%; background:var(--accent)}
-  .hint{margin-top:26px; font-size:13px; color:var(--faint)}
+  .credit{display:flex; flex-wrap:wrap; align-items:center; gap:12px 16px; margin-top:30px}
+  .credit-by{font-family:"Sora",sans-serif; font-size:clamp(16px,2vw,22px); color:var(--ink); font-weight:500}
+  .credit-by b{font-weight:700}
+  .credit-turma{font-family:"Space Mono",monospace; font-size:clamp(12px,1.4vw,15px); letter-spacing:2px;
+    text-transform:uppercase; color:var(--accent); background:var(--accent-soft);
+    border:1px solid var(--panel-brd); padding:6px 14px; border-radius:999px; transition:color .6s, background .6s}
+  .hint{margin-top:26px; font-size:clamp(12px,1.4vw,15px); color:var(--faint)}
   .hint kbd{font-family:"Space Mono",monospace; background:rgba(255,255,255,.06);
     border:1px solid rgba(255,255,255,.12); border-radius:6px; padding:2px 7px; font-size:12px; color:#cdd8ef}
 
@@ -279,6 +285,10 @@ const SLIDES = [
     <p class="eyebrow">Comunicação Interna &amp; Externa</p>
     <h1 class="title">Comunicação<br>em Rede</h1>
     <p class="lead">Do <strong>conceito</strong> às <strong>barreiras</strong>, dos <strong>canais internos</strong> aos <strong>públicos externos</strong> — como as pessoas e as organizações trocam significados e constroem relações.</p>
+    <div class="credit">
+      <div class="credit-by">Feito por <b>Lucas Nascimento</b> &amp; <b>João Pinto</b></div>
+      <div class="credit-turma">Turma 3R</div>
+    </div>
     <div class="cover-meta">
       <span>Introdução</span><span>Parte I · Interna</span><span>Parte II · Externa</span>
     </div>
@@ -504,7 +514,11 @@ const SLIDES = [
     <p class="eyebrow">Conclusão</p>
     <h1 class="title" style="font-size:clamp(28px,5.4vw,52px)">A comunicação<br>conecta tudo.</h1>
     <p class="lead">Interna ou externa, a boa comunicação é <strong>clara, coerente e de mão dupla</strong>. Quando a mensagem é compreendida e gera resposta, pessoas e organizações crescem juntas.</p>
-    <p class="hint" style="margin-top:34px">Obrigado! · Perguntas? · Use <kbd>I</kbd> para rever qualquer tópico.</p>
+    <div class="credit">
+      <div class="credit-by">Lucas Nascimento &amp; João Pinto</div>
+      <div class="credit-turma">Turma 3R</div>
+    </div>
+    <p class="hint" style="margin-top:22px">Obrigado! · Perguntas? · Use <kbd>I</kbd> para rever qualquer tópico.</p>
   `},
 ];
 
