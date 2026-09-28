@@ -120,6 +120,22 @@
   .card h3{font-family:"Sora",sans-serif; font-size:clamp(18px,2vw,23px); margin:9px 0 7px; font-weight:700; color:#fff}
   .card p{margin:0; color:var(--muted); font-size:clamp(15px,1.6vw,18px); line-height:1.45; font-weight:500}
 
+  /* Cards ilustrados (tipos) */
+  .viz-grid{display:grid; gap:15px; margin-top:24px;
+    grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .viz-card{background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.08);
+    border-radius:16px; overflow:hidden; transition:.2s; display:flex; flex-direction:column}
+  .viz-card:hover{border-color:var(--accent); transform:translateY(-3px)}
+  .viz-thumb{aspect-ratio:16/9; display:grid; place-items:center; color:var(--accent);
+    background:linear-gradient(135deg, var(--accent-soft), rgba(255,255,255,.015));
+    border-bottom:1px solid rgba(255,255,255,.07); transition:color .6s, background .6s}
+  .viz-thumb svg{width:66%; height:66%}
+  .viz-body{padding:15px 18px 18px}
+  .viz-body .k{font-family:"Space Mono",monospace; font-size:clamp(11px,1.3vw,13px); letter-spacing:1.5px;
+    text-transform:uppercase; color:var(--accent); transition:color .6s; font-weight:700}
+  .viz-body h3{font-family:"Sora",sans-serif; font-size:clamp(18px,2vw,23px); margin:8px 0 6px; font-weight:700; color:#fff}
+  .viz-body p{margin:0; color:var(--muted); font-size:clamp(15px,1.6vw,18px); line-height:1.45; font-weight:500}
+
   /* Process (elementos) */
   .flow{display:flex; flex-wrap:wrap; gap:10px; align-items:stretch; margin-top:24px}
   .flow .step{flex:1 1 120px; min-width:110px; background:rgba(255,255,255,.03);
@@ -360,13 +376,81 @@ const SLIDES = [
     </div>`},
 
   { sec:"intro", type:"topic", eyebrow:"Comunicação · Tipos", title:"Tipos de comunicação", html:`
-    ${cards([
-      {k:"Quanto à forma",h:"Verbal e não verbal",p:"Verbal: oral e escrita. Não verbal: gestos, expressões, imagem, postura."},
-      {k:"Quanto ao sentido",h:"Direções",p:"Descendente, ascendente, horizontal e diagonal (transversal)."},
-      {k:"Quanto ao alcance",h:"Nº de pessoas",p:"Intrapessoal, interpessoal, grupal e de massa."},
-      {k:"Quanto ao ambiente",h:"Interna e externa",p:"Dentro da organização ou dirigida aos públicos externos."},
-      {k:"Quanto à estrutura",h:"Formal e informal",p:"Canais oficiais x rede espontânea de relações (“rádio-corredor”)."},
-    ])}`},
+    <div class="viz-grid">
+      <div class="viz-card">
+        <div class="viz-thumb">
+          <svg viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h42a8 8 0 0 1 8 8v13a8 8 0 0 1-8 8H36l-11 9v-9H12a8 8 0 0 1-8-8V28a8 8 0 0 1 8-8Z" fill="currentColor" fill-opacity=".14"/>
+            <path d="M18 30h30M18 39h20"/>
+            <circle cx="92" cy="42" r="20" fill="currentColor" fill-opacity=".14"/>
+            <circle cx="85" cy="38" r="2.6" fill="currentColor" stroke="none"/>
+            <circle cx="99" cy="38" r="2.6" fill="currentColor" stroke="none"/>
+            <path d="M84 48c4.5 5 15.5 5 20 0"/>
+          </svg>
+        </div>
+        <div class="viz-body"><div class="k">Quanto à forma</div><h3>Verbal e não verbal</h3>
+          <p>Verbal: oral e escrita. Não verbal: gestos, expressões, imagem e postura.</p></div>
+      </div>
+
+      <div class="viz-card">
+        <div class="viz-thumb">
+          <svg viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="60" cy="40" r="8" fill="currentColor" fill-opacity=".2"/>
+            <path d="M60 28V11M53 18l7-7 7 7"/>
+            <path d="M60 52v17M53 62l7 7 7-7"/>
+            <path d="M48 40H16M23 33l-7 7 7 7"/>
+            <path d="M72 40h32M97 33l7 7-7 7"/>
+          </svg>
+        </div>
+        <div class="viz-body"><div class="k">Quanto ao sentido</div><h3>Direções</h3>
+          <p>Descendente, ascendente, horizontal e diagonal (transversal).</p></div>
+      </div>
+
+      <div class="viz-card">
+        <div class="viz-thumb">
+          <svg viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="22" cy="30" r="8" fill="currentColor" fill-opacity=".2"/>
+            <path d="M9 64c0-10 6-17 13-17s13 7 13 17"/>
+            <path d="M46 40h14M55 34l6 6-6 6"/>
+            <circle cx="82" cy="28" r="7" fill="currentColor" fill-opacity=".14"/>
+            <circle cx="104" cy="28" r="7" fill="currentColor" fill-opacity=".14"/>
+            <circle cx="93" cy="22" r="7" fill="currentColor" fill-opacity=".22"/>
+            <path d="M70 60c0-9 5-15 12-15M116 60c0-9-5-15-12-15M81 64c0-10 5-16 12-16s12 6 12 16"/>
+          </svg>
+        </div>
+        <div class="viz-body"><div class="k">Quanto ao alcance</div><h3>Nº de pessoas</h3>
+          <p>Intrapessoal, interpessoal, grupal e de massa (um → muitos).</p></div>
+      </div>
+
+      <div class="viz-card">
+        <div class="viz-thumb">
+          <svg viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="12" y="18" width="40" height="48" rx="3" fill="currentColor" fill-opacity=".14"/>
+            <path d="M20 28h8M36 28h8M20 39h8M36 39h8M20 50h8M36 50h8"/>
+            <path d="M56 42h30M78 36l8 6-8 6"/>
+            <circle cx="102" cy="42" r="14" fill="currentColor" fill-opacity=".14"/>
+            <path d="M88 42h28M102 28c6.5 6.5 6.5 21.5 0 28M102 28c-6.5 6.5-6.5 21.5 0 28"/>
+          </svg>
+        </div>
+        <div class="viz-body"><div class="k">Quanto ao ambiente</div><h3>Interna e externa</h3>
+          <p>Dentro da organização ou dirigida aos públicos externos.</p></div>
+      </div>
+
+      <div class="viz-card">
+        <div class="viz-thumb">
+          <svg viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 10h26l14 14v43a3 3 0 0 1-3 3H16a3 3 0 0 1-3-3V13a3 3 0 0 1 3-3Z" fill="currentColor" fill-opacity=".14"/>
+            <path d="M42 10v14h14M23 38h26M23 49h26M23 60h16"/>
+            <path d="M72 22h32a5 5 0 0 1 5 5v12a5 5 0 0 1-5 5H88l-9 8v-8h-7a5 5 0 0 1-5-5V27a5 5 0 0 1 5-5Z" fill="currentColor" fill-opacity=".2"/>
+            <circle cx="83" cy="33" r="2" fill="currentColor" stroke="none"/>
+            <circle cx="90" cy="33" r="2" fill="currentColor" stroke="none"/>
+            <circle cx="97" cy="33" r="2" fill="currentColor" stroke="none"/>
+          </svg>
+        </div>
+        <div class="viz-body"><div class="k">Quanto à estrutura</div><h3>Formal e informal</h3>
+          <p>Canais oficiais x rede espontânea de relações (“rádio-corredor”).</p></div>
+      </div>
+    </div>`},
 
   /* ---- PARTE I — INTERNA ---- */
   { sec:"interna", type:"divider", part:"Parte I", title:"Comunicação Interna", lead:"A comunicação que circula <strong>dentro da organização</strong>, entre dirigentes e colaboradores." },
