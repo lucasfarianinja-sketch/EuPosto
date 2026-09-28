@@ -14,7 +14,7 @@
     --accent-soft:rgba(53,224,208,0.14);
     --shadow:0 24px 60px -24px rgba(0,0,0,0.75);
     --r:18px;
-    --maxw:1080px;
+    --maxw:940px;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -710,14 +710,14 @@ function fitSlide(){
   if(!box) return;
   requestAnimationFrame(()=>{
     box.style.transform = 'none';
-    const availH = el.clientHeight - 14;
-    const availW = el.clientWidth;
+    const availH = el.clientHeight - 12;
+    const availW = el.clientWidth - 4;
     const h = box.offsetHeight, w = box.offsetWidth;
-    let scale = 1;
-    if(h > availH) scale = availH / h;
-    if(w > availW) scale = Math.min(scale, availW / w);
-    scale = Math.max(scale, 0.45);
-    box.style.transform = scale < 0.999 ? `scale(${scale})` : 'none';
+    /* escala para PREENCHER a área: cresce ou encolhe conforme necessário,
+       sempre cabendo inteiro na altura e na largura (sem scroll). */
+    let scale = Math.min(availH / h, availW / w);
+    scale = Math.max(0.45, Math.min(scale, 2.0));
+    box.style.transform = `scale(${scale})`;
   });
 }
 window.addEventListener('resize', fitSlide);
