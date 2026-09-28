@@ -64,20 +64,23 @@
 
   /* Deck / slides */
   #deck{
-    flex:1; position:relative; min-height:0;
-    display:flex; align-items:center; justify-content:center;
-    padding:8px clamp(16px,4vw,40px);
+    flex:1; position:relative; min-height:0; overflow:hidden;
+    padding:6px clamp(16px,4vw,40px);
   }
   .slide{
-    position:absolute; width:100%; max-width:var(--maxw);
-    opacity:0; visibility:hidden; transform:translateY(22px) scale(.985);
-    transition:opacity .5s ease, transform .5s cubic-bezier(.2,.7,.2,1);
-    max-height:100%; overflow:auto; scrollbar-width:thin;
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; visibility:hidden; transform:translateY(22px);
+    transition:opacity .45s ease, transform .45s cubic-bezier(.2,.7,.2,1);
+    pointer-events:none;
   }
-  .slide::-webkit-scrollbar{width:8px}
-  .slide::-webkit-scrollbar-thumb{background:rgba(120,150,200,.3); border-radius:8px}
-  .slide.active{opacity:1; visibility:visible; transform:none; position:relative}
-  .slide.leaving{opacity:0; transform:translateY(-18px) scale(.985)}
+  .slide.active{opacity:1; visibility:visible; transform:none; pointer-events:auto}
+  .slide.leaving{opacity:0; transform:translateY(-16px)}
+  .slide-inner{
+    width:100%; max-width:var(--maxw);
+    transform-origin:center center;
+    transition:transform .3s ease;
+  }
 
   .eyebrow{font-family:"Space Mono",monospace; font-size:clamp(13px,1.5vw,16px); letter-spacing:3px;
     text-transform:uppercase; color:var(--accent); margin:0 0 16px; transition:color .6s; font-weight:700}
@@ -624,7 +627,10 @@ function buildSlide(s){
     inner += `<h1 class="title">${s.title}</h1>`;
     inner += `<p class="lead">${s.lead}</p>`;
   }
-  el.innerHTML = inner;
+  const box = document.createElement('div');
+  box.className = 'slide-inner';
+  box.innerHTML = inner;
+  el.appendChild(box);
   return el;
 }
 SLIDES.forEach(s=>deck.appendChild(buildSlide(s)));
@@ -692,8 +698,31 @@ function go(i){
   idxItems.forEach((it,k)=>it.classList.toggle('current', k===i));
   document.getElementById('prevBtn').disabled = i===0;
   document.getElementById('nextBtn').disabled = i===total-1;
-  slideEls[i].querySelector('.slide')?.focus?.();
+  fitSlide();
 }
+
+/* Ajusta o slide ativo para caber inteiro na tela, sem scroll:
+   usa a maior escala possível (até 1) que faz o conteúdo caber na altura. */
+function fitSlide(){
+  const el = slideEls[cur];
+  if(!el) return;
+  const box = el.querySelector('.slide-inner');
+  if(!box) return;
+  requestAnimationFrame(()=>{
+    box.style.transform = 'none';
+    const availH = el.clientHeight - 14;
+    const availW = el.clientWidth;
+    const h = box.offsetHeight, w = box.offsetWidth;
+    let scale = 1;
+    if(h > availH) scale = availH / h;
+    if(w > availW) scale = Math.min(scale, availW / w);
+    scale = Math.max(scale, 0.45);
+    box.style.transform = scale < 0.999 ? `scale(${scale})` : 'none';
+  });
+}
+window.addEventListener('resize', fitSlide);
+document.addEventListener('fullscreenchange', ()=> setTimeout(fitSlide, 60));
+if(document.fonts && document.fonts.ready){ document.fonts.ready.then(fitSlide); }
 const next = ()=>go(cur+1);
 const prev = ()=>go(cur-1);
 
