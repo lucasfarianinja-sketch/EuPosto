@@ -1,0 +1,776 @@
+<title>Comunicação em Rede</title>
+<meta name="description" content="Apresentação 3D interativa sobre Comunicação, Comunicação Interna e Comunicação Externa.">
+<style>
+  :root{
+    color-scheme: dark;
+    --bg:#0a0e1a;
+    --bg-2:#0d1424;
+    --panel:rgba(16,23,42,0.62);
+    --panel-brd:rgba(120,150,200,0.16);
+    --ink:#eaf1ff;
+    --muted:#9db0d0;
+    --faint:#5f7195;
+    --accent:#35e0d0;
+    --accent-soft:rgba(53,224,208,0.14);
+    --shadow:0 24px 60px -24px rgba(0,0,0,0.75);
+    --r:18px;
+    --maxw:1080px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 800px at 78% -10%, rgba(56,189,248,0.10), transparent 60%),
+      radial-gradient(1000px 700px at 10% 110%, rgba(167,139,250,0.10), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  #bg{position:fixed; inset:0; width:100%; height:100%; display:block; z-index:0}
+  .vignette{position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:radial-gradient(120% 120% at 50% 50%, transparent 55%, rgba(4,7,14,0.66) 100%);}
+
+  .stage{position:relative; z-index:2; height:100%; display:flex; flex-direction:column;}
+
+  /* Top bar */
+  .topbar{
+    display:flex; align-items:center; gap:14px;
+    padding:calc(env(safe-area-inset-top,0px) + 16px) clamp(16px,4vw,40px) 8px;
+  }
+  .brand{display:flex; align-items:center; gap:11px; font-weight:700; letter-spacing:.2px}
+  .brand .dot{width:12px; height:12px; border-radius:50%;
+    background:var(--accent); box-shadow:0 0 18px var(--accent); transition:background .6s, box-shadow .6s}
+  .brand small{display:block; font-family:"Space Mono",monospace; font-size:11px; letter-spacing:2px;
+    text-transform:uppercase; color:var(--faint); font-weight:400; margin-top:1px}
+  .brand b{font-family:"Sora",sans-serif; font-size:15px}
+  .sec-tag{
+    margin-left:auto; font-family:"Space Mono",monospace; font-size:11px; letter-spacing:2px;
+    text-transform:uppercase; color:var(--accent);
+    border:1px solid var(--panel-brd); background:var(--accent-soft);
+    padding:6px 12px; border-radius:999px; transition:color .6s, background .6s; white-space:nowrap;
+  }
+  .icon-btn{
+    display:grid; place-items:center; width:42px; height:42px; flex:0 0 auto;
+    border-radius:12px; border:1px solid var(--panel-brd); background:var(--panel);
+    color:var(--ink); cursor:pointer; backdrop-filter:blur(8px); transition:.18s;
+  }
+  .icon-btn:hover{border-color:var(--accent); color:var(--accent); transform:translateY(-1px)}
+  .icon-btn svg{width:20px; height:20px}
+
+  /* Deck / slides */
+  #deck{
+    flex:1; position:relative; min-height:0;
+    display:flex; align-items:center; justify-content:center;
+    padding:8px clamp(16px,4vw,40px);
+  }
+  .slide{
+    position:absolute; width:100%; max-width:var(--maxw);
+    opacity:0; visibility:hidden; transform:translateY(22px) scale(.985);
+    transition:opacity .5s ease, transform .5s cubic-bezier(.2,.7,.2,1);
+    max-height:100%; overflow:auto; scrollbar-width:thin;
+  }
+  .slide::-webkit-scrollbar{width:8px}
+  .slide::-webkit-scrollbar-thumb{background:rgba(120,150,200,.3); border-radius:8px}
+  .slide.active{opacity:1; visibility:visible; transform:none; position:relative}
+  .slide.leaving{opacity:0; transform:translateY(-18px) scale(.985)}
+
+  .eyebrow{font-family:"Space Mono",monospace; font-size:12px; letter-spacing:3px;
+    text-transform:uppercase; color:var(--accent); margin:0 0 14px; transition:color .6s}
+  h1.title{font-family:"Sora",sans-serif; font-weight:800; letter-spacing:-.02em;
+    line-height:1.03; margin:0; text-wrap:balance; font-size:clamp(30px,6vw,60px)}
+  h2.title{font-family:"Sora",sans-serif; font-weight:700; letter-spacing:-.01em;
+    line-height:1.08; margin:0 0 4px; text-wrap:balance; font-size:clamp(26px,4.6vw,44px)}
+  .lead{color:var(--muted); font-size:clamp(15px,1.9vw,19px); line-height:1.6; max-width:64ch; margin:16px 0 0}
+  .lead strong{color:var(--ink); font-weight:700}
+
+  .panel{
+    background:var(--panel); border:1px solid var(--panel-brd); border-radius:var(--r);
+    padding:clamp(20px,3vw,34px); box-shadow:var(--shadow); backdrop-filter:blur(14px);
+  }
+
+  /* Bullet list */
+  ul.points{list-style:none; margin:22px 0 0; padding:0; display:grid; gap:12px}
+  ul.points li{
+    position:relative; padding:13px 16px 13px 46px; border-radius:14px;
+    background:rgba(255,255,255,.028); border:1px solid rgba(255,255,255,.05);
+    font-size:clamp(14.5px,1.8vw,17px); line-height:1.5; color:#dbe6fb;
+  }
+  ul.points li::before{
+    content:""; position:absolute; left:16px; top:50%; transform:translateY(-50%);
+    width:14px; height:14px; border-radius:4px; background:var(--accent);
+    box-shadow:0 0 14px var(--accent-soft); transition:background .6s;
+  }
+  ul.points li b{color:#fff; font-weight:700}
+
+  /* Card grid */
+  .grid{display:grid; gap:14px; margin-top:22px;
+    grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+  .card{
+    background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06);
+    border-radius:14px; padding:18px; transition:.2s;
+  }
+  .card:hover{border-color:var(--accent); transform:translateY(-3px); background:var(--accent-soft)}
+  .card .k{font-family:"Space Mono",monospace; font-size:11px; letter-spacing:1.5px;
+    text-transform:uppercase; color:var(--accent); transition:color .6s}
+  .card h3{font-family:"Sora",sans-serif; font-size:17px; margin:8px 0 6px; font-weight:600; color:#fff}
+  .card p{margin:0; color:var(--muted); font-size:14px; line-height:1.5}
+
+  /* Process (elementos) */
+  .flow{display:flex; flex-wrap:wrap; gap:10px; align-items:stretch; margin-top:24px}
+  .flow .step{flex:1 1 120px; min-width:110px; background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.07); border-radius:12px; padding:14px; text-align:center}
+  .flow .step .n{font-family:"Space Mono",monospace; color:var(--accent); font-size:12px; transition:color .6s}
+  .flow .step .t{font-family:"Sora",sans-serif; font-weight:600; margin-top:6px; font-size:15px}
+  .flow .step .d{color:var(--muted); font-size:12.5px; margin-top:4px; line-height:1.4}
+
+  /* Two-column compare */
+  .compare{display:grid; gap:16px; margin-top:22px; grid-template-columns:1fr 1fr}
+  .compare .col{border-radius:16px; padding:22px; border:1px solid var(--panel-brd)}
+  .compare .col.a{background:rgba(56,189,248,.09)}
+  .compare .col.b{background:rgba(255,180,84,.09)}
+  .compare h3{font-family:"Sora",sans-serif; margin:0 0 10px; font-size:19px}
+  .compare .col.a h3{color:#7dd3fc}
+  .compare .col.b h3{color:#ffc879}
+  .compare ul{margin:0; padding-left:18px; color:var(--muted); font-size:14.5px; line-height:1.7}
+
+  .cover-meta{display:flex; flex-wrap:wrap; gap:10px 22px; margin-top:30px;
+    font-family:"Space Mono",monospace; font-size:12.5px; color:var(--faint); letter-spacing:1px}
+  .cover-meta span{display:flex; align-items:center; gap:8px}
+  .cover-meta span::before{content:""; width:7px; height:7px; border-radius:50%; background:var(--accent)}
+  .hint{margin-top:26px; font-size:13px; color:var(--faint)}
+  .hint kbd{font-family:"Space Mono",monospace; background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.12); border-radius:6px; padding:2px 7px; font-size:12px; color:#cdd8ef}
+
+  /* big number for dividers */
+  .part-num{font-family:"Sora",sans-serif; font-weight:800; font-size:clamp(64px,16vw,150px);
+    line-height:.9; letter-spacing:-.04em;
+    background:linear-gradient(180deg,#fff, color-mix(in srgb, var(--accent) 70%, #fff));
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    opacity:.95; margin:0 0 6px}
+
+  /* Controls */
+  .controls{
+    display:flex; align-items:center; gap:14px;
+    padding:8px clamp(16px,4vw,40px) calc(env(safe-area-inset-bottom,0px) + 16px);
+  }
+  .nav-btn{
+    display:inline-flex; align-items:center; gap:9px; cursor:pointer;
+    border:1px solid var(--panel-brd); background:var(--panel); color:var(--ink);
+    padding:11px 18px; border-radius:12px; font-family:"Sora",sans-serif; font-weight:600; font-size:14px;
+    backdrop-filter:blur(8px); transition:.18s;
+  }
+  .nav-btn:hover:not(:disabled){border-color:var(--accent); color:var(--accent); transform:translateY(-1px)}
+  .nav-btn:disabled{opacity:.34; cursor:not-allowed}
+  .nav-btn svg{width:17px; height:17px}
+  .progress-wrap{flex:1; display:flex; flex-direction:column; gap:7px; min-width:0}
+  .bar{height:5px; border-radius:99px; background:rgba(255,255,255,.09); overflow:hidden}
+  .bar > i{display:block; height:100%; width:0%; border-radius:99px;
+    background:linear-gradient(90deg, var(--accent), color-mix(in srgb,var(--accent) 40%, #fff));
+    box-shadow:0 0 14px var(--accent-soft); transition:width .45s ease, background .6s}
+  .meta-row{display:flex; justify-content:space-between; font-family:"Space Mono",monospace;
+    font-size:11px; letter-spacing:1px; color:var(--faint)}
+  .meta-row .now{color:var(--accent); transition:color .6s}
+  .counter{font-family:"Space Mono",monospace; font-size:13px; color:var(--muted); white-space:nowrap}
+  .counter b{color:var(--ink)}
+
+  /* Index overlay */
+  .index{
+    position:fixed; inset:0; z-index:20; display:none; padding:24px;
+    background:rgba(6,9,17,.72); backdrop-filter:blur(10px);
+    align-items:center; justify-content:center;
+  }
+  .index.open{display:flex}
+  .index-panel{width:min(680px,100%); max-height:86vh; overflow:auto;
+    background:var(--bg-2); border:1px solid var(--panel-brd); border-radius:22px; box-shadow:var(--shadow);
+    padding:26px clamp(18px,3vw,30px)}
+  .index-panel h4{font-family:"Sora",sans-serif; margin:0 0 4px; font-size:20px}
+  .index-panel p{margin:0 0 18px; color:var(--muted); font-size:13.5px}
+  .idx-group{font-family:"Space Mono",monospace; font-size:11px; letter-spacing:2px; text-transform:uppercase;
+    color:var(--faint); margin:18px 0 8px}
+  .idx-item{display:flex; gap:12px; align-items:baseline; width:100%; text-align:left; cursor:pointer;
+    border:none; background:transparent; color:var(--ink); padding:9px 12px; border-radius:10px;
+    font-family:"Manrope",sans-serif; font-size:15px; transition:.15s}
+  .idx-item:hover{background:rgba(255,255,255,.05)}
+  .idx-item.current{background:var(--accent-soft); color:var(--accent)}
+  .idx-item .num{font-family:"Space Mono",monospace; font-size:12px; color:var(--faint); min-width:24px}
+
+  .kicker-count{opacity:.55}
+
+  @media (max-width:720px){
+    .compare{grid-template-columns:1fr}
+    .nav-btn .lbl{display:none}
+    .nav-btn{padding:11px 14px}
+    .brand small{display:none}
+    .sec-tag{display:none}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .slide{transition:opacity .2s}
+    .bar > i{transition:width .2s}
+  }
+</style>
+
+<canvas id="bg"></canvas>
+<div class="vignette"></div>
+
+<div class="stage">
+  <header class="topbar">
+    <div class="brand">
+      <span class="dot"></span>
+      <span><small>Apresentação</small><b>Comunicação em Rede</b></span>
+    </div>
+    <span class="sec-tag" id="secTag">Introdução</span>
+    <button class="icon-btn" id="indexBtn" title="Índice (I)" aria-label="Abrir índice">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <button class="icon-btn" id="fsBtn" title="Tela cheia (F)" aria-label="Tela cheia">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m8 0h3a2 2 0 0 0 2-2v-3"/></svg>
+    </button>
+  </header>
+
+  <main id="deck" aria-live="polite"></main>
+
+  <footer class="controls">
+    <button class="nav-btn" id="prevBtn" aria-label="Slide anterior">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      <span class="lbl">Anterior</span>
+    </button>
+    <div class="progress-wrap">
+      <div class="bar"><i id="barFill"></i></div>
+      <div class="meta-row"><span class="now" id="nowLabel">Comunicação</span><span id="sectionOf"></span></div>
+    </div>
+    <span class="counter"><b id="cur">01</b> / <span id="total">01</span></span>
+    <button class="nav-btn" id="nextBtn" aria-label="Próximo slide">
+      <span class="lbl">Próximo</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </footer>
+</div>
+
+<div class="index" id="index" role="dialog" aria-modal="true" aria-label="Índice da apresentação">
+  <div class="index-panel">
+    <h4>Índice</h4>
+    <p>Clique em um tópico para ir até ele. Feche com <b>Esc</b>.</p>
+    <div id="indexList"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ---------- Paleta por seção ---------- */
+const SECTIONS = {
+  intro:  { label:"Comunicação",         tag:"Introdução",     color:"#35e0d0" },
+  interna:{ label:"Comunicação Interna",  tag:"Parte I",        color:"#38bdf8" },
+  externa:{ label:"Comunicação Externa",  tag:"Parte II",       color:"#ffb454" },
+  fecho:  { label:"Síntese",              tag:"Conclusão",      color:"#a78bfa" },
+};
+
+/* ---------- Conteúdo dos slides ---------- */
+const list = (arr)=>`<ul class="points">${arr.map(t=>`<li>${t}</li>`).join("")}</ul>`;
+const cards = (arr)=>`<div class="grid">${arr.map(c=>`<div class="card"><div class="k">${c.k}</div><h3>${c.h}</h3><p>${c.p}</p></div>`).join("")}</div>`;
+
+const SLIDES = [
+  /* ---- Capa ---- */
+  { sec:"intro", type:"cover", html:`
+    <p class="eyebrow">Comunicação Interna &amp; Externa</p>
+    <h1 class="title">Comunicação<br>em Rede</h1>
+    <p class="lead">Do <strong>conceito</strong> às <strong>barreiras</strong>, dos <strong>canais internos</strong> aos <strong>públicos externos</strong> — como as pessoas e as organizações trocam significados e constroem relações.</p>
+    <div class="cover-meta">
+      <span>Introdução</span><span>Parte I · Interna</span><span>Parte II · Externa</span>
+    </div>
+    <p class="hint">Navegue com <kbd>←</kbd> <kbd>→</kbd> ou os botões · <kbd>F</kbd> tela cheia · <kbd>I</kbd> índice · arraste o fundo para girar a rede</p>
+  `},
+
+  /* ---- COMUNICAÇÃO (geral) ---- */
+  { sec:"intro", type:"topic", eyebrow:"Comunicação · Conceito", title:"O que é comunicação?", html:`
+    <div class="panel">
+      <p class="lead">Comunicação é o <strong>processo de troca de informações, ideias, sentimentos e significados</strong> entre um emissor e um receptor, por meio de símbolos partilhados (linguagem verbal e não verbal).</p>
+      ${list([
+        "Do latim <b>communicare</b> — “tornar comum, partilhar”.",
+        "É um processo de <b>mão dupla</b>: pressupõe uma resposta (feedback).",
+        "Só há comunicação quando a mensagem é <b>compreendida</b> pelo receptor, não apenas enviada.",
+        "Está presente em <b>toda relação humana, social e organizacional</b>."
+      ])}
+    </div>`},
+
+  { sec:"intro", type:"topic", eyebrow:"Comunicação · Elementos", title:"O processo da comunicação", subtitle:"Todo ato comunicativo envolve estes elementos:", html:`
+    <div class="flow">
+      <div class="step"><div class="n">01</div><div class="t">Emissor</div><div class="d">Quem cria e envia a mensagem</div></div>
+      <div class="step"><div class="n">02</div><div class="t">Codificação</div><div class="d">Transforma a ideia em símbolos</div></div>
+      <div class="step"><div class="n">03</div><div class="t">Mensagem</div><div class="d">O conteúdo transmitido</div></div>
+      <div class="step"><div class="n">04</div><div class="t">Canal</div><div class="d">O meio por onde ela passa</div></div>
+      <div class="step"><div class="n">05</div><div class="t">Receptor</div><div class="d">Quem recebe e decodifica</div></div>
+      <div class="step"><div class="n">06</div><div class="t">Feedback</div><div class="d">A resposta que retorna</div></div>
+    </div>
+    <p class="lead" style="margin-top:20px">Envolvendo tudo: o <strong>contexto</strong> (a situação) e o <strong>ruído</strong> (o que distorce a mensagem).</p>`},
+
+  { sec:"intro", type:"topic", eyebrow:"Comunicação · Importância", title:"Por que a comunicação é importante?", html:`
+    <div class="panel">
+      ${list([
+        "É a <b>base de todas as relações</b> humanas e organizacionais.",
+        "Permite <b>coordenar ações</b>, tomar decisões e resolver conflitos.",
+        "Transmite <b>conhecimento, cultura e valores</b>.",
+        "<b>Motiva, integra e envolve</b> as pessoas.",
+        "Constrói a <b>imagem e a reputação</b> de pessoas e empresas.",
+        "Sem comunicação eficaz, geram-se <b>erros, boatos e desmotivação</b>."
+      ])}
+    </div>`},
+
+  { sec:"intro", type:"topic", eyebrow:"Comunicação · Funções", title:"Funções da comunicação", html:`
+    ${cards([
+      {k:"01",h:"Informar",p:"Transmitir dados e conhecimentos necessários para agir e decidir."},
+      {k:"02",h:"Motivar / Influenciar",p:"Estimular comportamentos, persuadir e envolver as pessoas."},
+      {k:"03",h:"Controlar / Coordenar",p:"Orientar tarefas, esclarecer papéis e regras, alinhar equipes."},
+      {k:"04",h:"Expressar emoções",p:"Partilhar sentimentos, atitudes e satisfação social."},
+      {k:"05",h:"Integrar",p:"Aproximar pessoas, criar relações e sentimento de grupo."},
+    ])}`},
+
+  { sec:"intro", type:"topic", eyebrow:"Comunicação · Barreiras", title:"Barreiras à comunicação", subtitle:"Obstáculos que distorcem ou bloqueiam a mensagem:", html:`
+    ${cards([
+      {k:"Físicas",h:"Ambiente e técnica",p:"Ruído, distância, falhas de rede, som ou imagem ruins."},
+      {k:"Semânticas",h:"Linguagem",p:"Palavras ambíguas, jargão técnico, idioma diferente."},
+      {k:"Psicológicas",h:"Pessoais",p:"Emoções, preconceitos, desatenção, filtragem da informação."},
+      {k:"Culturais",h:"Valores e costumes",p:"Diferenças culturais que mudam o sentido da mensagem."},
+      {k:"Organizacionais",h:"Estrutura",p:"Excesso de níveis hierárquicos e sobrecarga de informação."},
+    ])}`},
+
+  { sec:"intro", type:"topic", eyebrow:"Comunicação · Objetivos", title:"Objetivos da comunicação", html:`
+    <div class="panel">
+      ${list([
+        "<b>Transmitir</b> mensagens de forma clara, correta e eficaz.",
+        "Gerar <b>compreensão mútua</b> entre emissor e receptor.",
+        "Obter uma <b>resposta / feedback</b>.",
+        "<b>Influenciar</b> comportamentos, atitudes e decisões.",
+        "<b>Aproximar</b> pessoas, grupos e organizações."
+      ])}
+    </div>`},
+
+  { sec:"intro", type:"topic", eyebrow:"Comunicação · Tipos", title:"Tipos de comunicação", html:`
+    ${cards([
+      {k:"Quanto à forma",h:"Verbal e não verbal",p:"Verbal: oral e escrita. Não verbal: gestos, expressões, imagem, postura."},
+      {k:"Quanto ao sentido",h:"Direções",p:"Descendente, ascendente, horizontal e diagonal (transversal)."},
+      {k:"Quanto ao alcance",h:"Nº de pessoas",p:"Intrapessoal, interpessoal, grupal e de massa."},
+      {k:"Quanto ao ambiente",h:"Interna e externa",p:"Dentro da organização ou dirigida aos públicos externos."},
+      {k:"Quanto à estrutura",h:"Formal e informal",p:"Canais oficiais x rede espontânea de relações (“rádio-corredor”)."},
+    ])}`},
+
+  /* ---- PARTE I — INTERNA ---- */
+  { sec:"interna", type:"divider", part:"Parte I", title:"Comunicação Interna", lead:"A comunicação que circula <strong>dentro da organização</strong>, entre dirigentes e colaboradores." },
+
+  { sec:"interna", type:"topic", eyebrow:"Interna · Conceito", title:"O que é comunicação interna?", html:`
+    <div class="panel">
+      <p class="lead">É o <strong>conjunto de ações e mensagens trocadas dentro de uma organização</strong>, entre os seus membros. Dirige-se ao <strong>público interno</strong>: dirigentes, gestores e colaboradores.</p>
+      ${list([
+        "Faz a informação circular em <b>todos os sentidos</b> (para baixo, para cima e para os lados).",
+        "Pode ser <b>formal</b> (canais oficiais) ou <b>informal</b> (relações espontâneas).",
+        "É gerida sobretudo pelos <b>Recursos Humanos</b> e pela liderança."
+      ])}
+    </div>`},
+
+  { sec:"interna", type:"topic", eyebrow:"Interna · Importância", title:"Por que ela importa?", html:`
+    <div class="panel">
+      ${list([
+        "<b>Alinha</b> todos com os objetivos e a estratégia da empresa.",
+        "Cria <b>sentimento de pertença</b> e motiva as equipes.",
+        "Melhora o <b>clima e a cultura</b> organizacional.",
+        "<b>Reduz boatos, ruídos e conflitos</b> internos.",
+        "Aumenta o <b>compromisso e a produtividade</b>."
+      ])}
+    </div>`},
+
+  { sec:"interna", type:"topic", eyebrow:"Interna · Funções", title:"Funções da comunicação interna", html:`
+    ${cards([
+      {k:"01",h:"Informar",p:"Dar a conhecer decisões, metas, normas e novidades aos colaboradores."},
+      {k:"02",h:"Integrar",p:"Acolher e unir as pessoas em torno de uma identidade comum."},
+      {k:"03",h:"Motivar",p:"Reconhecer, envolver e estimular o empenho das equipes."},
+      {k:"04",h:"Coordenar",p:"Articular tarefas e áreas para trabalharem no mesmo sentido."},
+      {k:"05",h:"Dar voz",p:"Recolher opiniões, sugestões e feedback dos colaboradores."},
+    ])}`},
+
+  { sec:"interna", type:"topic", eyebrow:"Interna · Sentidos", title:"Em que sentidos ela flui?", html:`
+    ${cards([
+      {k:"↓ Descendente",h:"Da chefia para a equipe",p:"Ordens, metas, normas e informações. Ex.: circulares, reuniões."},
+      {k:"↑ Ascendente",h:"Da equipe para a chefia",p:"Feedback, sugestões, pedidos e relatórios. Ex.: caixa de sugestões."},
+      {k:"↔ Horizontal",h:"Entre pares",p:"Entre pessoas do mesmo nível, para coordenar e cooperar."},
+    ])}`},
+
+  { sec:"interna", type:"topic", eyebrow:"Interna · Objetivos", title:"Objetivos da comunicação interna", html:`
+    <div class="panel">
+      ${list([
+        "Garantir que a <b>informação circule</b> de forma clara e sem ruído.",
+        "<b>Envolver e comprometer</b> os colaboradores com a organização.",
+        "Fortalecer a <b>identidade, os valores e a cultura</b>.",
+        "Estimular a <b>cooperação</b> entre pessoas e departamentos.",
+        "Melhorar o <b>desempenho coletivo</b> e o bem-estar no trabalho."
+      ])}
+    </div>`},
+
+  { sec:"interna", type:"topic", eyebrow:"Interna · Suportes", title:"Suportes: canais internos", subtitle:"Meios usados para comunicar dentro da organização — e para quê:", html:`
+    ${cards([
+      {k:"Reuniões",h:"Reuniões e briefings",p:"Alinhar equipes, decidir e esclarecer dúvidas em tempo real."},
+      {k:"Intranet",h:"Intranet",p:"Portal interno com documentos, notícias e serviços centralizados."},
+      {k:"E-mail",h:"E-mail / newsletter interna",p:"Difundir avisos e novidades de forma rápida e registrada."},
+      {k:"Mural",h:"Quadro de avisos",p:"Comunicados rápidos em locais de grande circulação."},
+      {k:"Jornal",h:"Jornal / revista interna",p:"Aprofundar temas, valorizar pessoas e reforçar a cultura."},
+      {k:"Sugestões",h:"Caixa de sugestões",p:"Canal ascendente para ideias e reclamações dos colaboradores."},
+      {k:"Chat",h:"Redes corporativas",p:"Slack, Teams, Workplace: conversa ágil e trabalho em equipe."},
+      {k:"Docs",h:"Memorandos e circulares",p:"Comunicação formal de normas, ordens e procedimentos."},
+    ])}`},
+
+  /* ---- PARTE II — EXTERNA ---- */
+  { sec:"externa", type:"divider", part:"Parte II", title:"Comunicação Externa", lead:"A comunicação da organização com os seus <strong>públicos externos</strong> — clientes, parceiros, media e sociedade." },
+
+  { sec:"externa", type:"topic", eyebrow:"Externa · Conceito", title:"O que é comunicação externa?", html:`
+    <div class="panel">
+      <p class="lead">É o <strong>conjunto de mensagens que a organização troca com o exterior</strong>: clientes, fornecedores, parceiros, investidores, media, Estado e comunidade. Projeta a organização para fora.</p>
+      ${list([
+        "Dirige-se ao <b>público externo</b>, não aos colaboradores.",
+        "É a principal responsável pela <b>imagem e reputação</b> da marca.",
+        "Envolve marketing, publicidade e relações públicas."
+      ])}
+    </div>`},
+
+  { sec:"externa", type:"topic", eyebrow:"Externa · Importância", title:"Por que ela importa?", html:`
+    <div class="panel">
+      ${list([
+        "Constrói e defende a <b>imagem e a reputação</b> da organização.",
+        "<b>Atrai e fideliza</b> clientes.",
+        "<b>Divulga</b> produtos, serviços e novidades.",
+        "Cria <b>relações</b> com parceiros, media e sociedade.",
+        "<b>Diferencia</b> a organização da concorrência."
+      ])}
+    </div>`},
+
+  { sec:"externa", type:"topic", eyebrow:"Externa · Funções", title:"Funções da comunicação externa", html:`
+    ${cards([
+      {k:"01",h:"Informar o mercado",p:"Dar a conhecer a empresa, a oferta e as novidades ao público."},
+      {k:"02",h:"Promover e vender",p:"Divulgar produtos/serviços e estimular a compra."},
+      {k:"03",h:"Construir marca",p:"Criar uma imagem forte, coerente e memorável."},
+      {k:"04",h:"Relacionar",p:"Manter laços com clientes, media, parceiros e comunidade."},
+      {k:"05",h:"Gerir a reputação",p:"Cuidar da credibilidade e responder em momentos de crise."},
+    ])}`},
+
+  { sec:"externa", type:"topic", eyebrow:"Externa · Objetivos", title:"Objetivos da comunicação externa", html:`
+    <div class="panel">
+      ${list([
+        "<b>Dar a conhecer</b> a organização e a sua oferta.",
+        "<b>Persuadir</b> e conquistar novos clientes.",
+        "Reforçar a <b>notoriedade e a credibilidade</b> da marca.",
+        "Manter <b>boas relações</b> com todos os públicos externos.",
+        "Apoiar as <b>vendas</b> e o crescimento do negócio."
+      ])}
+    </div>`},
+
+  { sec:"externa", type:"topic", eyebrow:"Externa · Suportes", title:"Suportes: canais externos", subtitle:"Meios usados para comunicar com o exterior — e para quê:", html:`
+    ${cards([
+      {k:"Publicidade",h:"Anúncios pagos",p:"TV, rádio, imprensa, outdoors: alcançar muita gente e promover a marca."},
+      {k:"Website",h:"Site institucional",p:"Cartão de visita digital: informação oficial disponível 24h."},
+      {k:"Redes sociais",h:"Instagram, Facebook, LinkedIn",p:"Relacionamento próximo, conteúdo e interação com o público."},
+      {k:"Imprensa",h:"Assessoria / releases",p:"Notícias e comunicados enviados aos meios de comunicação."},
+      {k:"E-mail",h:"E-mail marketing",p:"Ofertas e novidades enviadas diretamente aos clientes."},
+      {k:"Impressos",h:"Catálogos e folhetos",p:"Apresentar a oferta de forma detalhada e tangível."},
+      {k:"Eventos",h:"Feiras e eventos",p:"Contato direto, demonstrações e networking com o mercado."},
+      {k:"Atendimento",h:"SAC / atendimento",p:"Ouvir, apoiar e resolver — a comunicação do dia a dia com o cliente."},
+    ])}`},
+
+  /* ---- FECHO ---- */
+  { sec:"fecho", type:"compare", eyebrow:"Síntese", title:"Interna x Externa", subtitle:"Duas faces da mesma organização — devem falar a mesma língua.", html:`
+    <div class="compare">
+      <div class="col a">
+        <h3>Comunicação Interna</h3>
+        <ul>
+          <li>Público: <b>colaboradores</b></li>
+          <li>Objetivo: alinhar, integrar e motivar</li>
+          <li>Canais: intranet, reuniões, mural, e-mail interno</li>
+          <li>Resultado: bom clima e produtividade</li>
+        </ul>
+      </div>
+      <div class="col b">
+        <h3>Comunicação Externa</h3>
+        <ul>
+          <li>Público: <b>clientes, media, sociedade</b></li>
+          <li>Objetivo: divulgar, vender e criar imagem</li>
+          <li>Canais: publicidade, site, redes sociais, eventos</li>
+          <li>Resultado: reputação e crescimento</li>
+        </ul>
+      </div>
+    </div>`},
+
+  { sec:"fecho", type:"cover", html:`
+    <p class="eyebrow">Conclusão</p>
+    <h1 class="title" style="font-size:clamp(28px,5.4vw,52px)">A comunicação<br>conecta tudo.</h1>
+    <p class="lead">Interna ou externa, a boa comunicação é <strong>clara, coerente e de mão dupla</strong>. Quando a mensagem é compreendida e gera resposta, pessoas e organizações crescem juntas.</p>
+    <p class="hint" style="margin-top:34px">Obrigado! · Perguntas? · Use <kbd>I</kbd> para rever qualquer tópico.</p>
+  `},
+];
+
+/* ---------- Render dos slides ---------- */
+const deck = document.getElementById('deck');
+function buildSlide(s){
+  const el = document.createElement('article');
+  el.className = 'slide';
+  let inner = '';
+  if(s.type === 'cover' || s.type === 'compare' || s.type === 'topic'){
+    if(s.type !== 'cover'){
+      inner += `<p class="eyebrow">${s.eyebrow||''}</p>`;
+      inner += `<h2 class="title">${s.title||''}</h2>`;
+      if(s.subtitle) inner += `<p class="lead" style="margin-bottom:2px">${s.subtitle}</p>`;
+    }
+    inner += s.html || '';
+  } else if(s.type === 'divider'){
+    inner += `<div class="part-num">${s.part}</div>`;
+    inner += `<h1 class="title">${s.title}</h1>`;
+    inner += `<p class="lead">${s.lead}</p>`;
+  }
+  el.innerHTML = inner;
+  return el;
+}
+SLIDES.forEach(s=>deck.appendChild(buildSlide(s)));
+const slideEls = [...deck.querySelectorAll('.slide')];
+
+/* ---------- Índice ---------- */
+const indexList = document.getElementById('indexList');
+let lastSec = null;
+SLIDES.forEach((s,i)=>{
+  if(s.sec !== lastSec){
+    const g = document.createElement('div');
+    g.className = 'idx-group';
+    g.textContent = SECTIONS[s.sec].tag + ' · ' + SECTIONS[s.sec].label;
+    indexList.appendChild(g);
+    lastSec = s.sec;
+  }
+  const b = document.createElement('button');
+  b.className = 'idx-item';
+  const label = s.title || (s.type==='cover' ? 'Capa' : SECTIONS[s.sec].label);
+  b.innerHTML = `<span class="num">${String(i+1).padStart(2,'0')}</span><span>${label}</span>`;
+  b.addEventListener('click', ()=>{ go(i); closeIndex(); });
+  indexList.appendChild(b);
+});
+const idxItems = [...indexList.querySelectorAll('.idx-item')];
+
+/* ---------- Navegação ---------- */
+let cur = 0;
+const total = SLIDES.length;
+document.getElementById('total').textContent = String(total).padStart(2,'0');
+
+const secTag = document.getElementById('secTag');
+const nowLabel = document.getElementById('nowLabel');
+const sectionOf = document.getElementById('sectionOf');
+const barFill = document.getElementById('barFill');
+const curEl = document.getElementById('cur');
+const dotEl = document.querySelector('.brand .dot');
+
+function applyAccent(sec){
+  const c = SECTIONS[sec].color;
+  document.documentElement.style.setProperty('--accent', c);
+  document.documentElement.style.setProperty('--accent-soft', hexA(c,0.14));
+  netTargetColor.set(c);
+}
+function hexA(hex,a){
+  const n = parseInt(hex.slice(1),16);
+  return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+}
+
+function go(i){
+  i = Math.max(0, Math.min(total-1, i));
+  if(i === cur && slideEls[i].classList.contains('active')) return;
+  const prev = cur; cur = i;
+  slideEls.forEach((el,k)=>{
+    el.classList.toggle('active', k===i);
+    el.classList.toggle('leaving', k===prev && k!==i);
+  });
+  deck.scrollTop = 0;
+  const s = SLIDES[i];
+  applyAccent(s.sec);
+  secTag.textContent = SECTIONS[s.sec].tag;
+  nowLabel.textContent = SECTIONS[s.sec].label;
+  sectionOf.textContent = (s.title || 'Capa');
+  barFill.style.width = ((i)/(total-1))*100 + '%';
+  curEl.textContent = String(i+1).padStart(2,'0');
+  idxItems.forEach((it,k)=>it.classList.toggle('current', k===i));
+  document.getElementById('prevBtn').disabled = i===0;
+  document.getElementById('nextBtn').disabled = i===total-1;
+  slideEls[i].querySelector('.slide')?.focus?.();
+}
+const next = ()=>go(cur+1);
+const prev = ()=>go(cur-1);
+
+document.getElementById('nextBtn').addEventListener('click', next);
+document.getElementById('prevBtn').addEventListener('click', prev);
+
+/* Índice open/close */
+const indexEl = document.getElementById('index');
+const openIndex = ()=>{ indexEl.classList.add('open'); };
+const closeIndex = ()=>{ indexEl.classList.remove('open'); };
+document.getElementById('indexBtn').addEventListener('click', ()=> indexEl.classList.contains('open') ? closeIndex() : openIndex());
+indexEl.addEventListener('click', e=>{ if(e.target===indexEl) closeIndex(); });
+
+/* Tela cheia */
+document.getElementById('fsBtn').addEventListener('click', ()=>{
+  if(!document.fullscreenElement){ document.documentElement.requestFullscreen?.().catch(()=>{}); }
+  else { document.exitFullscreen?.(); }
+});
+
+/* Teclado */
+window.addEventListener('keydown', e=>{
+  if(e.key==='ArrowRight' || e.key==='PageDown' || e.key===' '){ e.preventDefault(); next(); }
+  else if(e.key==='ArrowLeft' || e.key==='PageUp'){ e.preventDefault(); prev(); }
+  else if(e.key==='Home'){ go(0); }
+  else if(e.key==='End'){ go(total-1); }
+  else if(e.key==='f' || e.key==='F'){ document.getElementById('fsBtn').click(); }
+  else if(e.key==='i' || e.key==='I'){ indexEl.classList.contains('open')?closeIndex():openIndex(); }
+  else if(e.key==='Escape'){ closeIndex(); }
+});
+
+/* Swipe (touch) */
+let tx=0, ty=0;
+deck.addEventListener('touchstart', e=>{ tx=e.touches[0].clientX; ty=e.touches[0].clientY; }, {passive:true});
+deck.addEventListener('touchend', e=>{
+  const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)){ dx<0 ? next() : prev(); }
+}, {passive:true});
+
+/* ==================================================================
+   Rede 3D — Three.js
+   ================================================================== */
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const canvas = document.getElementById('bg');
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(62, innerWidth/innerHeight, 0.1, 400);
+camera.position.z = 62;
+
+const group = new THREE.Group();
+scene.add(group);
+
+const N = 120;
+const BOUND = 52;
+const pos = new Float32Array(N*3);
+const vel = new Float32Array(N*3);
+for(let i=0;i<N;i++){
+  pos[i*3]   = (Math.random()*2-1)*BOUND;
+  pos[i*3+1] = (Math.random()*2-1)*BOUND*0.62;
+  pos[i*3+2] = (Math.random()*2-1)*24;
+  vel[i*3]   = (Math.random()*2-1)*0.05;
+  vel[i*3+1] = (Math.random()*2-1)*0.05;
+  vel[i*3+2] = (Math.random()*2-1)*0.03;
+}
+
+/* sprite circular para os nós */
+function discTexture(){
+  const c = document.createElement('canvas'); c.width=c.height=64;
+  const g = c.getContext('2d');
+  const grd = g.createRadialGradient(32,32,0,32,32,32);
+  grd.addColorStop(0,'rgba(255,255,255,1)');
+  grd.addColorStop(0.35,'rgba(255,255,255,0.85)');
+  grd.addColorStop(1,'rgba(255,255,255,0)');
+  g.fillStyle=grd; g.beginPath(); g.arc(32,32,32,0,Math.PI*2); g.fill();
+  const t = new THREE.Texture(c); t.needsUpdate=true; return t;
+}
+
+const netColor = new THREE.Color(SECTIONS.intro.color);
+const netTargetColor = new THREE.Color(SECTIONS.intro.color);
+
+const nodeGeo = new THREE.BufferGeometry();
+nodeGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+const nodeMat = new THREE.PointsMaterial({
+  size:1.7, map:discTexture(), transparent:true, depthWrite:false,
+  blending:THREE.AdditiveBlending, color:netColor.clone()
+});
+const points = new THREE.Points(nodeGeo, nodeMat);
+group.add(points);
+
+/* linhas dinâmicas */
+const MAXSEG = 900;
+const linePos = new Float32Array(MAXSEG*2*3);
+const lineGeo = new THREE.BufferGeometry();
+lineGeo.setAttribute('position', new THREE.BufferAttribute(linePos, 3).setUsage(THREE.DynamicDrawUsage));
+const lineMat = new THREE.LineBasicMaterial({ transparent:true, opacity:0.32, color:netColor.clone(), blending:THREE.AdditiveBlending });
+const lines = new THREE.LineSegments(lineGeo, lineMat);
+group.add(lines);
+
+const LINK = 15, LINK2 = LINK*LINK;
+function updateLinks(){
+  let seg = 0;
+  for(let i=0;i<N && seg<MAXSEG;i++){
+    const ix=pos[i*3], iy=pos[i*3+1], iz=pos[i*3+2];
+    for(let j=i+1;j<N && seg<MAXSEG;j++){
+      const dx=ix-pos[j*3], dy=iy-pos[j*3+1], dz=iz-pos[j*3+2];
+      const d2=dx*dx+dy*dy+dz*dz;
+      if(d2 < LINK2){
+        const o = seg*6;
+        linePos[o]=ix; linePos[o+1]=iy; linePos[o+2]=iz;
+        linePos[o+3]=pos[j*3]; linePos[o+4]=pos[j*3+1]; linePos[o+5]=pos[j*3+2];
+        seg++;
+      }
+    }
+  }
+  lineGeo.setDrawRange(0, seg*2);
+  lineGeo.attributes.position.needsUpdate = true;
+}
+
+/* interação: mouse parallax + arrasto */
+let targetRX=0, targetRY=0, curRX=0, curRY=0;
+let pointer = {x:0,y:0};
+let dragging=false, dragRX=0, dragRY=0, lastPX=0, lastPY=0;
+
+window.addEventListener('pointermove', e=>{
+  pointer.x = (e.clientX/innerWidth)*2-1;
+  pointer.y = (e.clientY/innerHeight)*2-1;
+  if(dragging){
+    dragRY += (e.clientX-lastPX)*0.005;
+    dragRX += (e.clientY-lastPY)*0.005;
+    lastPX=e.clientX; lastPY=e.clientY;
+  }
+});
+canvas.addEventListener('pointerdown', e=>{ dragging=true; lastPX=e.clientX; lastPY=e.clientY; });
+window.addEventListener('pointerup', ()=> dragging=false);
+
+let t=0;
+function animate(){
+  requestAnimationFrame(animate);
+  t += 0.003;
+
+  if(!reduce){
+    for(let i=0;i<N;i++){
+      pos[i*3]   += vel[i*3];
+      pos[i*3+1] += vel[i*3+1];
+      pos[i*3+2] += vel[i*3+2];
+      if(pos[i*3]>BOUND || pos[i*3]<-BOUND) vel[i*3]*=-1;
+      if(pos[i*3+1]>BOUND*0.62 || pos[i*3+1]<-BOUND*0.62) vel[i*3+1]*=-1;
+      if(pos[i*3+2]>24 || pos[i*3+2]<-24) vel[i*3+2]*=-1;
+    }
+    nodeGeo.attributes.position.needsUpdate = true;
+  }
+  updateLinks();
+
+  /* cor transita suavemente para o acento da seção */
+  netColor.lerp(netTargetColor, 0.04);
+  nodeMat.color.copy(netColor);
+  lineMat.color.copy(netColor);
+
+  targetRX = pointer.y*0.18 + dragRX;
+  targetRY = pointer.x*0.28 + dragRY + (reduce?0:t*0.4);
+  curRX += (targetRX-curRX)*0.05;
+  curRY += (targetRY-curRY)*0.05;
+  group.rotation.x = curRX;
+  group.rotation.y = curRY;
+
+  renderer.render(scene, camera);
+}
+
+function resize(){
+  renderer.setSize(innerWidth, innerHeight, false);
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+resize();
+animate();
+
+/* start */
+go(0);
+</script>
