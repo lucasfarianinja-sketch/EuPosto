@@ -1,0 +1,485 @@
+<title>PULSO Festival</title>
+<meta name="description" content="PULSO — festival de música eletrónica. Três noites, três palcos, à beira-rio em Lisboa." />
+<style>
+  /* ── Site do festival PULSO: neon sobre preto aplicado como produto real.
+       Hero imersivo, line-up por dia, horário, bilhetes com total, galeria, FAQ. ── */
+  :root{
+    --black:#050507; --panel:#0e0b16; --panel-2:#140d1f; --panel-3:#1a1226;
+    --magenta:#ff2d78; --cyan:#22e6ff; --lime:#c6ff3d;
+    --uv:#7b2cff; --orange:#ff7a1a; --blood:#ff3b3b;
+    --white:#f4f2fb; --ash:#b7b2c8; --dim:#746f85; --line:#ffffff17;
+    --display:'Anton','Arial Narrow',system-ui,sans-serif;
+    --body:'Sora',system-ui,-apple-system,sans-serif;
+    --mono:'Space Mono',ui-monospace,monospace;
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  html,body{margin:0}
+  body{
+    background:
+      radial-gradient(900px 520px at 85% -6%,rgba(255,45,120,.2),transparent 58%),
+      radial-gradient(760px 520px at 6% 10%,rgba(34,230,255,.13),transparent 55%),
+      radial-gradient(800px 700px at 50% 120%,rgba(123,44,255,.18),transparent 60%),
+      var(--black);
+    color:var(--white);font-family:var(--body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding-inline:20px}
+  a{color:var(--cyan);text-decoration:none}
+  h1,h2,h3{text-wrap:balance}
+  .kicker{font-family:var(--mono);font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:var(--cyan)}
+
+  /* ── Botões ── */
+  .btn{display:inline-flex;align-items:center;gap:9px;font-family:var(--body);font-weight:700;font-size:.92rem;
+    padding:13px 24px;border-radius:999px;border:1px solid transparent;cursor:pointer;transition:.2s;text-decoration:none}
+  .btn-primary{background:var(--magenta);color:#fff;box-shadow:0 0 26px rgba(255,45,120,.45)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 38px rgba(255,45,120,.7)}
+  .btn-ghost{background:#ffffff0a;color:var(--white);border-color:var(--line)}
+  .btn-ghost:hover{border-color:var(--cyan);color:var(--cyan)}
+
+  /* ── Nav ── */
+  .topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:60;
+    backdrop-filter:blur(14px);background:rgba(5,5,7,.8);border-bottom:1px solid var(--line)}
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
+  .logo{font-family:var(--display);font-size:1.5rem;letter-spacing:2px;text-transform:uppercase;color:var(--white)}
+  .logo b{color:var(--magenta);font-weight:400}
+  .nav-links{display:flex;gap:4px;align-items:center}
+  .nav-links a{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ash);padding:8px 12px;border-radius:7px;transition:.18s}
+  .nav-links a:hover{color:var(--white);background:#ffffff0d}
+  .nav-links .btn{margin-left:8px;padding:9px 18px}
+  .burger{display:none;background:none;border:1px solid var(--line);border-radius:9px;width:42px;height:38px;cursor:pointer;flex-direction:column;gap:4px;align-items:center;justify-content:center}
+  .burger span{width:18px;height:2px;background:var(--white);transition:.2s}
+  @media(max-width:860px){
+    .nav-links{position:absolute;top:62px;left:0;right:0;flex-direction:column;align-items:stretch;gap:2px;
+      background:rgba(10,8,18,.98);border-bottom:1px solid var(--line);padding:12px 20px 18px;display:none}
+    .nav-links.open{display:flex}
+    .nav-links a{padding:12px}.nav-links .btn{margin:6px 0 0;justify-content:center}
+    .burger{display:flex}
+  }
+
+  /* ── Hero ── */
+  .hero{position:relative;overflow:hidden;padding-top:46px;padding-bottom:54px}
+  .beams{position:absolute;inset:0;z-index:0;opacity:.55;pointer-events:none}
+  .hero .wrap{position:relative;z-index:1}
+  .hero-dates{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+  .hero-dates .pill{font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;
+    border:1px solid var(--line);border-radius:999px;padding:7px 14px;color:var(--ash)}
+  .hero-dates .pill b{color:var(--lime);font-weight:700}
+  h1.big{font-family:var(--display);font-weight:400;text-transform:uppercase;line-height:.82;letter-spacing:1px;
+    font-size:clamp(4rem,19vw,12rem);margin:0}
+  h1.big span{display:block;color:transparent;background:linear-gradient(100deg,var(--magenta),var(--uv) 48%,var(--cyan));
+    -webkit-background-clip:text;background-clip:text}
+  .hero-sub{font-family:var(--display);text-transform:uppercase;letter-spacing:2px;font-size:clamp(1.2rem,4vw,2.1rem);margin:.2em 0 .1em;color:var(--white)}
+  .hero-lede{color:var(--ash);max-width:48ch;font-size:1.05rem;margin:0 0 26px}
+  .hero-cta{display:flex;gap:12px;flex-wrap:wrap}
+
+  /* ── Countdown ── */
+  .countdown{display:flex;gap:10px;margin-top:34px;flex-wrap:wrap}
+  .cd-unit{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 10px;min-width:82px;text-align:center}
+  .cd-unit .n{font-family:var(--display);font-size:2.6rem;line-height:1;letter-spacing:1px;font-variant-numeric:tabular-nums;color:var(--white)}
+  .cd-unit .l{font-family:var(--mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-top:7px}
+  @media(max-width:460px){.cd-unit{flex:1;min-width:0}.cd-unit .n{font-size:2rem}}
+
+  /* ── Section base ── */
+  section{padding-block:60px;scroll-margin-top:66px}
+  .sec-top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:30px;flex-wrap:wrap}
+  .sec-top h2{font-family:var(--display);font-weight:400;text-transform:uppercase;letter-spacing:1px;
+    font-size:clamp(2rem,6vw,3.4rem);margin:.15em 0 0;line-height:.9}
+
+  /* ── Tabs (dias) ── */
+  .tabs{display:inline-flex;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:5px}
+  .tab{font-family:var(--mono);font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ash);
+    background:none;border:none;padding:9px 16px;border-radius:999px;cursor:pointer;transition:.18s}
+  .tab[aria-selected="true"]{background:var(--magenta);color:#fff}
+
+  /* ── Line-up ── */
+  .lineup-head{font-family:var(--display);text-transform:uppercase;font-size:clamp(2.4rem,9vw,5rem);line-height:.9;letter-spacing:1px;margin:0 0 6px;color:transparent;
+    background:linear-gradient(100deg,var(--cyan),var(--magenta));-webkit-background-clip:text;background-clip:text}
+  .lineup-headmeta{font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:22px}
+  .acts{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+  .act{position:relative;border:1px solid var(--line);border-radius:14px;overflow:hidden;min-height:132px;
+    display:flex;flex-direction:column;justify-content:flex-end;padding:16px;transition:transform .2s}
+  .act:hover{transform:translateY(-4px)}
+  .act .glow{position:absolute;inset:0;z-index:0;opacity:.9}
+  .act .nm{position:relative;z-index:1;font-family:var(--display);text-transform:uppercase;letter-spacing:.5px;font-size:1.5rem;line-height:.95}
+  .act .tag{position:relative;z-index:1;font-family:var(--mono);font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:#ffffffcc;margin-top:6px}
+  .act.big{grid-column:span 2;min-height:168px}
+  @media(max-width:520px){.act.big{grid-column:span 1}}
+
+  /* ── Palcos ── */
+  .stages{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:760px){.stages{grid-template-columns:1fr}}
+  .stage{border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:24px;position:relative;overflow:hidden}
+  .stage .sv{height:64px;margin:-24px -24px 18px;display:block}
+  .stage h3{font-family:var(--display);text-transform:uppercase;letter-spacing:.5px;font-size:1.5rem;margin:0 0 8px}
+  .stage p{color:var(--ash);font-size:.92rem;margin:0}
+  .stage .cap{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--lime);margin-top:14px;display:block}
+
+  /* ── Horário ── */
+  .schedule{border:1px solid var(--line);border-radius:16px;background:var(--panel);overflow:hidden}
+  .slot{display:grid;grid-template-columns:96px 1fr auto;gap:14px;align-items:center;padding:15px 20px;border-top:1px solid var(--line)}
+  .slot:first-child{border-top:none}
+  .slot .time{font-family:var(--mono);font-size:.84rem;color:var(--cyan);letter-spacing:.03em;font-variant-numeric:tabular-nums}
+  .slot .who{font-family:var(--display);text-transform:uppercase;letter-spacing:.5px;font-size:1.15rem}
+  .slot .stg{font-family:var(--mono);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--ash);white-space:nowrap}
+  @media(max-width:560px){.slot{grid-template-columns:70px 1fr;gap:8px}.slot .stg{grid-column:2;justify-self:start}}
+
+  /* ── Bilhetes ── */
+  .tickets{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:860px){.tickets{grid-template-columns:1fr}}
+  .tk{border:1px solid var(--line);border-radius:18px;background:var(--panel);padding:26px;display:flex;flex-direction:column;gap:14px;position:relative}
+  .tk.feat{border-color:var(--magenta);box-shadow:0 0 36px rgba(255,45,120,.22)}
+  .tk .badge{position:absolute;top:-11px;left:24px;background:var(--magenta);color:#fff;font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;padding:4px 11px;border-radius:999px}
+  .tk h3{font-family:var(--display);text-transform:uppercase;letter-spacing:.5px;font-size:1.6rem;margin:0}
+  .tk .price{font-family:var(--display);font-size:2.6rem;letter-spacing:1px;line-height:1;color:var(--lime)}
+  .tk .price small{font-family:var(--mono);font-size:.8rem;color:var(--dim);letter-spacing:.06em}
+  .tk ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+  .tk li{font-size:.9rem;color:var(--ash);display:flex;gap:9px;align-items:flex-start}
+  .tk li::before{content:"✦";color:var(--cyan);flex:none}
+  .stepper{display:flex;align-items:center;gap:0;margin-top:auto;border:1px solid var(--line);border-radius:999px;overflow:hidden;align-self:flex-start}
+  .stepper button{background:#ffffff0a;border:none;color:var(--white);width:40px;height:40px;font-size:1.3rem;cursor:pointer;transition:.15s}
+  .stepper button:hover{background:var(--magenta);color:#fff}
+  .stepper .q{min-width:44px;text-align:center;font-family:var(--mono);font-variant-numeric:tabular-nums}
+  .cart{position:sticky;bottom:0;margin-top:22px;background:linear-gradient(0deg,var(--panel-2),var(--panel));
+    border:1px solid var(--line);border-radius:16px;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .cart .sum{font-family:var(--mono);font-size:.82rem;color:var(--ash);letter-spacing:.04em}
+  .cart .tot{font-family:var(--display);font-size:2rem;letter-spacing:1px;color:var(--white)}
+  .cart .tot span{color:var(--lime)}
+
+  /* ── Galeria ── */
+  .gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;grid-auto-rows:150px}
+  @media(max-width:860px){.gallery{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:460px){.gallery{grid-template-columns:1fr}}
+  .gtile{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);display:flex;align-items:flex-end;padding:12px;transition:transform .2s}
+  .gtile:hover{transform:translateY(-4px)}
+  .gtile.wide{grid-column:span 2}.gtile.tall{grid-row:span 2}
+  @media(max-width:460px){.gtile.wide{grid-column:span 1}}
+  .gtile svg{position:absolute;inset:0;width:100%;height:100%}
+  .gtile .cap{position:relative;z-index:2;font-family:var(--mono);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:#00000055;padding:3px 8px;border-radius:6px}
+
+  /* ── FAQ ── */
+  .faq{border:1px solid var(--line);border-radius:16px;background:var(--panel);overflow:hidden}
+  .faq details{border-top:1px solid var(--line)}
+  .faq details:first-child{border-top:none}
+  .faq summary{list-style:none;cursor:pointer;padding:18px 22px;display:flex;justify-content:space-between;align-items:center;gap:14px;
+    font-family:var(--display);text-transform:uppercase;letter-spacing:.5px;font-size:1.1rem}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::after{content:"+";font-family:var(--mono);color:var(--cyan);font-size:1.4rem;transition:.2s;flex:none}
+  .faq details[open] summary::after{transform:rotate(45deg)}
+  .faq .ans{padding:0 22px 20px;color:var(--ash);font-size:.94rem;max-width:72ch}
+
+  /* ── Newsletter / footer ── */
+  .news{border:1px solid var(--line);border-radius:18px;background:var(--panel-2);padding:30px;display:flex;gap:22px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+  .news h3{font-family:var(--display);text-transform:uppercase;letter-spacing:.5px;font-size:1.6rem;margin:0 0 6px}
+  .news p{color:var(--ash);margin:0;font-size:.92rem}
+  .news form{display:flex;gap:10px;flex-wrap:wrap}
+  .news input{background:var(--black);border:1px solid var(--line);border-radius:999px;padding:13px 18px;color:var(--white);font-family:var(--body);min-width:220px}
+  .news input:focus-visible{outline:2px solid var(--cyan);outline-offset:1px}
+  footer{border-top:1px solid var(--line);padding-block:30px;margin-top:40px}
+  footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+  footer small{color:var(--dim);font-family:var(--mono);font-size:.72rem;letter-spacing:.06em}
+  .f-social{display:flex;gap:10px}
+  .f-social a{width:38px;height:38px;border:1px solid var(--line);border-radius:10px;display:flex;align-items:center;justify-content:center;transition:.2s}
+  .f-social a:hover{border-color:var(--magenta)}
+  .f-social svg{width:18px;height:18px;stroke:var(--ash);fill:none;stroke-width:1.7}
+
+  /* ── Toast ── */
+  #toast{position:fixed;left:50%;bottom:26px;translate:-50% 20px;z-index:90;max-width:90vw;
+    background:var(--magenta);color:#fff;font-family:var(--mono);font-size:.8rem;letter-spacing:.03em;
+    padding:12px 20px;border-radius:12px;box-shadow:0 10px 30px rgba(255,45,120,.55);opacity:0;pointer-events:none;transition:.25s;text-align:center}
+  #toast.show{opacity:1;translate:-50% 0}
+  :focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+  @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Sora:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+<div class="topbar">
+  <div class="wrap">
+    <a href="#top" class="logo"><b>◆</b> PULSO</a>
+    <nav class="nav-links" id="nav">
+      <a href="#lineup">Line-up</a>
+      <a href="#palcos">Palcos</a>
+      <a href="#horario">Horário</a>
+      <a href="#galeria">Galeria</a>
+      <a href="#info">Info</a>
+      <a href="#bilhetes" class="btn btn-primary">Bilhetes</a>
+    </nav>
+    <button class="burger" id="burger" aria-label="Abrir menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</div>
+
+<header class="hero" id="top">
+  <svg class="beams" viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="beamA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#ff2d78" stop-opacity=".32"/></linearGradient>
+      <linearGradient id="beamB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#22e6ff" stop-opacity=".28"/></linearGradient>
+      <linearGradient id="beamC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#7b2cff" stop-opacity=".3"/></linearGradient>
+    </defs>
+    <polygon points="500,-60 300,600 440,600" fill="url(#beamB)"/>
+    <polygon points="500,-60 560,600 700,600" fill="url(#beamA)"/>
+    <polygon points="500,-60 130,600 250,600" fill="url(#beamC)"/>
+    <polygon points="500,-60 760,600 900,600" fill="url(#beamB)" opacity=".7"/>
+  </svg>
+  <div class="wrap">
+    <div class="hero-dates">
+      <span class="pill"><b>27–29</b> NOV 2026</span>
+      <span class="pill">Doca Norte · Lisboa</span>
+      <span class="pill">3 palcos · do pôr ao sol</span>
+    </div>
+    <h1 class="big">PUL<span>SO</span></h1>
+    <p class="hero-sub">Três noites. Uma frequência.</p>
+    <p class="hero-lede">Techno, house e eletrónica ao vivo à beira-rio. Quando as luzes caem, a multidão torna-se uma só.</p>
+    <div class="hero-cta">
+      <a href="#bilhetes" class="btn btn-primary">Garantir bilhete →</a>
+      <a href="#lineup" class="btn btn-ghost">Ver line-up</a>
+    </div>
+    <div class="countdown" id="countdown" aria-label="Contagem decrescente para o festival">
+      <div class="cd-unit"><div class="n" id="cd-d">00</div><div class="l">Dias</div></div>
+      <div class="cd-unit"><div class="n" id="cd-h">00</div><div class="l">Horas</div></div>
+      <div class="cd-unit"><div class="n" id="cd-m">00</div><div class="l">Min</div></div>
+      <div class="cd-unit"><div class="n" id="cd-s">00</div><div class="l">Seg</div></div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- LINE-UP -->
+  <section id="lineup" class="wrap">
+    <div class="sec-top">
+      <div><span class="kicker">Cartaz 2026</span><h2>Line-up</h2></div>
+      <div class="tabs" role="tablist" aria-label="Dias do festival">
+        <button class="tab" role="tab" data-day="0" aria-selected="true">Sex 27</button>
+        <button class="tab" role="tab" data-day="1" aria-selected="false">Sáb 28</button>
+        <button class="tab" role="tab" data-day="2" aria-selected="false">Dom 29</button>
+      </div>
+    </div>
+    <div id="lineup-head"></div>
+    <div class="acts" id="acts"></div>
+  </section>
+
+  <!-- PALCOS -->
+  <section id="palcos" class="wrap">
+    <div class="sec-top"><div><span class="kicker">Três mundos</span><h2>Palcos</h2></div></div>
+    <div class="stages">
+      <div class="stage">
+        <svg class="sv" viewBox="0 0 400 64" preserveAspectRatio="none" aria-hidden="true"><rect width="400" height="64" fill="#ff2d78"/><circle cx="330" cy="20" r="40" fill="#ffffff22"/></svg>
+        <h3>Palco Principal</h3>
+        <p>O coração do festival, a céu aberto. Headliners e sistemas de som que se sentem no peito.</p>
+        <span class="cap">Capacidade 12 000</span>
+      </div>
+      <div class="stage">
+        <svg class="sv" viewBox="0 0 400 64" preserveAspectRatio="none" aria-hidden="true"><rect width="400" height="64" fill="#22e6ff"/><path d="M0 64 Q200 -10 400 64Z" fill="#ffffff22"/></svg>
+        <h3>Cúpula</h3>
+        <p>Domo imersivo com mapping 360° e house melódico. Luz e som envolvem-te por completo.</p>
+        <span class="cap">Experiência VIP</span>
+      </div>
+      <div class="stage">
+        <svg class="sv" viewBox="0 0 400 64" preserveAspectRatio="none" aria-hidden="true"><rect width="400" height="64" fill="#7b2cff"/><rect x="0" y="40" width="400" height="24" fill="#00000055"/></svg>
+        <h3>Subsolo</h3>
+        <p>O lado underground: techno cru, luz estroboscópica e sets até o sol nascer.</p>
+        <span class="cap">18+ · só noite</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- HORARIO -->
+  <section id="horario" class="wrap">
+    <div class="sec-top">
+      <div><span class="kicker">Planeia a tua noite</span><h2>Horário</h2></div>
+      <div class="tabs" role="tablist" aria-label="Dias do horário">
+        <button class="tab" role="tab" data-sday="0" aria-selected="true">Sex 27</button>
+        <button class="tab" role="tab" data-sday="1" aria-selected="false">Sáb 28</button>
+        <button class="tab" role="tab" data-sday="2" aria-selected="false">Dom 29</button>
+      </div>
+    </div>
+    <div class="schedule" id="schedule"></div>
+  </section>
+
+  <!-- BILHETES -->
+  <section id="bilhetes" class="wrap">
+    <div class="sec-top"><div><span class="kicker">Entradas limitadas</span><h2>Bilhetes</h2></div></div>
+    <div class="tickets">
+      <div class="tk" data-price="45" data-name="Bilhete Diário">
+        <h3>Diário</h3>
+        <div class="price">€45 <small>/ noite</small></div>
+        <ul><li>Acesso a 1 noite à escolha</li><li>Palco Principal + Subsolo</li><li>Reentrada no mesmo dia</li></ul>
+        <div class="stepper"><button type="button" data-step="-1" aria-label="Menos">−</button><span class="q">0</span><button type="button" data-step="1" aria-label="Mais">+</button></div>
+      </div>
+      <div class="tk feat" data-price="110" data-name="Passe 3 Noites">
+        <span class="badge">Mais popular</span>
+        <h3>Passe 3 Noites</h3>
+        <div class="price">€110 <small>/ passe</small></div>
+        <ul><li>As três noites completas</li><li>Todos os palcos incl. Cúpula</li><li>Fila rápida na entrada</li><li>Poupas €25 vs. diário</li></ul>
+        <div class="stepper"><button type="button" data-step="-1" aria-label="Menos">−</button><span class="q">0</span><button type="button" data-step="1" aria-label="Mais">+</button></div>
+      </div>
+      <div class="tk" data-price="180" data-name="VIP Cúpula">
+        <h3>VIP Cúpula</h3>
+        <div class="price">€180 <small>/ passe</small></div>
+        <ul><li>Tudo do Passe 3 Noites</li><li>Acesso a lounge e bar privado</li><li>Zona elevada na Cúpula</li><li>Welcome drink + merch</li></ul>
+        <div class="stepper"><button type="button" data-step="-1" aria-label="Menos">−</button><span class="q">0</span><button type="button" data-step="1" aria-label="Mais">+</button></div>
+      </div>
+    </div>
+    <div class="cart">
+      <div class="sum" id="cart-sum">Nenhum bilhete selecionado</div>
+      <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+        <div class="tot">Total <span id="cart-total">€0</span></div>
+        <button class="btn btn-primary" id="checkout">Finalizar compra →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALERIA -->
+  <section id="galeria" class="wrap">
+    <div class="sec-top"><div><span class="kicker">Edições anteriores</span><h2>Galeria</h2></div></div>
+    <div class="gallery" id="gallery"></div>
+  </section>
+
+  <!-- INFO / FAQ -->
+  <section id="info" class="wrap">
+    <div class="sec-top"><div><span class="kicker">Antes de vires</span><h2>Info & FAQ</h2></div></div>
+    <div class="faq">
+      <details open><summary>Como chego ao recinto?</summary><div class="ans">A Doca Norte fica a 10 min do centro. Comboio até Alcântara-Mar, shuttle gratuito do festival a cada 15 min, ou bicicleta com parque vigiado. Sem estacionamento no recinto.</div></details>
+      <details><summary>Qual a idade mínima?</summary><div class="ans">O recinto é 16+ com adulto responsável durante o dia. O palco Subsolo é estritamente 18+ e exige documento de identificação à entrada.</div></details>
+      <details><summary>Posso levar câmara?</summary><div class="ans">Câmaras compactas e telemóveis são bem-vindos. Equipamento profissional (lentes destacáveis, tripés, drones) só com acreditação de imprensa.</div></details>
+      <details><summary>Há reembolso?</summary><div class="ans">Bilhetes são reembolsáveis até 30 dias antes do evento. Em caso de cancelamento do festival, o reembolso é integral e automático.</div></details>
+      <details><summary>O que posso comer e beber?</summary><div class="ans">Mais de 20 food trucks abertos toda a madrugada, com opções vegetarianas e vegan. Pagamento cashless por pulseira recarregável.</div></details>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="news">
+      <div>
+        <h3>Fica na frequência</h3>
+        <p>Recebe o anúncio do cartaz completo e o pré-venda antes de todos.</p>
+      </div>
+      <form id="news-form">
+        <input type="email" id="news-email" placeholder="o-teu@email.com" required aria-label="O teu email" />
+        <button class="btn btn-primary" type="submit">Subscrever</button>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a href="#top" class="logo"><b>◆</b> PULSO</a>
+    <div class="f-social">
+      <a href="#galeria" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+      <a href="#galeria" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M15 4v9a4 4 0 11-4-4"/><path d="M15 4a5 5 0 005 5"/></svg></a>
+      <a href="#galeria" aria-label="SoundCloud"><svg viewBox="0 0 24 24"><path d="M4 16v-4M8 16v-7M12 16v-9M16 16v-6"/><path d="M19 16a3 3 0 000-6"/></svg></a>
+    </div>
+    <small>PULSO Festival · Doca Norte, Lisboa · 2026 · evento fictício para demonstração</small>
+  </div>
+</footer>
+
+<div id="toast"></div>
+
+<script>
+  /* ── Menu mobile ── */
+  const burger=document.getElementById('burger'),nav=document.getElementById('nav');
+  burger.addEventListener('click',()=>{const o=nav.classList.toggle('open');burger.setAttribute('aria-expanded',o);});
+  nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{nav.classList.remove('open');burger.setAttribute('aria-expanded','false');}));
+
+  /* ── Countdown ── */
+  const target=new Date('2026-11-27T20:00:00').getTime();
+  const pad=n=>String(n).padStart(2,'0');
+  function tick(){
+    const diff=Math.max(0,target-Date.now());
+    const d=Math.floor(diff/864e5),h=Math.floor(diff%864e5/36e5),m=Math.floor(diff%36e5/6e4),s=Math.floor(diff%6e4/1e3);
+    cd_d.textContent=pad(d);cd_h.textContent=pad(h);cd_m.textContent=pad(m);cd_s.textContent=pad(s);
+  }
+  const cd_d=document.getElementById('cd-d'),cd_h=document.getElementById('cd-h'),cd_m=document.getElementById('cd-m'),cd_s=document.getElementById('cd-s');
+  tick();setInterval(tick,1000);
+
+  /* ── Dados de line-up ── */
+  const GRAD=['linear-gradient(135deg,#7b2cff,#ff2d78)','linear-gradient(135deg,#22e6ff,#7b2cff)','linear-gradient(135deg,#ff2d78,#ff7a1a)','linear-gradient(135deg,#c6ff3d,#22e6ff)','linear-gradient(135deg,#ff7a1a,#ff2d78)','linear-gradient(135deg,#7b2cff,#22e6ff)'];
+  const days=[
+    {head:'NOVADROM',headtag:'Headliner · Palco Principal',acts:[['Lua Preta','Live · house melódico'],['Hélice','Techno'],['Sistema 7','Eletrónica ao vivo'],['Marés','Downtempo'],['Códex','Techno']]},
+    {head:'KÍRON',headtag:'Headliner · Palco Principal',acts:[['Veludo','Deep house'],['Obscura','Techno industrial'],['Pulsar 9','Trance'],['Ninho','Breakbeat'],['Fôlego','Ambient live']]},
+    {head:'MÁQUINA LENTA',headtag:'Headliner · Cúpula',acts:[['Aurora B','Progressive'],['Transe','Acid techno'],['Gêiser','Live']  ,['Vértice','Minimal'],['Eco','Dub techno']]},
+  ];
+  const lineupHead=document.getElementById('lineup-head'),actsEl=document.getElementById('acts');
+  function renderLineup(di){
+    const day=days[di];
+    lineupHead.innerHTML=`<div class="lineup-head">${day.head}</div><div class="lineup-headmeta">${day.headtag}</div>`;
+    actsEl.innerHTML=day.acts.map((a,i)=>
+      `<div class="act ${i===0?'big':''}"><div class="glow" style="background:${GRAD[i%GRAD.length]}"></div><div class="nm">${a[0]}</div><div class="tag">${a[1]}</div></div>`
+    ).join('');
+  }
+  renderLineup(0);
+  document.querySelectorAll('.tab[data-day]').forEach(t=>t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab[data-day]').forEach(x=>x.setAttribute('aria-selected','false'));
+    t.setAttribute('aria-selected','true');renderLineup(+t.dataset.day);
+  }));
+
+  /* ── Horário ── */
+  const stages=['Palco Principal','Cúpula','Subsolo'];
+  const sched=[
+    [['20:00','Códex',2],['21:00','Marés',1],['22:15','Sistema 7',0],['23:30','Hélice',2],['00:45','Lua Preta',1],['02:00','NOVADROM',0]],
+    [['20:00','Fôlego',1],['21:00','Ninho',2],['22:15','Pulsar 9',1],['23:30','Obscura',2],['00:45','Veludo',0],['02:00','KÍRON',0]],
+    [['19:30','Eco',1],['20:30','Vértice',2],['21:45','Gêiser',1],['23:00','Transe',2],['00:15','Aurora B',1],['01:30','MÁQUINA LENTA',1]],
+  ];
+  const schedEl=document.getElementById('schedule');
+  const stgColor=['var(--magenta)','var(--cyan)','var(--uv)'];
+  function renderSched(di){
+    schedEl.innerHTML=sched[di].map(s=>
+      `<div class="slot"><span class="time">${s[0]}</span><span class="who">${s[1]}</span><span class="stg" style="border-color:${stgColor[s[2]]};color:${stgColor[s[2]]}">${stages[s[2]]}</span></div>`
+    ).join('');
+  }
+  renderSched(0);
+  document.querySelectorAll('.tab[data-sday]').forEach(t=>t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab[data-sday]').forEach(x=>x.setAttribute('aria-selected','false'));
+    t.setAttribute('aria-selected','true');renderSched(+t.dataset.sday);
+  }));
+
+  /* ── Bilhetes / carrinho ── */
+  function fmt(n){return '€'+n.toLocaleString('pt-PT');}
+  function updateCart(){
+    let total=0,count=0,parts=[];
+    document.querySelectorAll('.tk').forEach(tk=>{
+      const q=+tk.querySelector('.q').textContent, price=+tk.dataset.price;
+      if(q>0){total+=q*price;count+=q;parts.push(`${q}× ${tk.dataset.name}`);}
+    });
+    document.getElementById('cart-total').textContent=fmt(total);
+    document.getElementById('cart-sum').textContent=count? parts.join('  ·  ') : 'Nenhum bilhete selecionado';
+  }
+  document.querySelectorAll('.stepper').forEach(st=>{
+    const q=st.querySelector('.q');
+    st.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+      let v=+q.textContent + (+b.dataset.step);
+      v=Math.max(0,Math.min(10,v));q.textContent=v;updateCart();
+    }));
+  });
+  document.getElementById('checkout').addEventListener('click',()=>{
+    const tot=document.getElementById('cart-total').textContent;
+    if(tot==='€0'){flash('Seleciona pelo menos um bilhete ✦');return;}
+    flash('Demo — reserva de '+tot+' registada ✦');
+  });
+
+  /* ── Galeria (tiles gráficos inline) ── */
+  const tiles=[
+    {cls:'wide tall',cap:'Multidão',svg:`<defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7b2cff"/><stop offset="1" stop-color="#050507"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g1)"/><circle cx="50%" cy="24%" r="30" fill="#fff" opacity=".85"/>${Array.from({length:20},(_,i)=>`<rect x="${5+i*4.7}%" y="${60+(i%4)*4}%" width="2.4%" height="${40-(i%4)*4}%" rx="2" fill="#0a0612"/>`).join('')}`},
+    {cls:'',cap:'Luz de palco',svg:`<defs><radialGradient id="g2"><stop offset="0" stop-color="#fff"/><stop offset=".4" stop-color="#22e6ff"/><stop offset="1" stop-color="#050507"/></radialGradient></defs><rect width="100%" height="100%" fill="url(#g2)"/>`},
+    {cls:'',cap:'Neon',svg:`<defs><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff2d78"/><stop offset=".5" stop-color="#7b2cff"/><stop offset="1" stop-color="#22e6ff"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g3)"/>`},
+    {cls:'wide',cap:'Equalizador',svg:`<rect width="100%" height="100%" fill="#0e0b16"/>${Array.from({length:18},(_,i)=>`<rect x="${4+i*5.3}%" y="${20+(i%5)*7}%" width="3%" height="${62-(i%5)*7}%" rx="3" fill="${['#ff2d78','#22e6ff','#c6ff3d','#7b2cff'][i%4]}"/>`).join('')}`},
+    {cls:'',cap:'UV',svg:`<rect width="100%" height="100%" fill="#050507"/><circle cx="35%" cy="35%" r="38" fill="#7b2cff" opacity=".8"/><circle cx="72%" cy="68%" r="30" fill="#ff2d78" opacity=".75"/>`},
+    {cls:'',cap:'Pulseira',svg:`<rect width="100%" height="100%" fill="#0a0612"/><rect x="16%" y="42%" width="68%" height="16%" rx="8" fill="none" stroke="#c6ff3d" stroke-width="3"/><rect x="44%" y="38%" width="12%" height="24%" rx="4" fill="#c6ff3d"/>`},
+    {cls:'wide',cap:'Feixes',svg:`<rect width="100%" height="100%" fill="#07060d"/><defs><linearGradient id="g7" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22e6ff" stop-opacity="0"/><stop offset="1" stop-color="#22e6ff" stop-opacity=".6"/></linearGradient></defs><polygon points="100,0 60,200 140,200" fill="url(#g7)"/><polygon points="100,0 160,200 220,200" fill="url(#g7)" opacity=".6"/>`},
+  ];
+  document.getElementById('gallery').innerHTML=tiles.map(t=>
+    `<div class="gtile ${t.cls}"><svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${t.svg}</svg><span class="cap">${t.cap}</span></div>`
+  ).join('');
+
+  /* ── Newsletter ── */
+  document.getElementById('news-form').addEventListener('submit',e=>{
+    e.preventDefault();
+    const em=document.getElementById('news-email').value.trim();
+    if(em){flash('Subscrição confirmada ✦ (demo)');e.target.reset();}
+  });
+
+  /* ── Toast ── */
+  const toast=document.getElementById('toast');let tTimer;
+  function flash(m){toast.textContent=m;toast.classList.add('show');clearTimeout(tTimer);tTimer=setTimeout(()=>toast.classList.remove('show'),1800);}
+</script>
