@@ -121,6 +121,29 @@
       text-align: center;
       overflow: hidden;
     }
+    /* Yellow grid backdrop — fades out towards the edges */
+    .hero::before {
+      content: '';
+      position: absolute; inset: -1px;
+      background-image:
+        linear-gradient(rgba(250,204,21,.13) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(250,204,21,.13) 1px, transparent 1px);
+      background-size: 62px 62px;
+      -webkit-mask-image: radial-gradient(ellipse 85% 70% at 50% 42%, #000 35%, transparent 78%);
+      mask-image: radial-gradient(ellipse 85% 70% at 50% 42%, #000 35%, transparent 78%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    /* Warm glow sitting under the headline */
+    .hero::after {
+      content: '';
+      position: absolute; top: 12%; left: 50%;
+      width: 760px; height: 420px;
+      transform: translateX(-50%);
+      background: radial-gradient(ellipse at center, rgba(250,204,21,.07), transparent 68%);
+      pointer-events: none;
+      z-index: 0;
+    }
     /* Floating platform icons behind hero */
     .hero-float {
       position: absolute; inset: 0;
