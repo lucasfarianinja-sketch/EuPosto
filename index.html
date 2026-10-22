@@ -158,9 +158,11 @@
       will-change: transform;
     }
     .hero-float i svg { width: 60%; height: 60%; }
+    /* --px/--py are driven by the pointer (see parallax script); the keyframe
+       adds the idle bob on top so both motions combine. */
     @keyframes floatY {
-      0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); }
-      50%      { transform: translateY(-16px) rotate(var(--rot, 0deg)); }
+      0%, 100% { transform: translate(var(--px, 0px), var(--py, 0px)) rotate(var(--rot, 0deg)); }
+      50%      { transform: translate(var(--px, 0px), calc(var(--py, 0px) - 16px)) rotate(var(--rot, 0deg)); }
     }
     .hero-inner { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; }
 
@@ -1234,6 +1236,65 @@
   function toggleFaq(el) {
     el.closest('.faq-item').classList.toggle('open');
   }
+
+  // Hero icons shy away from the cursor and drift back when it leaves.
+  (function heroIconRepel() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const hero = document.querySelector('.hero');
+    const icons = [...document.querySelectorAll('.hero-float i')];
+    if (!hero || !icons.length) return;
+
+    const RADIUS = 170;   // how close the cursor must get, in px
+    const PUSH   = 52;    // how far an icon runs at most, in px
+    const EASE   = 0.12;  // lerp factor — lower is lazier
+
+    const state = icons.map(() => ({ x: 0, y: 0, tx: 0, ty: 0 }));
+    let pointer = null, raf = null;
+
+    function retarget() {
+      icons.forEach((icon, i) => {
+        const s = state[i];
+        if (!pointer) { s.tx = 0; s.ty = 0; return; }
+        const b = icon.getBoundingClientRect();
+        // Undo the current offset so the rest point stays fixed while it moves.
+        const cx = b.left + b.width / 2 - s.x;
+        const cy = b.top + b.height / 2 - s.y;
+        const dx = cx - pointer.x, dy = cy - pointer.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist > RADIUS || dist === 0) { s.tx = 0; s.ty = 0; return; }
+        const force = (1 - dist / RADIUS) ** 2;
+        s.tx = (dx / dist) * PUSH * force;
+        s.ty = (dy / dist) * PUSH * force;
+      });
+    }
+
+    function tick() {
+      let moving = false;
+      icons.forEach((icon, i) => {
+        const s = state[i];
+        s.x += (s.tx - s.x) * EASE;
+        s.y += (s.ty - s.y) * EASE;
+        if (Math.abs(s.tx - s.x) > 0.1 || Math.abs(s.ty - s.y) > 0.1) moving = true;
+        icon.style.setProperty('--px', s.x.toFixed(2) + 'px');
+        icon.style.setProperty('--py', s.y.toFixed(2) + 'px');
+      });
+      raf = moving || pointer ? requestAnimationFrame(tick) : null;
+    }
+
+    function wake() { if (!raf) raf = requestAnimationFrame(tick); }
+
+    hero.addEventListener('pointermove', e => {
+      pointer = { x: e.clientX, y: e.clientY };
+      retarget();
+      wake();
+    }, { passive: true });
+
+    hero.addEventListener('pointerleave', () => {
+      pointer = null;
+      retarget();
+      wake();
+    }, { passive: true });
+  })();
 
   // Navbar scroll effect
   const mainNav = document.getElementById('main-nav');
