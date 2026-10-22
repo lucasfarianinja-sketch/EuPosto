@@ -8,6 +8,34 @@
   <meta name="robots" content="noindex" />
   <link rel="icon" type="image/svg+xml" href="euposto-icon.svg" />
   <meta name="theme-color" content="#0a0a0a" />
+
+  <!-- Session gate. Runs before anything paints so a signed-in visitor never
+       sees this page flash by on the way to the app. The page stays blank until
+       we know there is no valid session; without JS the noscript rule shows it. -->
+  <style id="gate-style">html.session-gate body { visibility: hidden; }</style>
+  <noscript><style>html.session-gate body { visibility: visible !important; }</style></noscript>
+  <script>
+    document.documentElement.className += ' session-gate';
+    (function () {
+      var SESSION_MS = 15 * 24 * 60 * 60 * 1000; // 15 days
+      function reveal() { document.documentElement.classList.remove('session-gate'); }
+      // Asking for the sign-up form (or an explicit sign-in) means they want
+      // this page even if a session is sitting in storage.
+      var wants = /[?&](signup|switch)\b/.test(location.search);
+      try {
+        var saved = JSON.parse(localStorage.getItem('euposto_user') || 'null');
+        if (!wants && saved && Date.now() - (saved.loginTime || 0) < SESSION_MS) {
+          // Valid session — hop straight to the app, still hidden.
+          window.location.replace('euposto.html');
+          return;
+        }
+      } catch (e) { /* unreadable storage → treat as signed out */ }
+      reveal();
+      // Safety net: never leave the page stuck blank.
+      setTimeout(reveal, 2000);
+    })();
+  </script>
+
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -339,17 +367,8 @@
     google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: onGoogleCredential, auto_select: false });
   });
 
-  // Already signed in? Go straight through.
-  (function () {
-    try {
-      const saved = JSON.parse(localStorage.getItem('euposto_user') || 'null');
-      if (saved && Date.now() - (saved.loginTime || 0) < 15 * 24 * 60 * 60 * 1000) {
-        window.location.replace('euposto.html');
-        return;
-      }
-    } catch (e) {}
-    if (location.search.includes('signup')) setMode('signup');
-  })();
+  // The session gate in <head> already sent signed-in visitors to the app.
+  if (location.search.includes('signup')) setMode('signup');
 </script>
 </body>
 </html>

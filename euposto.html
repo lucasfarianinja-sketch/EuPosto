@@ -9,6 +9,31 @@
   <title>EuPosto</title>
   <link rel="icon" type="image/svg+xml" href="/euposto-icon.svg" />
   <link rel="icon" type="image/png" href="/favicon.png" />
+
+  <!-- Session gate. Runs before anything paints: a signed-out visitor goes to
+       login.html without the app's own login screen flashing first, and a
+       signed-in one never sees it at all. Without JS the noscript rule shows
+       the page so it is never stuck blank. -->
+  <style id="gate-style">html.session-gate body { visibility: hidden; }</style>
+  <noscript><style>html.session-gate body { visibility: visible !important; }</style></noscript>
+  <script>
+    document.documentElement.className += ' session-gate';
+    (function () {
+      var SESSION_MS = 15 * 24 * 60 * 60 * 1000; // 15 days
+      function reveal() { document.documentElement.classList.remove('session-gate'); }
+      try {
+        var saved = JSON.parse(localStorage.getItem('euposto_user') || 'null');
+        if (!saved || Date.now() - (saved.loginTime || 0) >= SESSION_MS) {
+          // No usable session — go sign in, still hidden.
+          window.location.replace('login.html');
+          return;
+        }
+      } catch (e) { window.location.replace('login.html'); return; }
+      reveal();
+      // Safety net: never leave the app stuck blank.
+      setTimeout(reveal, 2000);
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet" />
