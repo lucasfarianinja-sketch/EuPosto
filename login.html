@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entrar — EuPosto</title>
+  <meta name="description" content="Entra na tua conta EuPosto para publicares vídeos no YouTube, Instagram, TikTok e Facebook de uma vez." />
+  <meta name="robots" content="noindex" />
+  <link rel="icon" type="image/svg+xml" href="euposto-icon.svg" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111113;
+      --surface2: #17171a;
+      --border: rgba(255,255,255,.1);
+      --text: #ffffff;
+      --text2: #a1a1aa;
+      --muted: #71717a;
+      --yellow: #FACC15;
+      --yellow-deep: #EAB308;
+      --accent: #2563EB;
+      --accent-light: #3B82F6;
+      --error: #f87171;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      background: var(--bg); color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    a { color: inherit; }
+
+    .shell { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+
+    /* ─────────── Left: the form ─────────── */
+    .pane-form {
+      display: flex; flex-direction: column;
+      padding: 34px 48px 32px;
+      position: relative;
+    }
+    .top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: auto; }
+    .brand { display: flex; align-items: center; gap: 9px; text-decoration: none; }
+    .brand img { width: 32px; height: 32px; border-radius: 9px; }
+    .brand span { font-size: 1.1rem; font-weight: 800; letter-spacing: -.02em; }
+    .back-home { font-size: .875rem; font-weight: 600; color: var(--text2); text-decoration: none; transition: color .18s; }
+    .back-home:hover { color: var(--text); }
+
+    .form-body { width: 100%; max-width: 400px; margin: 0 auto; padding: 48px 0; }
+    .form-body h1 { font-size: 2.6rem; font-weight: 800; letter-spacing: -.035em; margin-bottom: 10px; }
+    .form-sub { font-size: .98rem; color: var(--text2); line-height: 1.55; margin-bottom: 34px; }
+
+    .btn-social {
+      width: 100%; display: flex; align-items: center; justify-content: center; gap: 11px;
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); font-family: inherit;
+      font-size: .97rem; font-weight: 600;
+      padding: 15px 20px; border-radius: 11px;
+      cursor: pointer; margin-bottom: 12px;
+      transition: background .18s, border-color .18s, transform .18s;
+    }
+    .btn-social:hover { background: var(--surface2); border-color: rgba(255,255,255,.22); transform: translateY(-1px); }
+    .btn-social svg { width: 19px; height: 19px; flex-shrink: 0; }
+
+    .email-form { margin-top: 4px; }
+    .email-form.hidden { display: none; }
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block; font-size: .7rem; font-weight: 700;
+      letter-spacing: .09em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 7px;
+    }
+    .field input {
+      width: 100%; background: var(--surface); color: var(--text);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 13px 15px; font-size: .95rem; font-family: inherit;
+      transition: border-color .18s, box-shadow .18s;
+    }
+    .field input::placeholder { color: #52525b; }
+    .field input:focus {
+      outline: none; border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.18);
+    }
+    .err { font-size: .83rem; color: var(--error); min-height: 18px; margin-bottom: 4px; }
+    .btn-primary {
+      width: 100%; background: var(--accent); color: #fff;
+      font-family: inherit; font-size: 1rem; font-weight: 700;
+      padding: 15px 20px; border: none; border-radius: 11px;
+      cursor: pointer; transition: background .18s, transform .18s, box-shadow .18s;
+      box-shadow: 0 5px 20px rgba(37,99,235,.28);
+    }
+    .btn-primary:hover { background: var(--accent-light); transform: translateY(-1px); box-shadow: 0 8px 26px rgba(37,99,235,.4); }
+
+    .switch { font-size: .92rem; color: var(--text2); margin-top: 26px; }
+    .switch a { color: var(--yellow); font-weight: 700; text-decoration: none; }
+    .switch a:hover { text-decoration: underline; }
+
+    .legal { font-size: .78rem; color: var(--muted); line-height: 1.65; margin-top: auto; padding-top: 28px; }
+    .legal a { color: var(--text2); text-decoration: underline; }
+    .legal a:hover { color: var(--text); }
+
+    /* ─────────── Right: the visual ─────────── */
+    .pane-art {
+      position: relative; overflow: hidden;
+      border-left: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      padding: 48px;
+    }
+    .pane-art::before {
+      content: ''; position: absolute; inset: -1px;
+      background-image:
+        linear-gradient(rgba(250,204,21,.13) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(250,204,21,.13) 1px, transparent 1px);
+      background-size: 62px 62px;
+      -webkit-mask-image: radial-gradient(ellipse 80% 75% at 50% 45%, #000 30%, transparent 76%);
+      mask-image: radial-gradient(ellipse 80% 75% at 50% 45%, #000 30%, transparent 76%);
+    }
+    .pane-art::after {
+      content: ''; position: absolute; top: 20%; left: 50%;
+      width: 560px; height: 420px; transform: translateX(-50%);
+      background: radial-gradient(ellipse at center, rgba(250,204,21,.08), transparent 68%);
+    }
+    .art-float { position: absolute; inset: 0; pointer-events: none; }
+    .art-float i {
+      position: absolute; display: flex; align-items: center; justify-content: center;
+      border-radius: 12px; opacity: .55;
+      animation: bob 7s ease-in-out infinite;
+    }
+    .art-float i svg { width: 58%; height: 58%; }
+    @keyframes bob {
+      0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); }
+      50%      { transform: translateY(-15px) rotate(var(--rot, 0deg)); }
+    }
+    .art-copy { position: relative; z-index: 1; text-align: center; max-width: 360px; }
+    .art-plats { display: flex; justify-content: center; gap: 11px; margin-bottom: 28px; }
+    .art-plat {
+      width: 50px; height: 50px; border-radius: 13px;
+      background: var(--surface2); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .art-plat svg { width: 25px; height: 25px; }
+    .art-copy h2 {
+      font-size: 1.62rem; font-weight: 800; letter-spacing: -.028em;
+      line-height: 1.22; margin-bottom: 12px;
+    }
+    .art-copy h2 span { color: var(--yellow); }
+    .art-copy p { font-size: .95rem; color: var(--text2); line-height: 1.62; }
+
+    /* ─────────── Responsive ─────────── */
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: 1fr; }
+      .pane-art { display: none; }
+      .pane-form { padding: 26px 22px 28px; }
+      .form-body { padding: 36px 0; max-width: 440px; }
+      .form-body h1 { font-size: 2.1rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .art-float i { animation: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- ═══════ FORM ═══════ -->
+  <div class="pane-form">
+    <div class="top-row">
+      <a class="brand" href="/">
+        <img src="euposto-icon.svg" alt="" />
+        <span>EuPosto</span>
+      </a>
+      <a class="back-home" href="/">Voltar ao início</a>
+    </div>
+
+    <div class="form-body">
+      <h1 id="page-title">Entrar</h1>
+      <p class="form-sub" id="page-sub">Bem-vindo de volta. Entra para gerires as tuas publicações.</p>
+
+      <button class="btn-social" type="button" onclick="handleGoogle()">
+        <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continuar com a Google
+      </button>
+
+      <button class="btn-social" type="button" id="email-toggle" onclick="revealEmail()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,6 12,13 2,6"/></svg>
+        Continuar com email
+      </button>
+
+      <form class="email-form hidden" id="email-form" onsubmit="submitAuth(event)">
+        <div class="field" id="name-field" style="display:none;">
+          <label for="f-name">Nome</label>
+          <input id="f-name" type="text" placeholder="O teu nome" autocomplete="name" />
+        </div>
+        <div class="field">
+          <label for="f-email">Email</label>
+          <input id="f-email" type="email" placeholder="o_teu@email.com" autocomplete="email" />
+        </div>
+        <div class="field">
+          <label for="f-pw">Password</label>
+          <input id="f-pw" type="password" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <div class="err" id="f-error"></div>
+        <button type="submit" class="btn-primary" id="submit-btn">Entrar</button>
+      </form>
+
+      <p class="switch" id="switch-line">
+        Não tens conta? <a href="#" onclick="setMode('signup'); return false;">Criar conta grátis</a>
+      </p>
+    </div>
+
+    <p class="legal">
+      Ao continuares concordas com os nossos
+      <a href="terms.html">Termos de Serviço</a> e a
+      <a href="privacy.html">Política de Privacidade</a>.
+    </p>
+  </div>
+
+  <!-- ═══════ ART ═══════ -->
+  <div class="pane-art">
+    <div class="art-float" aria-hidden="true">
+      <i style="top:12%;left:12%;width:42px;height:42px;background:#ff0000;--rot:-9deg;animation-delay:0s">
+        <svg viewBox="0 0 24 24" fill="#fff"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.8 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>
+      </i>
+      <i style="top:24%;right:14%;width:38px;height:38px;background:linear-gradient(45deg,#f09433,#dc2743,#bc1888);--rot:10deg;animation-delay:1.4s">
+        <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+      </i>
+      <i style="bottom:22%;left:16%;width:36px;height:36px;background:#010101;border:1px solid rgba(255,255,255,.15);--rot:-7deg;animation-delay:2.6s">
+        <svg viewBox="0 0 24 24" fill="#fff"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.95a8.24 8.24 0 004.83 1.56V7.07a4.85 4.85 0 01-1.06-.38z"/></svg>
+      </i>
+      <i style="bottom:14%;right:18%;width:40px;height:40px;background:#1877f2;--rot:8deg;animation-delay:3.8s">
+        <svg viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      </i>
+    </div>
+
+    <div class="art-copy">
+      <div class="art-plats">
+        <div class="art-plat"><svg viewBox="0 0 24 24" fill="#ff0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.8 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg></div>
+        <div class="art-plat"><svg viewBox="0 0 24 24" fill="#e1306c"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg></div>
+        <div class="art-plat"><svg viewBox="0 0 24 24" fill="#fff"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.95a8.24 8.24 0 004.83 1.56V7.07a4.85 4.85 0 01-1.06-.38z"/></svg></div>
+        <div class="art-plat"><svg viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></div>
+      </div>
+      <h2>Um vídeo.<br/><span>Quatro plataformas.</span></h2>
+      <p>Carrega uma vez e publica em todo o lado — sem ferramentas pagas, sem complicações.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const ACCOUNTS_KEY = 'euposto_accounts';
+  const GOOGLE_CLIENT_ID = '601922449886-j4eh52n43r1k19oj3d44hp4u17eqq641.apps.googleusercontent.com';
+  let mode = 'login';
+
+  function getAccounts() { try { return JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || '[]'); } catch(e) { return []; } }
+
+  async function hashPassword(pw) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  function saveUserAndGo(user) {
+    user.loginTime = Date.now();
+    localStorage.setItem('euposto_user', JSON.stringify(user));
+    window.location.href = 'euposto.html';
+  }
+
+  function setMode(next) {
+    mode = next;
+    const signup = next === 'signup';
+    document.getElementById('page-title').textContent = signup ? 'Criar conta' : 'Entrar';
+    document.getElementById('page-sub').textContent = signup
+      ? 'É grátis e leva menos de um minuto.'
+      : 'Bem-vindo de volta. Entra para gerires as tuas publicações.';
+    document.getElementById('name-field').style.display = signup ? '' : 'none';
+    document.getElementById('submit-btn').textContent = signup ? 'Criar conta grátis' : 'Entrar';
+    document.getElementById('f-pw').setAttribute('autocomplete', signup ? 'new-password' : 'current-password');
+    document.getElementById('f-pw').placeholder = signup ? 'Mínimo 6 caracteres' : '••••••••';
+    document.getElementById('switch-line').innerHTML = signup
+      ? 'Já tens conta? <a href="#" onclick="setMode(\'login\'); return false;">Entrar</a>'
+      : 'Não tens conta? <a href="#" onclick="setMode(\'signup\'); return false;">Criar conta grátis</a>';
+    document.getElementById('f-error').textContent = '';
+    history.replaceState(null, '', signup ? '?signup' : location.pathname);
+    if (signup) revealEmail();
+  }
+
+  function revealEmail() {
+    document.getElementById('email-form').classList.remove('hidden');
+    document.getElementById('email-toggle').style.display = 'none';
+    document.getElementById(mode === 'signup' ? 'f-name' : 'f-email').focus();
+  }
+
+  async function submitAuth(e) {
+    e.preventDefault();
+    const err = document.getElementById('f-error');
+    const email = document.getElementById('f-email').value.trim().toLowerCase();
+    const pw = document.getElementById('f-pw').value;
+    err.textContent = '';
+
+    if (mode === 'signup') {
+      const name = document.getElementById('f-name').value.trim();
+      if (!name) return void (err.textContent = 'Introduz o teu nome.');
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return void (err.textContent = 'Email inválido.');
+      if (pw.length < 6) return void (err.textContent = 'A senha deve ter pelo menos 6 caracteres.');
+      const accounts = getAccounts();
+      if (accounts.find(a => a.email === email)) return void (err.textContent = 'Este email já está registado.');
+      accounts.push({ name, email, passwordHash: await hashPassword(pw), createdAt: Date.now() });
+      localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+      return saveUserAndGo({ name, email, avatar: '', provider: 'email' });
+    }
+
+    if (!email) return void (err.textContent = 'Introduz o teu email.');
+    if (!pw) return void (err.textContent = 'Introduz a tua senha.');
+    const accounts = getAccounts();
+    const account = accounts.find(a => a.email === email);
+    if (!account) return void (err.textContent = 'Não existe conta com este email.');
+    if (await hashPassword(pw) !== account.passwordHash) return void (err.textContent = 'Senha incorreta.');
+    saveUserAndGo({ name: account.name, email: account.email, avatar: '', provider: 'email' });
+  }
+
+  function onGoogleCredential(response) {
+    const payload = JSON.parse(atob(response.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    saveUserAndGo({ name: payload.name, email: payload.email, avatar: payload.picture, provider: 'google' });
+  }
+
+  function handleGoogle() {
+    if (!window.google) { document.getElementById('f-error').textContent = 'Google indisponível. Usa o email.'; revealEmail(); return; }
+    google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: onGoogleCredential, auto_select: false });
+    google.accounts.id.prompt(n => {
+      if (n.isNotDisplayed() || n.isSkippedMoment()) { revealEmail(); }
+    });
+  }
+
+  window.addEventListener('load', () => {
+    if (!window.google) return;
+    google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: onGoogleCredential, auto_select: false });
+  });
+
+  // Already signed in? Go straight through.
+  (function () {
+    try {
+      const saved = JSON.parse(localStorage.getItem('euposto_user') || 'null');
+      if (saved && Date.now() - (saved.loginTime || 0) < 15 * 24 * 60 * 60 * 1000) {
+        window.location.replace('euposto.html');
+        return;
+      }
+    } catch (e) {}
+    if (location.search.includes('signup')) setMode('signup');
+  })();
+</script>
+</body>
+</html>

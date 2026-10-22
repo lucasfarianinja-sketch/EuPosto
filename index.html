@@ -814,8 +814,8 @@
     <button class="lang-btn" data-lang="pt-BR" onclick="setLang('pt-BR')">🇧🇷 BR</button>
     <button class="lang-btn" data-lang="en" onclick="setLang('en')">🇬🇧 EN</button>
   </div>
-  <a class="nav-login" href="#" id="nav-login" onclick="openModal('login'); return false;">Entrar</a>
-  <a class="nav-cta" href="#" id="nav-cta" onclick="openModal('signup'); return false;">Criar conta</a>
+  <a class="nav-login" href="login.html" id="nav-login">Entrar</a>
+  <a class="nav-cta" href="login.html?signup" id="nav-cta">Criar conta</a>
 </nav>
 
 <!-- ══════════════ HERO ══════════════ -->
@@ -873,7 +873,7 @@
     </div>
 
     <div class="hero-actions">
-      <a class="btn-hero" href="euposto.html" id="btn-start">Começar grátis
+      <a class="btn-hero" href="login.html?signup" id="btn-start">Começar grátis
         <svg viewBox="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </a>
       <p class="hero-note" id="hero-p">Grátis para sempre. Sem cartão de crédito.</p>
@@ -1152,7 +1152,7 @@
   <div class="cta-inner">
     <h2 id="cta-h2">Pronto para <span>publicar mais depressa</span>?</h2>
     <p id="cta-p">Deixa-nos tratar do trabalho pesado para te concentrares em criar bom conteúdo.</p>
-    <a class="btn-cta-big" href="euposto.html" id="cta-btn">Começar grátis
+    <a class="btn-cta-big" href="login.html?signup" id="cta-btn">Começar grátis
       <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
     </a>
   </div>
@@ -1751,12 +1751,7 @@
     document.body.style.overflow = '';
   }
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModals(); });
-  document.addEventListener('click', function(e) {
-    const login = e.target.closest('#nav-login');
-    if (login) { e.preventDefault(); openModal('login'); return; }
-    const signup = e.target.closest('#nav-cta, #btn-start, #cta-btn');
-    if (signup) { e.preventDefault(); openModal('signup'); }
-  });
+  // Auth now lives on its own page (login.html) — the links navigate there directly.
   const ACCOUNTS_KEY = 'euposto_accounts';
   const GOOGLE_CLIENT_ID = '601922449886-j4eh52n43r1k19oj3d44hp4u17eqq641.apps.googleusercontent.com';
 

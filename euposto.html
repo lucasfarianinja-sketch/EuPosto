@@ -3901,7 +3901,7 @@ function loadSession() {
       const SESSION_DURATION = 15 * 24 * 60 * 60 * 1000; // 15 days in milliseconds
       if (sessionAge > SESSION_DURATION) {
         localStorage.removeItem('euposto_user');
-        window.location.replace('index.html');
+        window.location.replace('login.html');
         return;
       }
       showApp();
@@ -3911,8 +3911,8 @@ function loadSession() {
       localStorage.removeItem('euposto_user');
     }
   }
-  // No session — go back to landing page
-  window.location.replace('index.html');
+  // No session — send them to the login page
+  window.location.replace('login.html');
 }
 
 function saveSession(user) {
