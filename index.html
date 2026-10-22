@@ -25,344 +25,204 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&family=Instrument+Serif:ital@0;1&display=swap&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #060B14;
-      --surface: #0a1020;
-      --surface2: #0f1828;
+      --bg: #0a0a0a;
+      --surface: #111113;
+      --surface2: #17171a;
+      --border: rgba(255,255,255,.08);
+      --text: #ffffff;
+      --text2: #a1a1aa;
+      --muted: #71717a;
+      /* Amarelo */
+      --yellow: #FACC15;
+      --yellow-deep: #EAB308;
+      --yellow-glow: rgba(250,204,21,.14);
+      /* Azul */
       --accent: #2563EB;
-      --accent2: #38BDF8;
-      --text: #f0f0fa;
-      --text2: #8899b8;
-      --muted: #3a4a6a;
-      --border: rgba(255,255,255,.06);
-      --border2: rgba(255,255,255,.1);
-      --glow: rgba(37,99,235,.28);
-      --glow2: rgba(56,189,248,.2);
+      --accent-light: #3B82F6;
+      --accent-soft: #60A5FA;
+      --accent-glow: rgba(37,99,235,.2);
     }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     html { scroll-behavior: smooth; }
+
     body {
-      background: var(--bg); color: var(--text);
-      font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.6;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
     }
 
-    /* ── Animated background mesh ── */
-    body::before {
-      content: '';
-      position: fixed; inset: 0; z-index: 0; pointer-events: none;
-      background:
-        radial-gradient(ellipse 800px 600px at 20% 10%, rgba(37,99,235,.12) 0%, transparent 60%),
-        radial-gradient(ellipse 600px 500px at 80% 80%, rgba(56,189,248,.08) 0%, transparent 60%),
-        radial-gradient(ellipse 400px 400px at 50% 50%, rgba(37,99,235,.05) 0%, transparent 70%);
-      animation: meshMove 20s ease-in-out infinite alternate;
-    }
-    @keyframes meshMove {
-      0%   { transform: scale(1) translate(0,0); }
-      50%  { transform: scale(1.05) translate(20px, -20px); }
-      100% { transform: scale(1) translate(-10px, 10px); }
-    }
-    body > * { position: relative; z-index: 1; }
+    a { color: inherit; }
 
-    /* ── NAV ── */
-    nav {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(6,6,18,.7); backdrop-filter: blur(24px) saturate(1.4);
-      -webkit-backdrop-filter: blur(24px) saturate(1.4);
-      border-bottom: 1px solid rgba(255,255,255,.04);
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 40px; height: 64px;
-      transition: border-color .3s, background .3s;
+    .wrap { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+
+    /* ══════════════ NAV ══════════════ */
+    #main-nav {
+      position: sticky; top: 0; z-index: 900;
+      display: flex; align-items: center; gap: 28px;
+      padding: 16px 32px;
+      background: rgba(10,10,10,.72);
+      border-bottom: 1px solid transparent;
+      transition: background .25s, border-color .25s;
     }
-    nav.scrolled {
-      background: rgba(6,6,18,.92);
-      border-bottom-color: rgba(37,99,235,.15);
-      box-shadow: 0 1px 40px rgba(0,0,0,.4);
+    #main-nav.scrolled {
+      background: rgba(10,10,10,.92);
+      border-bottom-color: var(--border);
+      backdrop-filter: blur(14px);
     }
-    .nav-logo {
-      font-family: 'Space Mono', monospace; font-size: 1.1rem; font-weight: 700;
-      display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text; text-decoration: none; letter-spacing: -.5px;
+    .nav-brand {
+      display: flex; align-items: center; gap: 9px;
+      text-decoration: none; margin-right: auto;
     }
-    .nav-center { display: flex; align-items: center; gap: 36px; position: absolute; left: 50%; transform: translateX(-50%); }
-    .nav-center a { color: var(--text2); text-decoration: none; font-size: .88rem; font-weight: 500; transition: color .2s; letter-spacing: -.1px; }
-    .nav-center a:hover { color: var(--text); }
-    .nav-right { display: flex; align-items: center; gap: 14px; }
-    .lang-switcher { display: flex; gap: 2px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); border-radius: 8px; padding: 3px; }
-    .lang-btn { background: none; border: none; color: var(--text2); font-size: .73rem; font-weight: 700; padding: 4px 8px; border-radius: 5px; cursor: pointer; transition: all .2s; font-family: inherit; }
-    .lang-btn:hover { color: var(--text); background: rgba(255,255,255,.07); }
-    .lang-btn.active { background: rgba(37,99,235,.18); color: #60A5FA; }
+    .nav-brand img { width: 30px; height: 30px; border-radius: 8px; }
+    .nav-brand span {
+      font-size: 1.12rem; font-weight: 800; letter-spacing: -.02em;
+    }
+    .nav-links { display: flex; align-items: center; gap: 26px; }
+    .nav-links a {
+      font-size: .875rem; font-weight: 500; color: var(--text2);
+      text-decoration: none; transition: color .18s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-langs { display: flex; gap: 2px; }
+    .lang-btn {
+      background: none; border: none; color: var(--muted);
+      font-size: .72rem; font-weight: 700; padding: 5px 8px;
+      border-radius: 6px; cursor: pointer; transition: all .18s;
+      font-family: inherit;
+    }
+    .lang-btn:hover { color: var(--text); background: rgba(255,255,255,.06); }
+    .lang-btn.active { background: var(--yellow-glow); color: var(--yellow); }
     .nav-login {
-      color: var(--text2); text-decoration: none; padding: 8px 16px;
-      border-radius: 9px; font-size: .85rem; font-weight: 600;
-      transition: color .2s, background .2s;
+      font-size: .875rem; font-weight: 600; color: var(--text2);
+      text-decoration: none; transition: color .18s;
     }
-    .nav-login:hover { color: var(--text); background: rgba(255,255,255,.06); }
+    .nav-login:hover { color: var(--text); }
     .nav-cta {
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #fff; text-decoration: none; padding: 9px 20px;
-      border-radius: 10px; font-size: .85rem; font-weight: 700;
-      box-shadow: 0 4px 20px var(--glow);
-      transition: box-shadow .2s, transform .15s, opacity .2s;
+      background: var(--accent); color: #fff;
+      font-size: .875rem; font-weight: 700;
+      padding: 9px 20px; border-radius: 8px;
+      text-decoration: none; transition: all .2s;
+      border: none; cursor: pointer; font-family: inherit;
     }
-    .nav-cta:hover { box-shadow: 0 6px 32px var(--glow); transform: translateY(-1px); opacity: .92; }
+    .nav-cta:hover {
+      background: var(--accent-light);
+      box-shadow: 0 0 0 4px var(--accent-glow);
+    }
+    .nav-burger { display: none; background: none; border: none; color: var(--text); cursor: pointer; padding: 6px; }
 
-    /* ── HERO ── */
+    /* ══════════════ HERO ══════════════ */
     .hero {
-      max-width: 800px; margin: 0 auto; padding: 130px 24px 100px;
-      text-align: center; position: relative;
+      position: relative;
+      padding: 92px 24px 76px;
+      text-align: center;
+      overflow: hidden;
     }
-    .hero-badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: rgba(37,99,235,.08); border: 1px solid rgba(37,99,235,.2);
-      border-radius: 100px; padding: 6px 16px; font-size: .75rem; font-weight: 700;
-      color: #60A5FA; margin-bottom: 36px; letter-spacing: .5px;
-      animation: fadeUp .6s ease both;
+    /* Floating platform icons behind hero */
+    .hero-float {
+      position: absolute; inset: 0;
+      pointer-events: none; z-index: 0;
+    }
+    .hero-float i {
+      position: absolute;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 11px;
+      opacity: .5;
+      animation: floatY 7s ease-in-out infinite;
+      will-change: transform;
+    }
+    .hero-float i svg { width: 60%; height: 60%; }
+    @keyframes floatY {
+      0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); }
+      50%      { transform: translateY(-16px) rotate(var(--rot, 0deg)); }
+    }
+    .hero-inner { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; }
+
+    .hero-eyebrow {
+      font-size: .8rem; font-weight: 600;
+      letter-spacing: .2em; text-transform: uppercase;
+      color: var(--yellow-deep);
+      margin-bottom: 26px;
     }
     .hero h1 {
-      font-size: clamp(2.4rem, 5vw, 3.8rem); font-weight: 900; line-height: 1.05;
-      margin-bottom: 24px; letter-spacing: -.04em; color: var(--text);
-      animation: fadeUp .6s .1s ease both;
+      font-size: clamp(2.6rem, 7.2vw, 4.4rem);
+      font-weight: 800;
+      line-height: 1.02;
+      letter-spacing: -.035em;
+      margin-bottom: 34px;
     }
-    .hero h1 span {
-      background: linear-gradient(135deg, #60A5FA 0%, var(--accent2) 60%, #7DD3FC 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .hero h1 span { color: var(--yellow); display: block; }
+
+    /* Platform logo row */
+    .hero-plats {
+      display: flex; justify-content: center; gap: 12px;
+      margin-bottom: 26px; flex-wrap: wrap;
     }
-    .hero p {
-      font-size: 1.15rem; color: var(--text2); max-width: 52ch;
-      margin: 0 auto 44px; line-height: 1.75; font-weight: 400;
-      animation: fadeUp .6s .2s ease both;
+    .hero-plat {
+      width: 52px; height: 52px; border-radius: 13px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      transition: transform .22s, border-color .22s;
     }
-    .hero-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; animation: fadeUp .6s .3s ease both; }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
-      color: #fff; text-decoration: none; padding: 15px 36px;
-      border-radius: 14px; font-size: 1rem; font-weight: 700;
-      box-shadow: 0 8px 36px var(--glow), 0 0 0 1px rgba(37,99,235,.2);
-      transition: box-shadow .25s, transform .18s;
+    .hero-plat:hover { transform: translateY(-4px); border-color: rgba(255,255,255,.2); }
+    .hero-plat svg { width: 26px; height: 26px; }
+
+    .hero-badge {
       display: inline-flex; align-items: center; gap: 8px;
+      font-size: .875rem; font-weight: 600; color: #4ade80;
+      margin-bottom: 36px;
     }
-    .btn-primary:hover { box-shadow: 0 12px 48px var(--glow), 0 0 0 1px rgba(37,99,235,.35); transform: translateY(-2px); }
-    .btn-secondary {
-      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);
-      color: var(--text); text-decoration: none; padding: 15px 36px;
-      border-radius: 14px; font-size: 1rem; font-weight: 600;
-      transition: border-color .2s, background .2s, transform .18s;
-      display: inline-flex; align-items: center; gap: 8px;
-      backdrop-filter: blur(8px);
-    }
-    .btn-secondary:hover { border-color: rgba(37,99,235,.35); background: rgba(37,99,235,.06); transform: translateY(-2px); }
-    @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+    .hero-badge svg { width: 17px; height: 17px; flex-shrink: 0; }
 
-    /* ── PLATFORM PILLS ── */
-    .platforms {
-      display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
-      padding: 48px 24px 100px; max-width: 600px; margin: 0 auto;
-      animation: fadeUp .6s .4s ease both;
+    .hero-actions { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .btn-hero {
+      display: inline-flex; align-items: center; gap: 9px;
+      background: var(--accent); color: #fff;
+      font-size: 1.06rem; font-weight: 700;
+      padding: 15px 34px; border-radius: 9px;
+      text-decoration: none; transition: all .22s;
+      box-shadow: 0 6px 24px rgba(37,99,235,.3);
     }
-    .plat-pill {
-      display: flex; align-items: center; gap: 8px;
-      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
-      border-radius: 100px; padding: 9px 18px; font-size: .85rem; font-weight: 600;
-      color: var(--text2); animation: floatPill 4s ease-in-out infinite;
-      backdrop-filter: blur(8px);
+    .btn-hero:hover {
+      background: var(--accent-light);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 32px rgba(37,99,235,.42);
     }
-    .plat-pill:nth-child(2) { animation-delay: .6s; }
-    .plat-pill:nth-child(3) { animation-delay: 1.2s; }
-    .plat-pill:nth-child(4) { animation-delay: 1.8s; }
-    @keyframes floatPill { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
-    .plat-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .hero-note { font-size: .84rem; color: var(--muted); font-style: italic; }
 
-    /* ── SOCIAL PROOF ── */
-    .social-proof {
-      text-align: center; padding: 0 24px 80px; max-width: 600px; margin: 0 auto;
+    /* ══════════════ MARQUEE ══════════════ */
+    .partners { padding: 10px 0 56px; overflow: hidden; }
+    .partners-label {
+      text-align: center; font-size: .74rem; font-weight: 700;
+      letter-spacing: .22em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 26px;
     }
-    .social-avatars { display: flex; justify-content: center; align-items: center; margin-bottom: 14px; }
-    .social-avatar {
-      width: 36px; height: 36px; border-radius: 50%;
-      border: 2px solid var(--bg); margin-left: -10px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      display: flex; align-items: center; justify-content: center;
-      font-size: .7rem; font-weight: 800; color: #fff; flex-shrink: 0;
-    }
-    .social-avatar:first-child { margin-left: 0; }
-    .social-text { font-size: .88rem; color: var(--text2); }
-    .social-stars { color: #fbbf24; letter-spacing: 2px; margin-bottom: 6px; font-size: .9rem; }
-
-    /* ── SECTION SHARED ── */
-    .section { max-width: 1080px; margin: 0 auto; padding: 100px 40px; }
-    .section-eyebrow {
-      font-size: .7rem; font-weight: 800; letter-spacing: 2px;
-      color: var(--accent); text-transform: uppercase; margin-bottom: 16px;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .section-eyebrow::before { content:''; display:inline-block; width:20px; height:2px; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
-    .section-title { font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 900; margin-bottom: 16px; letter-spacing: -.04em; line-height: 1.1; }
-    .section-sub { font-size: 1.05rem; color: var(--text2); max-width: 48ch; line-height: 1.75; }
-    .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); max-width: 1080px; margin: 0 auto; }
-
-    /* ── BENTO FEATURES ── */
-    .bento-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: auto auto;
-      gap: 1px;
-      background: var(--border);
-      border-radius: 20px; overflow: hidden;
-      margin-top: 60px;
-    }
-    .bento-cell {
-      background: var(--surface);
-      padding: 32px 28px;
-      transition: background .25s;
-      position: relative; overflow: hidden;
-    }
-    .bento-cell:hover { background: var(--surface2); }
-    .bento-cell.span2 { grid-column: span 2; }
-    .bento-cell::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse 200px 200px at var(--mx,50%) var(--my,50%), rgba(37,99,235,.07), transparent);
-      opacity: 0; transition: opacity .3s; pointer-events: none;
-    }
-    .bento-cell:hover::after { opacity: 1; }
-    .bento-icon {
-      width: 48px; height: 48px; border-radius: 14px; margin-bottom: 20px;
-      display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
-    }
-    .bento-icon.purple { background: rgba(37,99,235,.15); }
-    .bento-icon.magenta { background: rgba(56,189,248,.12); }
-    .bento-icon.teal { background: rgba(20,184,166,.12); }
-    .bento-icon.amber { background: rgba(251,191,36,.1); }
-    .bento-icon.blue { background: rgba(59,130,246,.12); }
-    .bento-icon.green { background: rgba(74,222,128,.1); }
-    .feat-title { font-size: 1.05rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -.02em; }
-    .feat-desc { font-size: .875rem; color: var(--text2); line-height: 1.65; }
-
-    /* ── HOW IT WORKS ── */
-    .steps-wrapper { position: relative; margin-top: 60px; }
-    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative; }
-    .steps::before {
-      content: '';
-      position: absolute; top: 24px; left: calc(12.5%); right: calc(12.5%);
-      height: 1px; background: linear-gradient(90deg, var(--accent), var(--accent2));
-      z-index: 0;
-    }
-    .step { text-align: center; padding: 0 16px; }
-    .step-num {
-      width: 48px; height: 48px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Space Mono', monospace; font-size: .95rem; font-weight: 700;
-      color: #fff; margin: 0 auto 24px; position: relative; z-index: 1;
-      box-shadow: 0 0 0 6px var(--bg), 0 0 0 7px var(--border);
-    }
-    .step-title { font-size: .95rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -.02em; }
-    .step-desc { font-size: .82rem; color: var(--text2); line-height: 1.6; }
-
-    /* ── TESTIMONIALS ── */
-    .testimonials-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 60px; }
-    .testi-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 16px; padding: 24px;
-      transition: border-color .25s, transform .2s;
-    }
-    .testi-card:hover { border-color: rgba(37,99,235,.25); transform: translateY(-3px); }
-    .testi-stars { color: #fbbf24; font-size: .8rem; margin-bottom: 14px; }
-    .testi-quote { font-size: .9rem; color: var(--text2); line-height: 1.7; margin-bottom: 20px; font-style: italic; }
-    .testi-author { display: flex; align-items: center; gap: 10px; }
-    .testi-avatar {
-      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      display: flex; align-items: center; justify-content: center;
-      font-size: .75rem; font-weight: 800; color: #fff;
-    }
-    .testi-name { font-size: .85rem; font-weight: 700; }
-    .testi-handle { font-size: .75rem; color: var(--muted); }
-    .testi-badge {
-      margin-left: auto; font-size: .68rem; font-weight: 700; padding: 3px 8px;
-      border-radius: 6px; border: 1px solid;
-    }
-
-    /* ── FAQ ── */
-    .faq-list { display: flex; flex-direction: column; gap: 8px; margin-top: 48px; }
-    .faq-item { border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: var(--surface); }
-    .faq-q {
-      padding: 18px 22px; font-weight: 600; font-size: .95rem; cursor: pointer;
-      display: flex; justify-content: space-between; align-items: center; gap: 12px;
-      user-select: none; transition: color .2s;
-    }
-    .faq-q:hover { color: var(--accent); }
-    .faq-q svg { flex-shrink: 0; transition: transform .25s; }
-    .faq-item.open .faq-q svg { transform: rotate(180deg); }
-    .faq-a { display: none; padding: 0 22px 18px; font-size: .9rem; color: var(--text2); line-height: 1.75; }
-    .faq-item.open .faq-a { display: block; }
-
-    /* ── CTA FINAL ── */
-    .cta-section {
-      text-align: center; padding: 120px 24px; position: relative; overflow: hidden;
-    }
-    .cta-section::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(37,99,235,.14), transparent),
-                  radial-gradient(ellipse 60% 40% at 50% 0%, rgba(56,189,248,.1), transparent);
+    .marquee { position: relative; overflow: hidden; }
+    .marquee::before, .marquee::after {
+      content: ''; position: absolute; top: 0; bottom: 0; width: 110px; z-index: 2;
       pointer-events: none;
     }
-    .cta-inner { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; }
-    .cta-section h2 { font-size: clamp(2rem, 5vw, 3.8rem); font-weight: 900; margin-bottom: 18px; letter-spacing: -.04em; line-height: 1.1; }
-    .cta-section h2 span {
-      background: linear-gradient(135deg, #60A5FA, var(--accent2), #7DD3FC);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    .marquee::before { left: 0;  background: linear-gradient(90deg, var(--bg), transparent); }
+    .marquee::after  { right: 0; background: linear-gradient(270deg, var(--bg), transparent); }
+    .marquee-track {
+      display: flex; gap: 60px; width: max-content;
+      animation: scrollX 26s linear infinite;
     }
-    .cta-section p { font-size: 1.1rem; color: var(--text2); margin-bottom: 44px; }
-    .btn-cta-big {
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #fff; text-decoration: none; padding: 18px 52px;
-      border-radius: 16px; font-size: 1.1rem; font-weight: 800;
-      box-shadow: 0 12px 48px var(--glow), 0 4px 20px var(--glow2);
-      display: inline-flex; align-items: center; gap: 10px;
-      transition: box-shadow .25s, transform .18s;
-      letter-spacing: -.02em;
+    .marquee:hover .marquee-track { animation-play-state: paused; }
+    @keyframes scrollX {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
     }
-    .btn-cta-big:hover { transform: translateY(-3px); box-shadow: 0 20px 60px var(--glow), 0 8px 30px var(--glow2); }
-
-    /* ── FOOTER ── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 40px; display: flex; align-items: center;
-      justify-content: space-between; flex-wrap: wrap; gap: 20px;
-      max-width: 1080px; margin: 0 auto;
+    .marquee-item {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 1.02rem; font-weight: 700; color: var(--text2);
+      white-space: nowrap;
     }
-    .footer-logo { font-family: 'Space Mono', monospace; font-size: .9rem; font-weight: 700; color: var(--muted); }
-    .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
-    .footer-links a { color: var(--muted); text-decoration: none; font-size: .83rem; transition: color .2s; }
-    .footer-links a:hover { color: var(--text); }
-    .footer-copy { font-size: .78rem; color: var(--muted); width: 100%; text-align: center; padding-top: 20px; border-top: 1px solid var(--border); margin-top: 12px; }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 900px) {
-      .bento-grid { grid-template-columns: 1fr 1fr; }
-      .bento-cell.span2 { grid-column: span 1; }
-      .steps { grid-template-columns: repeat(2,1fr); gap: 32px; }
-      .steps::before { display: none; }
-      .testimonials-grid { grid-template-columns: 1fr; }
-      nav { padding: 0 24px; }
-      .nav-center { display: none; }
-      .section { padding: 70px 24px; }
-    }
-    @media (max-width: 600px) {
-      .bento-grid { grid-template-columns: 1fr; }
-      .hero { padding: 90px 20px 70px; }
-      .hero h1 { font-size: clamp(2.4rem,10vw,3.2rem); }
-      .lang-switcher { display: none; }
-      footer { padding: 28px 20px; }
-      .steps { grid-template-columns: 1fr; }
-    }
-
-    /* ── DEMO SECTION ── */
+    .marquee-item svg { width: 24px; height: 24px; opacity: .85; }
     .demo-section {
       max-width: 900px; margin: 0 auto; padding: 20px 24px 80px;
       text-align: center;
@@ -623,14 +483,210 @@
       font-size: .75rem; color: var(--text2); font-weight: 600;
     }
 
-    @media (max-width: 600px) {
-      .demo-section { padding: 10px 16px 60px; }
-      .demo-app { min-height: 320px; }
-      .demo-plats { gap: 6px; }
-      .demo-plat { font-size: .72rem; padding: 5px 10px; }
+
+    /* ══════════════ SECTIONS ══════════════ */
+    .section { padding: 84px 24px; }
+    .section-head { max-width: 680px; margin: 0 auto 52px; text-align: center; }
+    .section-eyebrow {
+      font-size: .74rem; font-weight: 700;
+      letter-spacing: .2em; text-transform: uppercase;
+      color: var(--yellow-deep); margin-bottom: 14px;
+    }
+    .section-title {
+      font-size: clamp(1.9rem, 4.4vw, 2.7rem);
+      font-weight: 800; letter-spacing: -.03em;
+      line-height: 1.12; margin-bottom: 16px;
+    }
+    .section-sub {
+      font-size: 1.02rem; color: var(--text2); line-height: 1.65;
     }
 
-    /* ── MODALS ── */
+    /* ══════════════ FEATURES ══════════════ */
+    .feat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 18px;
+      max-width: 1080px; margin: 0 auto;
+    }
+    .feat-card {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      padding: 30px 28px;
+      transition: border-color .25s, transform .25s;
+      overflow: hidden;
+    }
+    .feat-card::after {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(420px circle at var(--mx,50%) var(--my,0%), rgba(250,204,21,.07), transparent 65%);
+      opacity: 0; transition: opacity .3s; pointer-events: none;
+    }
+    .feat-card:hover { border-color: rgba(250,204,21,.28); transform: translateY(-3px); }
+    .feat-card:hover::after { opacity: 1; }
+    .feat-icon {
+      width: 46px; height: 46px; border-radius: 12px;
+      background: var(--yellow-glow);
+      border: 1px solid rgba(250,204,21,.22);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px;
+    }
+    .feat-icon svg { width: 22px; height: 22px; stroke: var(--yellow); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .feat-title {
+      font-size: 1.14rem; font-weight: 700; margin-bottom: 10px;
+      letter-spacing: -.015em;
+    }
+    .feat-desc { font-size: .93rem; color: var(--text2); line-height: 1.65; }
+
+    /* ══════════════ STEPS ══════════════ */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 16px; max-width: 1080px; margin: 0 auto;
+      counter-reset: step;
+    }
+    .step {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 26px 24px;
+      transition: border-color .25s;
+    }
+    .step:hover { border-color: rgba(37,99,235,.35); }
+    .step-num {
+      width: 34px; height: 34px; border-radius: 10px;
+      background: var(--accent); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .92rem; font-weight: 800;
+      margin-bottom: 17px;
+    }
+    .step-title { font-size: 1.04rem; font-weight: 700; margin-bottom: 9px; }
+    .step-desc { font-size: .9rem; color: var(--text2); line-height: 1.6; }
+
+    /* ══════════════ FAQ ══════════════ */
+    .faq-list { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+    .faq-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      overflow: hidden;
+      transition: border-color .2s;
+    }
+    .faq-item.open { border-color: rgba(250,204,21,.3); }
+    .faq-q {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 19px 22px;
+      font-size: 1rem; font-weight: 600; cursor: pointer;
+      user-select: none; transition: color .18s;
+    }
+    .faq-q:hover { color: var(--yellow); }
+    .faq-q svg {
+      width: 18px; height: 18px; flex-shrink: 0;
+      stroke: var(--muted); fill: none; stroke-width: 2.4; stroke-linecap: round;
+      transition: transform .25s, stroke .2s;
+    }
+    .faq-item.open .faq-q svg { transform: rotate(45deg); stroke: var(--yellow); }
+    .faq-a {
+      max-height: 0; overflow: hidden;
+      font-size: .93rem; color: var(--text2); line-height: 1.7;
+      padding: 0 22px;
+      transition: max-height .3s ease, padding .3s ease;
+    }
+    .faq-item.open .faq-a { max-height: 400px; padding: 0 22px 20px; }
+
+    /* ══════════════ CTA ══════════════ */
+    .cta-section { padding: 30px 24px 96px; }
+    .cta-inner {
+      position: relative;
+      max-width: 880px; margin: 0 auto;
+      text-align: center;
+      padding: 62px 40px;
+      border-radius: 24px;
+      background:
+        radial-gradient(640px circle at 50% 0%, rgba(37,99,235,.17), transparent 68%),
+        var(--surface);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .cta-inner::before {
+      content: ''; position: absolute; top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 60%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--yellow), transparent);
+      opacity: .6;
+    }
+    .cta-inner h2 {
+      font-size: clamp(1.8rem, 4.6vw, 2.6rem);
+      font-weight: 800; letter-spacing: -.03em; line-height: 1.14;
+      margin-bottom: 16px;
+    }
+    .cta-inner h2 span { color: var(--yellow); }
+    .cta-inner p { font-size: 1.02rem; color: var(--text2); margin-bottom: 32px; line-height: 1.6; }
+    .btn-cta-big {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--accent); color: #fff;
+      font-size: 1.06rem; font-weight: 700;
+      padding: 15px 36px; border-radius: 9px;
+      text-decoration: none; transition: all .22s;
+      box-shadow: 0 6px 24px rgba(37,99,235,.3);
+    }
+    .btn-cta-big:hover {
+      background: var(--accent-light);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 32px rgba(37,99,235,.44);
+    }
+
+    /* ══════════════ FOOTER ══════════════ */
+    footer {
+      display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
+      padding: 38px 32px;
+      border-top: 1px solid var(--border);
+      max-width: 1140px; margin: 0 auto;
+    }
+    .footer-logo {
+      font-family: 'Space Mono', monospace;
+      font-size: .9rem; font-weight: 700; color: var(--text2);
+      margin-right: auto;
+    }
+    .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+    .footer-links a {
+      color: var(--muted); text-decoration: none;
+      font-size: .83rem; transition: color .2s;
+    }
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy {
+      font-size: .78rem; color: var(--muted);
+      width: 100%; text-align: center;
+      padding-top: 22px; border-top: 1px solid var(--border);
+      margin-top: 8px;
+    }
+
+    /* ══════════════ RESPONSIVE ══════════════ */
+    @media (max-width: 860px) {
+      #main-nav { padding: 14px 20px; gap: 14px; }
+      .nav-links { display: none; }
+      .nav-langs { display: none; }
+      .hero { padding: 62px 20px 56px; }
+      .hero-float i { opacity: .22; }
+      /* Hide the icons that would sit over the hero text on narrow screens */
+      .hero-float i:nth-child(4),
+      .hero-float i:nth-child(7) { display: none; }
+      .section { padding: 62px 20px; }
+      .cta-inner { padding: 46px 26px; }
+      footer { padding: 30px 20px; }
+      .footer-logo { margin-right: 0; width: 100%; }
+    }
+    @media (max-width: 600px) {
+      .hero-plat { width: 46px; height: 46px; border-radius: 12px; }
+      .hero-plat svg { width: 22px; height: 22px; }
+      .marquee-track { gap: 38px; }
+      .demo-section { padding: 10px 16px 60px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hero-float i, .marquee-track { animation: none; }
+      html { scroll-behavior: auto; }
+    }
     .modal-overlay {
       display: none; position: fixed; inset: 0; z-index: 1000;
       background: rgba(0,0,0,.7); backdrop-filter: blur(8px);
@@ -717,64 +773,106 @@
 </head>
 <body>
 
+<!-- ══════════════ NAV ══════════════ -->
 <nav id="main-nav">
-  <a class="nav-logo" href="/"><svg viewBox="0 0 80 80" style="width:24px;height:24px;flex-shrink:0;filter:drop-shadow(0 2px 8px rgba(37,99,235,.35))" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="nav-ep-a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1e40af"/><stop offset="1" stop-color="#3b82f6"/></linearGradient><linearGradient id="nav-ep-b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7dd3fc"/><stop offset="1" stop-color="#3b82f6"/></linearGradient></defs><rect x="10" y="10" width="60" height="60" rx="14" fill="url(#nav-ep-a)"/><rect x="22" y="22" width="36" height="36" rx="8" fill="none" stroke="url(#nav-ep-b)" stroke-width="3"/><polygon points="34,30 50,40 34,50" fill="#fff"/></svg><span>EuPosto</span></a>
-  <div class="nav-center">
+  <a class="nav-brand" href="/">
+    <img src="euposto-icon.svg" alt="" />
+    <span>EuPosto</span>
+  </a>
+  <div class="nav-links">
     <a href="#funcionalidades" id="nav-features">Funcionalidades</a>
     <a href="#como-funciona" id="nav-how">Como funciona</a>
     <a href="#faq">FAQ</a>
   </div>
-  <div class="nav-right">
-    <div class="lang-switcher" id="lang-switcher">
-      <button class="lang-btn active" data-lang="pt" onclick="setLang('pt')">🇵🇹 PT</button>
-      <button class="lang-btn" data-lang="pt-BR" onclick="setLang('pt-BR')">🇧🇷 BR</button>
-      <button class="lang-btn" data-lang="en" onclick="setLang('en')">🇬🇧 EN</button>
-    </div>
-    <a class="nav-login" href="#" id="nav-login">Entrar</a>
-    <a class="nav-cta" href="#" id="nav-cta">Criar conta</a>
+  <div class="nav-langs">
+    <button class="lang-btn active" data-lang="pt" onclick="setLang('pt')">🇵🇹 PT</button>
+    <button class="lang-btn" data-lang="pt-BR" onclick="setLang('pt-BR')">🇧🇷 BR</button>
+    <button class="lang-btn" data-lang="en" onclick="setLang('en')">🇬🇧 EN</button>
   </div>
+  <a class="nav-login" href="#" id="nav-login" onclick="openModal('login'); return false;">Entrar</a>
+  <a class="nav-cta" href="#" id="nav-cta" onclick="openModal('signup'); return false;">Criar conta</a>
 </nav>
 
-<!-- HERO -->
+<!-- ══════════════ HERO ══════════════ -->
 <section class="hero">
-  <div class="hero-badge">
-    <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:#60A5FA"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-    <span id="hero-badge">Grátis · Sem instalação · Funciona no browser</span>
+  <!-- Floating platform icons -->
+  <div class="hero-float" aria-hidden="true">
+    <i style="top:7%;left:6%;width:44px;height:44px;background:#ff0000;--rot:-10deg;animation-delay:0s">
+      <svg viewBox="0 0 24 24" fill="#fff"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.8 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>
+    </i>
+    <i style="top:16%;left:14%;width:36px;height:36px;background:linear-gradient(45deg,#f09433,#dc2743,#bc1888);--rot:8deg;animation-delay:1.1s">
+      <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+    </i>
+    <i style="top:42%;left:4%;width:38px;height:38px;background:#010101;border:1px solid rgba(255,255,255,.14);--rot:-6deg;animation-delay:2.3s">
+      <svg viewBox="0 0 24 24" fill="#fff"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.95a8.24 8.24 0 004.83 1.56V7.07a4.85 4.85 0 01-1.06-.38z"/></svg>
+    </i>
+    <i style="top:62%;left:11%;width:34px;height:34px;background:#1877f2;--rot:12deg;animation-delay:3.4s">
+      <svg viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+    </i>
+    <i style="top:9%;right:8%;left:auto;width:40px;height:40px;background:linear-gradient(45deg,#f09433,#dc2743,#bc1888);--rot:9deg;animation-delay:.6s">
+      <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+    </i>
+    <i style="top:30%;right:5%;left:auto;width:36px;height:36px;background:#010101;border:1px solid rgba(255,255,255,.14);--rot:-11deg;animation-delay:1.8s">
+      <svg viewBox="0 0 24 24" fill="#fff"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.95a8.24 8.24 0 004.83 1.56V7.07a4.85 4.85 0 01-1.06-.38z"/></svg>
+    </i>
+    <i style="top:54%;right:10%;left:auto;width:42px;height:42px;background:#1877f2;--rot:7deg;animation-delay:2.9s">
+      <svg viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+    </i>
+    <i style="top:72%;right:4%;left:auto;width:34px;height:34px;background:#ff0000;--rot:-8deg;animation-delay:4s">
+      <svg viewBox="0 0 24 24" fill="#fff"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.8 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>
+    </i>
   </div>
-  <h1 id="hero-h1">Publica em todas<br/>as redes. <span>De uma vez.</span></h1>
-  <p id="hero-p">Faz upload de um vídeo e publica simultaneamente no YouTube, Instagram, TikTok e Facebook — sem ferramentas pagas, sem complicações.</p>
-  <div class="hero-btns">
-    <a class="btn-primary" href="euposto.html" id="btn-start">Começar grátis
-      <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-    </a>
-    <a class="btn-secondary" href="#como-funciona" id="btn-how">Ver como funciona</a>
+
+  <div class="hero-inner">
+    <p class="hero-eyebrow" id="hero-badge">EuPosto — o motor de publicação para criadores</p>
+    <h1 id="hero-h1">Carrega uma vez.<span>Publica em todo o lado.</span></h1>
+
+    <div class="hero-plats">
+      <div class="hero-plat" title="YouTube">
+        <svg viewBox="0 0 24 24" fill="#ff0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.8 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>
+      </div>
+      <div class="hero-plat" title="Instagram">
+        <svg viewBox="0 0 24 24" fill="#e1306c"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+      </div>
+      <div class="hero-plat" title="TikTok">
+        <svg viewBox="0 0 24 24" fill="#fff"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.95a8.24 8.24 0 004.83 1.56V7.07a4.85 4.85 0 01-1.06-.38z"/></svg>
+      </div>
+      <div class="hero-plat" title="Facebook">
+        <svg viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      </div>
+    </div>
+
+    <div class="hero-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12 11 15 16 9"/></svg>
+      <span>Com APIs oficiais</span>
+    </div>
+
+    <div class="hero-actions">
+      <a class="btn-hero" href="euposto.html" id="btn-start">Começar grátis
+        <svg viewBox="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+      <p class="hero-note" id="hero-p">Grátis para sempre. Sem cartão de crédito.</p>
+    </div>
   </div>
 </section>
 
-<!-- SOCIAL PROOF -->
-<div class="social-proof">
-  <div class="social-avatars">
-    <div class="social-avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">MR</div>
-    <div class="social-avatar" style="background:linear-gradient(135deg,#06b6d4,#3b82f6)">AS</div>
-    <div class="social-avatar" style="background:linear-gradient(135deg,#2563EB,#38BDF8)">JP</div>
-    <div class="social-avatar" style="background:linear-gradient(135deg,#10b981,#06b6d4)">LC</div>
-    <div class="social-avatar" style="background:linear-gradient(135deg,#f97316,#eab308)">TF</div>
+<!-- ══════════════ PARTNERS MARQUEE ══════════════ -->
+<section class="partners">
+  <p class="partners-label">Integrado com APIs oficiais de</p>
+  <div class="marquee">
+    <div class="marquee-track">
+      <span class="marquee-item"><svg viewBox="0 0 24 24" fill="#fff"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.8 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg> YouTube</span>
+      <span class="marquee-item"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg> Instagram</span>
+      <span class="marquee-item"><svg viewBox="0 0 24 24" fill="#fff"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.95a8.24 8.24 0 004.83 1.56V7.07a4.85 4.85 0 01-1.06-.38z"/></svg> TikTok</span>
+      <span class="marquee-item"><svg viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> Facebook</span>
+      <span class="marquee-item"><svg viewBox="0 0 24 24" fill="#fff"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.8 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg> YouTube</span>
+      <span class="marquee-item"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg> Instagram</span>
+      <span class="marquee-item"><svg viewBox="0 0 24 24" fill="#fff"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.95a8.24 8.24 0 004.83 1.56V7.07a4.85 4.85 0 01-1.06-.38z"/></svg> TikTok</span>
+      <span class="marquee-item"><svg viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> Facebook</span>
+    </div>
   </div>
-  <div class="social-stars">★★★★★</div>
-  <div class="social-text">Mais de <strong style="color:var(--text)"><span id="creator-count">2.400</span> criadores</strong> já publicam com o EuPosto</div>
-</div>
+</section>
 
-<!-- PLATFORMS -->
-<div class="platforms">
-  <div class="plat-pill"><span class="plat-dot" style="background:#ff4444"></span> YouTube</div>
-  <div class="plat-pill"><span class="plat-dot" style="background:#e1306c"></span> Instagram</div>
-  <div class="plat-pill"><span class="plat-dot" style="background:#69c9d0"></span> TikTok</div>
-  <div class="plat-pill"><span class="plat-dot" style="background:#1877f2"></span> Facebook</div>
-</div>
-
-<div class="divider"></div>
-
-<!-- DEMO -->
 <section class="demo-section">
   <div class="demo-section-label">Demo ao vivo</div>
   <div class="demo-section-title">Vê como funciona em tempo real</div>
@@ -904,185 +1002,134 @@
 <div class="divider"></div>
 
 <!-- FEATURES -->
+
+<!-- ══════════════ FEATURES ══════════════ -->
 <section class="section" id="funcionalidades">
-  <div class="section-eyebrow" id="feat-label">Funcionalidades</div>
-  <div class="section-title" id="feat-title">Tudo o que precisas.<br/>Numa só ferramenta.</div>
-  <div class="section-sub" id="feat-sub">Desenvolvido para criadores que querem poupar tempo e chegar a mais pessoas.</div>
-
-  <div class="bento-grid">
-    <div class="bento-cell span2">
-      <div class="bento-icon purple">🚀</div>
-      <div class="feat-title" id="feat-1-title">Publicação simultânea</div>
-      <div class="feat-desc" id="feat-1-desc">Faz upload do vídeo uma vez e publica em todas as plataformas ao mesmo tempo, com um clique. Zero repetição, máxima eficiência.</div>
+  <div class="section-head">
+    <p class="section-eyebrow">Funcionalidades</p>
+    <h2 class="section-title">Feito para distribuir em escala</h2>
+    <p class="section-sub">Tudo o que precisas para publicar mais depressa, manter a consistência e deixar a energia criativa onde ela importa — no conteúdo.</p>
+  </div>
+  <div class="feat-grid">
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+      <h3 class="feat-title">Publicação simultânea</h3>
+      <p class="feat-desc">Faz upload do vídeo uma vez e publica em todas as plataformas ao mesmo tempo, com um clique.</p>
     </div>
-    <div class="bento-cell">
-      <div class="bento-icon magenta">⏰</div>
-      <div class="feat-title" id="feat-2-title">Agendamento</div>
-      <div class="feat-desc" id="feat-2-desc">Define a data e hora exatas. A app publica automaticamente.</div>
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+      <h3 class="feat-title">Agendamento</h3>
+      <p class="feat-desc">Define a data e hora de publicação. A app publica automaticamente na hora certa.</p>
     </div>
-    <div class="bento-cell">
-      <div class="bento-icon amber">#</div>
-      <div class="feat-title" id="feat-3-title">Conjuntos de hashtags</div>
-      <div class="feat-desc" id="feat-3-desc">Guarda os teus grupos favoritos e aplica com um clique.</div>
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg></div>
+      <h3 class="feat-title">Conjuntos de hashtags</h3>
+      <p class="feat-desc">Guarda os teus grupos de hashtags favoritos e aplica-os com um clique em cada publicação.</p>
     </div>
-    <div class="bento-cell">
-      <div class="bento-icon teal">📊</div>
-      <div class="feat-title" id="feat-4-title">Histórico e métricas</div>
-      <div class="feat-desc" id="feat-4-desc">Consulta publicações, views, likes e exporta em CSV.</div>
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><polyline points="7 14 11 10 15 14 21 8"/></svg></div>
+      <h3 class="feat-title">Histórico de publicações</h3>
+      <p class="feat-desc">Consulta todas as tuas publicações, acompanha métricas básicas e exporta dados em CSV.</p>
     </div>
-    <div class="bento-cell">
-      <div class="bento-icon blue">🤝</div>
-      <div class="feat-title" id="feat-5-title">Colaboradores IG</div>
-      <div class="feat-desc" id="feat-5-desc">Adiciona colaboradores ao Reel diretamente ao publicar.</div>
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+      <h3 class="feat-title">Colaboradores Instagram</h3>
+      <p class="feat-desc">Adiciona colaboradores ao teu Reel de Instagram diretamente na publicação.</p>
     </div>
-    <div class="bento-cell">
-      <div class="bento-icon green">🔒</div>
-      <div class="feat-title" id="feat-6-title">Privacidade total</div>
-      <div class="feat-desc" id="feat-6-desc">Tokens e dados ficam apenas no teu browser. Zero servidores externos.</div>
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <h3 class="feat-title">Privacidade total</h3>
+      <p class="feat-desc">Os teus tokens e dados ficam guardados apenas no teu browser. Nada é enviado para servidores externos.</p>
     </div>
   </div>
 </section>
 
-<div class="divider"></div>
-
-<!-- HOW IT WORKS -->
+<!-- ══════════════ HOW IT WORKS ══════════════ -->
 <section class="section" id="como-funciona">
-  <div class="section-eyebrow" id="how-label">Como funciona</div>
-  <div class="section-title" id="how-title">Simples em 4 passos</div>
-  <div class="section-sub" id="how-sub">Sem instalar nada. Funciona diretamente no browser.</div>
-  <div class="steps-wrapper">
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-title" id="step-1-title">Cria a tua conta</div>
-        <div class="step-desc" id="step-1-desc">Regista-te com email ou Google. Grátis, sem cartão.</div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-title" id="step-2-title">Conecta as plataformas</div>
-        <div class="step-desc" id="step-2-desc">Liga YouTube, Instagram, TikTok e Facebook nas definições.</div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-title" id="step-3-title">Carrega o vídeo</div>
-        <div class="step-desc" id="step-3-desc">Arrasta o vídeo, escreve título, descrição e hashtags.</div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div class="step-title" id="step-4-title">Publica ou agenda</div>
-        <div class="step-desc" id="step-4-desc">Publica agora ou define uma data e hora para publicação automática.</div>
-      </div>
+  <div class="section-head">
+    <p class="section-eyebrow">Como funciona</p>
+    <h2 class="section-title">Simples em 4 passos</h2>
+    <p class="section-sub">Não precisas de instalar nada. Funciona diretamente no browser.</p>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3 class="step-title">Cria a tua conta</h3>
+      <p class="step-desc">Regista-te com email ou com a tua conta Google. É gratuito e sem cartão.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3 class="step-title">Conecta as plataformas</h3>
+      <p class="step-desc">Liga as tuas contas do YouTube, Instagram, TikTok e Facebook nas definições.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3 class="step-title">Carrega o vídeo</h3>
+      <p class="step-desc">Arrasta o vídeo, escreve o título, descrição e hashtags. Escolhe onde publicar.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <h3 class="step-title">Publica ou agenda</h3>
+      <p class="step-desc">Clica em "Publicar agora" ou define uma data e hora para publicação automática.</p>
     </div>
   </div>
 </section>
 
-<div class="divider"></div>
-
-<!-- TESTIMONIALS -->
-<section class="section">
-  <div class="section-eyebrow">Depoimentos</div>
-  <div class="section-title">O que dizem os criadores</div>
-  <div class="testimonials-grid">
-    <div class="testi-card">
-      <div class="testi-stars">★★★★★</div>
-      <div class="testi-quote">"Economizo pelo menos 2 horas por semana. Antes precisava entrar em cada rede separadamente. Agora é um clique e pronto."</div>
-      <div class="testi-author">
-        <div class="testi-avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">MR</div>
-        <div>
-          <div class="testi-name">Miguel Rodrigues</div>
-          <div class="testi-handle">@miguelvlogs</div>
-        </div>
-        <span class="testi-badge" style="color:#ff4444;border-color:#ff444440;background:#ff444408">YouTube</span>
-      </div>
-    </div>
-    <div class="testi-card">
-      <div class="testi-stars">★★★★★</div>
-      <div class="testi-quote">"O agendamento é incrível. Gravo o conteúdo no fim de semana e agende tudo para a semana. O EuPosto trata do resto."</div>
-      <div class="testi-author">
-        <div class="testi-avatar" style="background:linear-gradient(135deg,#38BDF8,#2563EB)">AS</div>
-        <div>
-          <div class="testi-name">Ana Silva</div>
-          <div class="testi-handle">@analifestyle</div>
-        </div>
-        <span class="testi-badge" style="color:#e1306c;border-color:#e1306c40;background:#e1306c08">Instagram</span>
-      </div>
-    </div>
-    <div class="testi-card">
-      <div class="testi-stars">★★★★★</div>
-      <div class="testi-quote">"Ferramenta gratuita que faz o que as pagas cobram €50/mês. Publicar no TikTok e YouTube ao mesmo tempo nunca foi tão fácil."</div>
-      <div class="testi-author">
-        <div class="testi-avatar" style="background:linear-gradient(135deg,#06b6d4,#10b981)">JP</div>
-        <div>
-          <div class="testi-name">João Pereira</div>
-          <div class="testi-handle">@joaotech</div>
-        </div>
-        <span class="testi-badge" style="color:#69c9d0;border-color:#69c9d040;background:#69c9d008">TikTok</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- FAQ -->
+<!-- ══════════════ FAQ ══════════════ -->
 <section class="section" id="faq">
-  <div class="section-eyebrow" id="faq-label">FAQ</div>
-  <div class="section-title" id="faq-title">Perguntas frequentes</div>
-  <div class="section-sub" id="faq-sub">Tens mais dúvidas? Entra em contacto em <a href="mailto:lucasgajo.contacto@gmail.com" style="color:var(--accent);text-decoration:none">lucasgajo.contacto@gmail.com</a></div>
+  <div class="section-head">
+    <p class="section-eyebrow">FAQ</p>
+    <h2 class="section-title">Perguntas frequentes</h2>
+    <p class="section-sub">Tens mais dúvidas? Entra em contacto em <a href="mailto:lucasgajo.contacto@gmail.com" style="color:var(--yellow);text-decoration:none">lucasgajo.contacto@gmail.com</a></p>
+  </div>
   <div class="faq-list">
     <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">
-        É gratuito?
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      <div class="faq-q" onclick="toggleFaq(this)">É gratuito?
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </div>
       <div class="faq-a">Sim, o EuPosto é completamente gratuito. Não há planos pagos nem funcionalidades escondidas.</div>
     </div>
     <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">
-        Preciso de instalar alguma coisa?
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      <div class="faq-q" onclick="toggleFaq(this)">Preciso de instalar alguma coisa?
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </div>
       <div class="faq-a">Não. O EuPosto funciona diretamente no browser, sem extensões, sem apps, sem downloads.</div>
     </div>
     <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">
-        Os meus dados e tokens estão seguros?
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      <div class="faq-q" onclick="toggleFaq(this)">Os meus dados e tokens estão seguros?
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </div>
-      <div class="faq-a">Sim. Os teus tokens são guardados exclusivamente no teu browser. Nenhum dado pessoal é enviado para os nossos servidores.</div>
+      <div class="faq-a">Sim. Os teus tokens de acesso às plataformas são guardados exclusivamente no teu browser (localStorage). Nenhum dado pessoal é enviado para os nossos servidores.</div>
     </div>
     <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">
-        Que tipos de vídeo são suportados?
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      <div class="faq-q" onclick="toggleFaq(this)">Que tipos de vídeo são suportados?
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </div>
-      <div class="faq-a">MP4, MOV e AVI até 4 GB. Suporta Shorts/Reels (vídeos verticais curtos) e vídeos longos para YouTube.</div>
+      <div class="faq-a">MP4, MOV e AVI até 4 GB. O EuPosto suporta Shorts/Reels (vídeos verticais curtos) e vídeos longos para YouTube e Facebook.</div>
     </div>
     <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">
-        O que acontece se fechar o browser com publicação agendada?
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      <div class="faq-q" onclick="toggleFaq(this)">O que acontece se fechar o browser com publicação agendada?
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </div>
       <div class="faq-a">O agendamento funciona localmente, por isso o browser precisa de estar aberto na hora de publicação.</div>
     </div>
     <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">
-        Como posso apagar a minha conta e dados?
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      <div class="faq-q" onclick="toggleFaq(this)">Como posso apagar a minha conta e dados?
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </div>
-      <div class="faq-a">Nas Definições da app podes apagar tudo. Os dados ficam apenas no teu browser, nunca nos nossos servidores.</div>
+      <div class="faq-a">Como os dados são guardados no teu browser, podes apagá-los a qualquer momento limpando o localStorage do site. Para remover o acesso da app às plataformas, revoga as permissões diretamente em cada plataforma.</div>
     </div>
   </div>
 </section>
 
-<!-- CTA FINAL -->
+<!-- ══════════════ CTA ══════════════ -->
 <section class="cta-section">
   <div class="cta-inner">
-  <h2 id="cta-h2">Pronto para <span>poupar tempo</span><br/>e chegar mais longe?</h2>
-  <p id="cta-p">Começa a publicar em todas as plataformas de uma vez — é grátis, para sempre.</p>
-  <a class="btn-cta-big" href="euposto.html" id="cta-btn">Começar grátis
-    <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-  </a>
+    <h2 id="cta-h2">Pronto para <span>publicar mais depressa</span>?</h2>
+    <p id="cta-p">Deixa-nos tratar do trabalho pesado para te concentrares em criar bom conteúdo.</p>
+    <a class="btn-cta-big" href="euposto.html" id="cta-btn">Começar grátis
+      <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
   </div>
 </section>
 
@@ -1160,7 +1207,6 @@
   </div>
   <div class="footer-copy" id="footer-copy">© 2026 EuPosto · Desenvolvido por Lucas Faria Nascimento · Todos os direitos reservados</div>
 </footer>
-
 <script>
   function toggleFaq(el) {
     el.closest('.faq-item').classList.toggle('open');
@@ -1187,7 +1233,7 @@
       navFeatures: 'Funcionalidades', navHow: 'Como funciona', navLogin: 'Entrar', navCta: 'Criar conta',
       badge: 'Grátis · Sem instalação · Funciona no browser',
       heroH1: 'Publica os teus vídeos em<br/><span>todas as redes de uma vez</span>',
-      heroP: 'Com o EuPosto fazes upload de um vídeo e publicas simultaneamente no YouTube, Instagram, TikTok e Facebook — sem ferramentas pagas, sem complicações.',
+      heroP: 'Grátis para sempre. Sem cartão de crédito.',
       btnStart: 'Começar grátis →', btnHow: 'Ver como funciona',
       demoLabel: 'Demo ao vivo', demoTitle: 'Vê como funciona em tempo real', demoSub: 'Uma publicação. Quatro plataformas. Segundos.',
       demoReplay: 'A simular em tempo real — repete automaticamente',
@@ -1218,7 +1264,7 @@
         { q: 'O que acontece se fechar o browser com publicação agendada?', a: 'O agendamento funciona localmente, por isso o browser precisa de estar aberto na hora de publicação. Recomendamos manter o separador aberto até a publicação ser concluída.' },
         { q: 'Como posso apagar a minha conta e dados?', a: 'Como os dados são guardados no teu browser, podes apagá-los a qualquer momento limpando o localStorage do site. Para remover o acesso da app às plataformas, revoga as permissões diretamente em cada plataforma.' }
       ],
-      ctaH2: 'Pronto para poupar tempo?', ctaP: 'Começa a publicar em todas as plataformas de uma vez — é grátis.', ctaBtn: 'Abrir o EuPosto →',
+      ctaH2: 'Pronto para <span>poupar tempo</span>?', ctaP: 'Começa a publicar em todas as plataformas de uma vez — é grátis.', ctaBtn: 'Abrir o EuPosto →',
       footerAbout: 'Sobre', footerPrivacy: 'Política de Privacidade', footerTerms: 'Termos de Serviço', footerContact: 'Contacto',
       footerCopy: '© 2026 EuPosto · Desenvolvido por Lucas Faria Nascimento · Todos os direitos reservados'
     },
@@ -1227,7 +1273,7 @@
       navFeatures: 'Funcionalidades', navHow: 'Como funciona', navLogin: 'Entrar', navCta: 'Criar conta',
       badge: 'Grátis · Sem instalação · Funciona no navegador',
       heroH1: 'Publique seus vídeos em<br/><span>todas as redes de uma vez</span>',
-      heroP: 'Com o EuPosto você faz upload de um vídeo e publica simultaneamente no YouTube, Instagram, TikTok e Facebook — sem ferramentas pagas, sem complicações.',
+      heroP: 'Grátis para sempre. Sem cartão de crédito.',
       btnStart: 'Começar grátis →', btnHow: 'Ver como funciona',
       demoLabel: 'Demo ao vivo', demoTitle: 'Veja como funciona em tempo real', demoSub: 'Uma publicação. Quatro plataformas. Segundos.',
       demoReplay: 'Simulando em tempo real — repete automaticamente',
@@ -1258,7 +1304,7 @@
         { q: 'O que acontece se eu fechar o navegador com publicação agendada?', a: 'O agendamento funciona localmente, então o navegador precisa estar aberto na hora da publicação. Recomendamos manter a aba aberta até a publicação ser concluída.' },
         { q: 'Como posso excluir minha conta e dados?', a: 'Como os dados são salvos no seu navegador, você pode excluí-los a qualquer momento limpando o localStorage do site. Para remover o acesso do app às plataformas, revogue as permissões diretamente em cada plataforma.' }
       ],
-      ctaH2: 'Pronto para economizar tempo?', ctaP: 'Comece a publicar em todas as plataformas de uma vez — é grátis.', ctaBtn: 'Abrir o EuPosto →',
+      ctaH2: 'Pronto para <span>economizar tempo</span>?', ctaP: 'Comece a publicar em todas as plataformas de uma vez — é grátis.', ctaBtn: 'Abrir o EuPosto →',
       footerAbout: 'Sobre', footerPrivacy: 'Política de Privacidade', footerTerms: 'Termos de Serviço', footerContact: 'Contato',
       footerCopy: '© 2026 EuPosto · Desenvolvido por Lucas Faria Nascimento · Todos os direitos reservados'
     },
@@ -1267,7 +1313,7 @@
       navFeatures: 'Features', navHow: 'How it works', navLogin: 'Log in', navCta: 'Sign up',
       badge: 'Free · No installation · Works in the browser',
       heroH1: 'Publish your videos to<br/><span>every network at once</span>',
-      heroP: 'With EuPosto you upload a video once and publish simultaneously to YouTube, Instagram, TikTok and Facebook — no paid tools, no hassle.',
+      heroP: 'Free forever. No credit card required.',
       btnStart: 'Start for free →', btnHow: 'See how it works',
       demoLabel: 'Live demo', demoTitle: 'See how it works in real time', demoSub: 'One upload. Four platforms. Seconds.',
       demoReplay: 'Simulating in real time — loops automatically',
@@ -1298,7 +1344,7 @@
         { q: 'What happens if I close the browser with a scheduled post?', a: 'Scheduling works locally, so the browser needs to be open at publish time. We recommend keeping the tab open until the post is published.' },
         { q: 'How do I delete my account and data?', a: 'Since data is stored in your browser, you can delete it anytime by clearing the site\'s localStorage. To remove app access to platforms, revoke permissions directly on each platform.' }
       ],
-      ctaH2: 'Ready to save time?', ctaP: 'Start publishing to all platforms at once — it\'s free.', ctaBtn: 'Open EuPosto →',
+      ctaH2: 'Ready to <span>save time</span>?', ctaP: 'Start publishing to all platforms at once — it\'s free.', ctaBtn: 'Open EuPosto →',
       footerAbout: 'About', footerPrivacy: 'Privacy Policy', footerTerms: 'Terms of Service', footerContact: 'Contact',
       footerCopy: '© 2026 EuPosto · Developed by Lucas Faria Nascimento · All rights reserved'
     }
@@ -1371,7 +1417,7 @@
     }
 
     // CTA
-    const ch = document.getElementById('cta-h2'); if (ch) ch.textContent = t.ctaH2;
+    const ch = document.getElementById('cta-h2'); if (ch) ch.innerHTML = t.ctaH2;
     const cp = document.getElementById('cta-p'); if (cp) cp.textContent = t.ctaP;
     const cb = document.getElementById('cta-btn'); if (cb) cb.textContent = t.ctaBtn;
 
