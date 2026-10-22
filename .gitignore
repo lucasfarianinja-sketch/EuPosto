@@ -17,7 +17,7 @@ euposto_live.html
 euposto_latest/
 index_current.html
 server.js
-_panel_*.html
+# _panel_8f3a2c7d.html agora e publicado (password validada no worker)
 tiktok*.txt
 
 # OS
@@ -27,3 +27,6 @@ desktop.ini
 
 # Logs
 *.log
+
+# Password do painel admin (so no teu PC)
+admin-password.local.txt

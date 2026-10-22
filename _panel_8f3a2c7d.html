@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EuPosto — Admin</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #07070e;
+      --surface:  #0f0f1c;
+      --surface2: #13131f;
+      --surface3: #18182a;
+      --border:   rgba(255,255,255,.07);
+      --accent:   #7c5fff;
+      --accent2:  #b06ef3;
+      --accent-light: #a78bfa;
+      --accent-glow:  rgba(124,95,255,.22);
+      --text:     #eeeef8;
+      --text2:    #9898b8;
+      --muted:    #52526e;
+      --success:  #34d399;
+      --error:    #f87171;
+      --warning:  #fbbf24;
+      --yt:  #ff4444;
+      --ig:  #b06ef3;
+      --fb:  #1877f2;
+      --tt:  #69c9d0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      background-image:
+        radial-gradient(ellipse 80% 55% at 50% -5%, rgba(124,95,255,.16) 0%, transparent 62%),
+        radial-gradient(ellipse 55% 40% at 95% 105%, rgba(176,110,243,.1) 0%, transparent 55%);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Password Gate ── */
+    #gate {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .gate-card {
+      background: linear-gradient(145deg, #12111e 0%, #0d0c19 100%);
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 24px;
+      padding: 48px 40px;
+      width: 100%; max-width: 420px;
+      position: relative;
+      box-shadow: 0 24px 64px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .gate-card::before {
+      content: '';
+      position: absolute; top: 0; left: 40px; right: 40px; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(124,95,255,.5) 30%, rgba(176,110,243,.5) 70%, transparent);
+    }
+    .gate-logo {
+      font-family: 'Space Mono', monospace; font-size: 1.6rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--accent-light), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; text-align: center; margin-bottom: 4px;
+    }
+    .gate-sub {
+      text-align: center; font-size: .8rem; font-family: 'Space Mono', monospace;
+      color: var(--muted); letter-spacing: 2px; text-transform: uppercase;
+      margin-bottom: 36px;
+    }
+    .gate-field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+    .gate-label { font-size: .72rem; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .8px; }
+    .gate-input-wrap {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,.04); border: 1.5px solid rgba(255,255,255,.09);
+      border-radius: 12px; padding: 12px 16px;
+      transition: border-color .22s, box-shadow .22s;
+    }
+    .gate-input-wrap:focus-within {
+      border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,95,255,.14);
+    }
+    .gate-input-wrap input {
+      flex: 1; background: none; border: none; outline: none;
+      color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; font-size: .95rem;
+    }
+    .gate-input-wrap input::placeholder { color: var(--muted); }
+    .gate-eye {
+      background: none; border: none; cursor: pointer; color: var(--muted);
+      display: flex; align-items: center; transition: color .2s;
+    }
+    .gate-eye:hover { color: var(--text); }
+    .gate-eye svg { width: 17px; height: 17px; }
+    .gate-error { font-size: .82rem; color: var(--error); min-height: 18px; font-weight: 600; }
+    .gate-btn {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none; border-radius: 14px; color: #fff;
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: .98rem; font-weight: 700;
+      cursor: pointer; transition: box-shadow .25s, transform .18s, opacity .2s;
+      box-shadow: 0 4px 24px rgba(124,95,255,.38);
+    }
+    .gate-btn:hover { box-shadow: 0 8px 36px rgba(124,95,255,.55); transform: translateY(-2px); }
+
+    /* ── Dashboard ── */
+    #dashboard { display: none; padding: 32px 24px 80px; max-width: 1400px; margin: 0 auto; }
+
+    .dash-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 40px; flex-wrap: wrap; gap: 16px;
+    }
+    .dash-header-left { display: flex; align-items: center; gap: 16px; }
+    .dash-title {
+      font-family: 'Space Mono', monospace; font-size: 1.5rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--accent-light), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; letter-spacing: -1px;
+    }
+    .dash-badge {
+      font-size: .68rem; font-family: 'Space Mono', monospace; text-transform: uppercase;
+      letter-spacing: 2px; background: rgba(124,95,255,.15); border: 1px solid rgba(124,95,255,.3);
+      color: var(--accent-light); padding: 4px 10px; border-radius: 20px;
+    }
+    .dash-actions { display: flex; gap: 10px; align-items: center; }
+    .btn-refresh {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 20px; border-radius: 12px;
+      background: rgba(124,95,255,.12); border: 1.5px solid rgba(124,95,255,.3);
+      color: var(--accent-light); font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .88rem; font-weight: 700; cursor: pointer;
+      transition: background .2s, box-shadow .2s;
+    }
+    .btn-refresh:hover { background: rgba(124,95,255,.2); box-shadow: 0 0 0 3px rgba(124,95,255,.1); }
+    .btn-logout {
+      padding: 10px 18px; border-radius: 12px;
+      background: transparent; border: 1.5px solid rgba(255,255,255,.09);
+      color: var(--muted); font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .88rem; font-weight: 600; cursor: pointer; transition: border-color .2s, color .2s;
+    }
+    .btn-logout:hover { border-color: var(--error); color: var(--error); }
+    .last-refresh { font-size: .75rem; color: var(--muted); font-family: 'Space Mono', monospace; }
+
+    /* ── Stat cards ── */
+    .kpi-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px; margin-bottom: 32px;
+    }
+    .kpi-card {
+      background: linear-gradient(145deg, #12111e 0%, #0d0c19 100%);
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 20px; padding: 24px 22px;
+      position: relative; overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06);
+      transition: border-color .25s, transform .2s;
+    }
+    .kpi-card::before {
+      content: ''; position: absolute; top: 0; left: 20px; right: 20px; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(124,95,255,.5) 30%, rgba(176,110,243,.5) 70%, transparent);
+    }
+    .kpi-card:hover { border-color: rgba(124,95,255,.22); transform: translateY(-2px); }
+    .kpi-icon {
+      width: 40px; height: 40px; border-radius: 12px; margin-bottom: 16px;
+      background: rgba(124,95,255,.12); border: 1px solid rgba(124,95,255,.2);
+      display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    }
+    .kpi-value {
+      font-size: 2.2rem; font-weight: 800; font-family: 'Space Mono', monospace;
+      background: linear-gradient(135deg, var(--accent-light), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; line-height: 1; margin-bottom: 6px;
+    }
+    .kpi-label {
+      font-size: .72rem; color: var(--muted); text-transform: uppercase;
+      letter-spacing: 1.5px; font-weight: 600; font-family: 'Space Mono', monospace;
+    }
+    .kpi-trend { font-size: .78rem; color: var(--text2); margin-top: 8px; }
+    .kpi-trend.up { color: var(--success); }
+
+    /* ── Section header ── */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: .72rem; font-family: 'Space Mono', monospace;
+      text-transform: uppercase; letter-spacing: 2.5px;
+      color: var(--accent-light); opacity: .85;
+      padding-left: 11px; border-left: 2px solid var(--accent);
+    }
+
+    /* ── Users Table ── */
+    .users-card {
+      background: linear-gradient(145deg, #12111e 0%, #0d0c19 100%);
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 20px; padding: 28px 32px;
+      position: relative; margin-bottom: 24px;
+      box-shadow: 0 4px 28px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .users-card::before {
+      content: ''; position: absolute; top: 0; left: 28px; right: 28px; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(124,95,255,.5) 25%, rgba(176,110,243,.5) 75%, transparent);
+    }
+    .users-table { width: 100%; border-collapse: collapse; }
+    .users-table th {
+      text-align: left; font-size: .65rem; font-family: 'Space Mono', monospace;
+      text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted);
+      padding: 0 12px 16px; font-weight: 700; border-bottom: 1px solid var(--border);
+    }
+    .users-table th:first-child { padding-left: 0; }
+    .users-table td {
+      padding: 16px 12px; border-bottom: 1px solid rgba(255,255,255,.05);
+      vertical-align: middle;
+    }
+    .users-table td:first-child { padding-left: 0; }
+    .users-table tr:last-child td { border-bottom: none; }
+    .users-table tr:hover td { background: rgba(124,95,255,.04); }
+
+    .user-cell { display: flex; align-items: center; gap: 12px; }
+    .user-avatar {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .9rem; font-weight: 800; color: #fff;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+    }
+    .user-name { font-weight: 700; font-size: .9rem; color: var(--text); }
+    .user-email { font-size: .75rem; color: var(--muted); margin-top: 2px; }
+
+    .stat-num {
+      font-family: 'Space Mono', monospace; font-weight: 700;
+      font-size: .9rem; color: var(--text);
+    }
+    .stat-num.accent { color: var(--accent-light); }
+
+    .plat-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 20px; font-size: .72rem; font-weight: 700;
+      border: 1px solid currentColor;
+    }
+    .plat-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    .last-seen { font-size: .78rem; color: var(--text2); font-family: 'Space Mono', monospace; }
+    .freq-bar-wrap { display: flex; align-items: center; gap: 8px; }
+    .freq-bar-bg { flex: 1; height: 5px; background: rgba(255,255,255,.08); border-radius: 3px; overflow: hidden; }
+    .freq-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .6s; }
+    .freq-label { font-size: .7rem; color: var(--muted); font-family: 'Space Mono', monospace; white-space: nowrap; }
+
+    /* ── Bottom grid ── */
+    .bottom-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 24px; margin-bottom: 24px;
+    }
+    @media (max-width: 900px) { .bottom-grid { grid-template-columns: 1fr; } }
+
+    .panel-card {
+      background: linear-gradient(145deg, #12111e 0%, #0d0c19 100%);
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 20px; padding: 28px 28px;
+      position: relative;
+      box-shadow: 0 4px 24px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .panel-card::before {
+      content: ''; position: absolute; top: 0; left: 24px; right: 24px; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(124,95,255,.5) 25%, rgba(176,110,243,.5) 75%, transparent);
+    }
+
+    /* Platform bars */
+    .plat-bars { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
+    .plat-bar-row { display: flex; flex-direction: column; gap: 6px; }
+    .plat-bar-header { display: flex; justify-content: space-between; align-items: center; }
+    .plat-bar-name { font-size: .82rem; font-weight: 700; }
+    .plat-bar-count { font-size: .78rem; font-family: 'Space Mono', monospace; color: var(--text2); }
+    .plat-bar-track { height: 8px; background: rgba(255,255,255,.07); border-radius: 4px; overflow: hidden; }
+    .plat-bar-fill { height: 100%; border-radius: 4px; transition: width .8s cubic-bezier(.4,0,.2,1); }
+
+    /* Activity feed */
+    .activity-feed { display: flex; flex-direction: column; gap: 0; margin-top: 20px; }
+    .activity-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px;
+    }
+    .dot-publish { background: var(--success); box-shadow: 0 0 6px rgba(52,211,153,.5); }
+    .dot-session { background: var(--accent); box-shadow: 0 0 6px rgba(124,95,255,.5); }
+    .dot-metrics { background: var(--warning); box-shadow: 0 0 6px rgba(251,191,36,.5); }
+    .activity-body { flex: 1; min-width: 0; }
+    .activity-text { font-size: .84rem; color: var(--text); font-weight: 500; }
+    .activity-text strong { color: var(--accent-light); }
+    .activity-time { font-size: .7rem; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 3px; }
+
+    /* Empty / loading states */
+    .empty-state {
+      text-align: center; padding: 48px 24px;
+      color: var(--muted); font-size: .88rem;
+    }
+    .spinner {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 3px solid rgba(124,95,255,.2);
+      border-top-color: var(--accent);
+      animation: spin .8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-overlay {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; min-height: 200px;
+    }
+
+    @media (max-width: 700px) {
+      #dashboard { padding: 20px 16px 60px; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .users-card { padding: 20px 16px; overflow-x: auto; }
+      .users-table { min-width: 640px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── PASSWORD GATE ── -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="gate-logo">EuPosto</div>
+    <div class="gate-sub">Admin Panel</div>
+
+    <div class="gate-field">
+      <label class="gate-label">Password</label>
+      <div class="gate-input-wrap">
+        <svg style="width:16px;height:16px;flex-shrink:0;color:var(--muted)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input type="password" id="gate-pwd" placeholder="••••••••••" autocomplete="current-password" />
+        <button class="gate-eye" onclick="toggleGatePwd()" tabindex="-1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="gate-error" id="gate-error"></div>
+    <button class="gate-btn" onclick="checkPassword()">Entrar no painel</button>
+  </div>
+</div>
+
+<!-- ── DASHBOARD ── -->
+<div id="dashboard">
+
+  <div class="dash-header">
+    <div class="dash-header-left">
+      <div>
+        <div class="dash-title">EuPosto Analytics</div>
+        <div class="last-refresh" id="last-refresh">A carregar...</div>
+      </div>
+      <span class="dash-badge">Developer Only</span>
+    </div>
+    <div class="dash-actions">
+      <button class="btn-refresh" onclick="loadData()">
+        <svg style="width:14px;height:14px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Atualizar
+      </button>
+      <button class="btn-logout" onclick="logout()">Sair</button>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid" id="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon">👥</div>
+      <div class="kpi-value" id="kpi-users">—</div>
+      <div class="kpi-label">Utilizadores</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">🎬</div>
+      <div class="kpi-value" id="kpi-posts">—</div>
+      <div class="kpi-label">Vídeos publicados</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">👁</div>
+      <div class="kpi-value" id="kpi-views">—</div>
+      <div class="kpi-label">Views totais</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">⚡</div>
+      <div class="kpi-value" id="kpi-sessions">—</div>
+      <div class="kpi-label">Sessões hoje</div>
+    </div>
+  </div>
+
+  <!-- Users Table -->
+  <div class="users-card">
+    <div class="section-header">
+      <div class="section-title">Utilizadores</div>
+    </div>
+    <div id="users-wrap">
+      <div class="loading-overlay"><div class="spinner"></div><div style="color:var(--muted);font-size:.85rem">A carregar dados...</div></div>
+    </div>
+  </div>
+
+  <!-- Bottom grid -->
+  <div class="bottom-grid">
+
+    <!-- Platform distribution -->
+    <div class="panel-card">
+      <div class="section-title">Plataformas mais usadas</div>
+      <div id="plat-chart" class="plat-bars">
+        <div class="loading-overlay"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- Recent activity -->
+    <div class="panel-card">
+      <div class="section-title">Actividade recente</div>
+      <div id="activity-feed" class="activity-feed">
+        <div class="loading-overlay"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── Config ──────────────────────────────────
+const WORKER = 'https://still-cloud-be15.lucasfarianinja.workers.dev';
+
+// ── Access gate ──────────────────────────────
+// The password is checked by the worker, which holds the Supabase key. Nothing
+// here grants access on its own, so knowing this URL is not enough to get in.
+let _pwd = null;
+
+function logout() {
+  _pwd = null;
+  try { sessionStorage.removeItem('_ep_pwd'); } catch (e) {}
+  window.location.replace('/');
+}
+
+function toggleGatePwd() {
+  const el = document.getElementById('gate-pwd');
+  el.type = el.type === 'password' ? 'text' : 'password';
+  el.focus();
+}
+
+async function checkPassword() {
+  const err = document.getElementById('gate-error');
+  const btn = document.querySelector('.gate-btn');
+  const pwd = document.getElementById('gate-pwd').value;
+  if (!pwd) { err.textContent = 'Escreve a password.'; return; }
+  err.textContent = '';
+  btn.disabled = true; btn.textContent = 'A verificar...';
+  try {
+    const events = await fetchEvents(pwd);
+    _pwd = pwd;
+    try { sessionStorage.setItem('_ep_pwd', pwd); } catch (e) {}
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    renderAll(events);
+  } catch (e) {
+    err.textContent = e.message || 'Falhou.';
+    document.getElementById('gate-pwd').select();
+  } finally {
+    btn.disabled = false; btn.textContent = 'Entrar no painel';
+  }
+}
+
+window.addEventListener('DOMContentLoaded', function () {
+  document.getElementById('gate-pwd')
+    .addEventListener('keydown', e => { if (e.key === 'Enter') checkPassword(); });
+  // Stale admin token from an older build — no longer used for anything.
+  try { localStorage.removeItem('_ep_adm'); } catch (e) {}
+  // Carry the password across a refresh within the same tab.
+  let saved = null;
+  try { saved = sessionStorage.getItem('_ep_pwd'); } catch (e) {}
+  if (saved) {
+    document.getElementById('gate-pwd').value = saved;
+    checkPassword();
+  }
+});
+
+// ── Supabase fetch ───────────────────────────
+async function fetchEvents(pwd) {
+  const r = await fetch(WORKER + '?action=admin_stats', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: pwd || _pwd })
+  });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.error || ('Erro ' + r.status));
+  return data.events || [];
+}
+
+// ── Helpers ──────────────────────────────────
+function fmtNum(n) {
+  if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n/1e3).toFixed(1) + 'K';
+  return String(n);
+}
+
+function timeAgo(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1)   return 'agora mesmo';
+  if (m < 60)  return m + 'min atrás';
+  const h = Math.floor(m / 60);
+  if (h < 24)  return h + 'h atrás';
+  const d = Math.floor(h / 24);
+  if (d < 7)   return d + 'd atrás';
+  return new Date(iso).toLocaleDateString('pt-PT');
+}
+
+function escHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Data processing ──────────────────────────
+function processEvents(events) {
+  const users = {};
+
+  events.forEach(e => {
+    const email = e.user_email;
+    if (!users[email]) {
+      users[email] = {
+        email,
+        name: e.user_name || email.split('@')[0],
+        sessions: 0,
+        posts: 0,
+        platforms: {},
+        max_views: 0,
+        max_likes: 0,
+        max_comments: 0,
+        last_seen: e.created_at,
+        first_seen: e.created_at
+      };
+    }
+    const u = users[email];
+    if (new Date(e.created_at) > new Date(u.last_seen))  u.last_seen  = e.created_at;
+    if (new Date(e.created_at) < new Date(u.first_seen)) u.first_seen = e.created_at;
+
+    if (e.event_type === 'session_start')   u.sessions++;
+    if (e.event_type === 'video_published') {
+      u.posts++;
+      const p = e.platforms;
+      if (p) u.platforms[p] = (u.platforms[p] || 0) + 1;
+    }
+    if (e.event_type === 'metrics_refresh') {
+      if ((e.total_views || 0) > u.max_views)     u.max_views    = e.total_views || 0;
+      if ((e.total_likes || 0) > u.max_likes)     u.max_likes    = e.total_likes || 0;
+      if ((e.total_comments || 0) > u.max_comments) u.max_comments = e.total_comments || 0;
+    }
+  });
+
+  return Object.values(users).sort((a, b) => b.posts - a.posts);
+}
+
+function favPlatform(platforms) {
+  let best = null, bestN = 0;
+  Object.entries(platforms).forEach(([p, n]) => { if (n > bestN) { bestN = n; best = p; } });
+  return best;
+}
+
+// ── Render ───────────────────────────────────
+function renderKPIs(events, users) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const sessionsToday = events.filter(e =>
+    e.event_type === 'session_start' && new Date(e.created_at) >= today
+  ).length;
+
+  const totalPosts = events.filter(e => e.event_type === 'video_published').length;
+  const totalViews = users.reduce((s, u) => s + u.max_views, 0);
+
+  document.getElementById('kpi-users').textContent    = fmtNum(users.length);
+  document.getElementById('kpi-posts').textContent    = fmtNum(totalPosts);
+  document.getElementById('kpi-views').textContent    = fmtNum(totalViews);
+  document.getElementById('kpi-sessions').textContent = fmtNum(sessionsToday);
+}
+
+function renderUsers(users) {
+  const wrap = document.getElementById('users-wrap');
+  if (!users.length) {
+    wrap.innerHTML = '<div class="empty-state">Ainda não há utilizadores registados.</div>';
+    return;
+  }
+
+  const maxSessions = Math.max(...users.map(u => u.sessions), 1);
+
+  wrap.innerHTML = `
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>Utilizador</th>
+          <th>Posts</th>
+          <th>Plat. favorita</th>
+          <th>Views</th>
+          <th>Likes</th>
+          <th>Comentários</th>
+          <th>Sessões / frequência</th>
+          <th>Último acesso</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${users.map(u => {
+          const initials = (u.name || u.email).slice(0,2).toUpperCase();
+          const fav = favPlatform(u.platforms);
+          const platColor = fav ? PLAT_COLORS[fav] : 'var(--muted)';
+          const platName  = fav ? PLAT_NAMES[fav] : '—';
+          const freqPct   = Math.round((u.sessions / maxSessions) * 100);
+          return `
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-avatar">${escHtml(initials)}</div>
+                  <div>
+                    <div class="user-name">${escHtml(u.name)}</div>
+                    <div class="user-email">${escHtml(u.email)}</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="stat-num accent">${u.posts}</span></td>
+              <td>
+                ${fav ? `<span class="plat-pill" style="color:${platColor}"><span class="plat-dot"></span>${platName}</span>` : '<span style="color:var(--muted);font-size:.8rem">—</span>'}
+              </td>
+              <td><span class="stat-num">${fmtNum(u.max_views)}</span></td>
+              <td><span class="stat-num">${fmtNum(u.max_likes)}</span></td>
+              <td><span class="stat-num">${fmtNum(u.max_comments)}</span></td>
+              <td>
+                <div class="freq-bar-wrap">
+                  <div class="freq-bar-bg"><div class="freq-bar-fill" style="width:${freqPct}%"></div></div>
+                  <span class="freq-label">${u.sessions} sess.</span>
+                </div>
+              </td>
+              <td><span class="last-seen">${timeAgo(u.last_seen)}</span></td>
+            </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+}
+
+function renderPlatformChart(events) {
+  const counts = { yt: 0, ig: 0, fb: 0, tt: 0 };
+  events.filter(e => e.event_type === 'video_published').forEach(e => {
+    if (counts[e.platforms] !== undefined) counts[e.platforms]++;
+  });
+  const max = Math.max(...Object.values(counts), 1);
+  const chart = document.getElementById('plat-chart');
+  if (Object.values(counts).every(n => n === 0)) {
+    chart.innerHTML = '<div class="empty-state" style="padding:24px 0">Sem dados de publicações ainda.</div>';
+    return;
+  }
+  chart.innerHTML = Object.entries(counts)
+    .sort((a,b) => b[1]-a[1])
+    .map(([p, n]) => `
+      <div class="plat-bar-row">
+        <div class="plat-bar-header">
+          <span class="plat-bar-name" style="color:${PLAT_COLORS[p]}">${PLAT_NAMES[p]}</span>
+          <span class="plat-bar-count">${n} post${n!==1?'s':''}</span>
+        </div>
+        <div class="plat-bar-track">
+          <div class="plat-bar-fill" style="width:${Math.round((n/max)*100)}%;background:${PLAT_COLORS[p]}"></div>
+        </div>
+      </div>`).join('');
+}
+
+function renderActivity(events) {
+  const feed = document.getElementById('activity-feed');
+  const recent = events.slice(0, 20);
+  if (!recent.length) {
+    feed.innerHTML = '<div class="empty-state" style="padding:24px 0">Sem actividade ainda.</div>';
+    return;
+  }
+  feed.innerHTML = recent.map(e => {
+    let dotClass = 'dot-session', text = '';
+    if (e.event_type === 'session_start') {
+      dotClass = 'dot-session';
+      text = `<strong>${escHtml(e.user_name || e.user_email)}</strong> entrou na app`;
+    } else if (e.event_type === 'video_published') {
+      dotClass = 'dot-publish';
+      const platName = PLAT_NAMES[e.platforms] || e.platforms;
+      text = `<strong>${escHtml(e.user_name || e.user_email)}</strong> publicou no ${platName}${e.video_title ? ` — <em style="color:var(--muted)">${escHtml(e.video_title.slice(0,40))}</em>` : ''}`;
+    } else if (e.event_type === 'metrics_refresh') {
+      dotClass = 'dot-metrics';
+      text = `<strong>${escHtml(e.user_name || e.user_email)}</strong> atualizou métricas (${fmtNum(e.total_views||0)} views)`;
+    }
+    return `
+      <div class="activity-item">
+        <div class="activity-dot ${dotClass}"></div>
+        <div class="activity-body">
+          <div class="activity-text">${text}</div>
+          <div class="activity-time">${timeAgo(e.created_at)}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── Load all data ────────────────────────────
+function renderAll(events) {
+  const users = processEvents(events);
+  renderKPIs(events, users);
+  renderUsers(users);
+  renderPlatformChart(events);
+  renderActivity(events);
+  document.getElementById('last-refresh').textContent =
+    'Atualizado as ' + new Date().toLocaleTimeString('pt-PT');
+}
+
+async function loadData() {
+  document.getElementById('last-refresh').textContent = 'A carregar...';
+  try {
+    renderAll(await fetchEvents());
+  } catch (err) {
+    document.getElementById('last-refresh').textContent = 'Erro ao carregar: ' + err.message;
+    document.getElementById('users-wrap').innerHTML =
+      '<div class="empty-state">Erro ao carregar dados.<br><small style="color:var(--error)">'
+      + err.message + '</small></div>';
+  }
+}
+</script>
+</body>
+</html>

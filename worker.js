@@ -15,6 +15,8 @@ var IG_APP_ID = "1736364031132996";
 var IG_CLIENT_SECRET = "f46a15a30cacf3030ee9a324ff80ef68";
 var TT_CLIENT_SECRET = "nG83QfTZxOCv1jWCMuuT4lMhthKVNdq9";
 var JOBS_KEY = "euposto_jobs";
+var SUPA_URL = "https://pwvtipxxyrtqgqdahrdr.supabase.co";
+var SUPA_KEY = "sb_publishable_nb0dYYtY-NDezaiU4VzKPg_AL7G0lZj";
 
 var worker_default = {
   async fetch(request, env) {
@@ -35,6 +37,7 @@ var worker_default = {
         case "tt_user":    res = await ttUser(url); break;
         case "tt_init":    res = await ttInit(request); break;
         case "tt_status":  res = await ttStatus(request); break;
+        case "admin_stats": res = await adminStats(request, env); break;
         case "r2-presign": res = await r2Presign(url); break;
         case "queue_jobs": res = await queueJobs(request, env); break;
         case "get_jobs":   res = await getJobs(url, env); break;
@@ -497,6 +500,39 @@ __name(signingKey, "signingKey");
 
 var enc = __name((s) => new TextEncoder().encode(s), "enc");
 var hex = __name((b) => [...new Uint8Array(b instanceof ArrayBuffer ? b : b)].map((x) => x.toString(16).padStart(2, "0")).join(""), "hex");
+
+
+// Admin panel data. The Supabase key lives here, not in the panel, so the
+// analytics rows are only reachable with the right password. ADMIN_PASSWORD is
+// a Cloudflare secret: with it unset the endpoint stays shut.
+async function adminStats(req, env) {
+  if (req.method !== "POST") return json({ error: "POST only" }, 405);
+  const expected = env.ADMIN_PASSWORD;
+  if (!expected) return json({ error: "Painel desativado: ADMIN_PASSWORD nao definida." }, 503);
+
+  let body = {};
+  try { body = await req.json(); } catch (e) {}
+  const given = typeof body.password === "string" ? body.password : "";
+
+  // Constant-time-ish compare so the response time says nothing about the password.
+  let diff = given.length ^ expected.length;
+  for (let i = 0; i < Math.max(given.length, expected.length); i++) {
+    diff |= (given.charCodeAt(i) || 0) ^ (expected.charCodeAt(i) || 0);
+  }
+  if (diff !== 0) {
+    await new Promise(r => setTimeout(r, 400)); // slow brute force down
+    return json({ error: "Password incorreta." }, 401);
+  }
+
+  const url = SUPA_URL + "/rest/v1/analytics_events"
+    + "?select=*&order=created_at.desc&limit=2000";
+  const r = await fetch(url, {
+    headers: { apikey: SUPA_KEY, Authorization: "Bearer " + SUPA_KEY }
+  });
+  if (!r.ok) return json({ error: "Supabase " + r.status }, 502);
+  return json({ events: await r.json() });
+}
+__name(adminStats, "adminStats");
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {

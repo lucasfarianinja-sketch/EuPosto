@@ -7752,7 +7752,8 @@ function showCopyrightResult(data) {
 function openAdminPanel(e) {
   e.preventDefault();
   if (!currentUser) return;
-  localStorage.setItem('_ep_adm', JSON.stringify({ email: currentUser.email, ts: Date.now() }));
+  // The panel asks for its own password, checked by the worker. Hiding this
+  // button is only tidiness — it is not what keeps other people out.
   window.open('/_panel_8f3a2c7d.html', '_blank');
 }
 
