@@ -294,6 +294,10 @@
       --accent-light: #60A5FA;
       --accent2: #38BDF8;
       --accent-glow: rgba(37,99,235,.25);
+      /* Yellow accent — mirrors the landing page: section labels and highlights */
+      --yellow: #FACC15;
+      --yellow-deep: #EAB308;
+      --yellow-glow: rgba(250,204,21,.14);
       --text: #f0f0fa;
       --text2: #8888a8;
       --muted: #50506e;
@@ -1919,9 +1923,12 @@
     }
     .home-stat { flex: 1; text-align: center; padding: 18px 12px; }
     .home-stat-num { font-family: 'Space Mono', monospace; font-size: 1.4rem; font-weight: 700; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    /* The streak stat runs yellow so it reads apart from the blue counters.
+       Set background-image, not background — the shorthand would reset background-clip. */
+    .home-stat:last-child .home-stat-num { background-image: linear-gradient(135deg, var(--yellow-deep), var(--yellow)); }
     .home-stat-lbl { font-size: .72rem; color: var(--muted); margin-top: 3px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
     .home-stat-sep { width: 1px; height: 40px; background: var(--border); flex-shrink: 0; }
-    .home-section-label { font-size: .70rem; font-weight: 800; letter-spacing: 1.3px; text-transform: uppercase; color: var(--text2); padding-left: 2px; margin-top: 8px; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+    .home-section-label { font-size: .70rem; font-weight: 800; letter-spacing: 1.3px; text-transform: uppercase; color: var(--yellow-deep); padding-left: 2px; margin-top: 8px; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
     .home-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .home-action-card {
       display: flex; align-items: center; gap: 14px;
@@ -2010,7 +2017,7 @@
     .settings-section { display: flex; flex-direction: column; gap: 10px; }
     .settings-section-label {
       font-size: .68rem; font-weight: 700; letter-spacing: 1.2px;
-      text-transform: uppercase; color: var(--muted);
+      text-transform: uppercase; color: var(--yellow-deep);
       padding-left: 4px;
     }
     .settings-card {
